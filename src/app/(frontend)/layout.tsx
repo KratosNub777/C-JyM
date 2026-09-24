@@ -34,15 +34,15 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <div className="relative mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.png"
                 alt="Comercial José María"
-                width={160}
-                height={80}
+                width={220}
+                height={110}
                 priority
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
             </Link>
 
