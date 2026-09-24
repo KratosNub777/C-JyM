@@ -25,10 +25,10 @@ export default async function ProductsPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Productos</h1>
+      <h1 className="mb-6 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Productos</h1>
 
       {products.length === 0 ? (
-        <p className="text-neutral-500">No hay productos para mostrar.</p>
+        <p className="text-neutral-500 dark:text-neutral-400">No hay productos para mostrar.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
@@ -44,13 +44,13 @@ export default async function ProductsPage({
             aria-disabled={!hasPrevPage}
             className={
               hasPrevPage
-                ? 'font-medium text-neutral-700 hover:text-neutral-900'
-                : 'pointer-events-none text-neutral-300'
+                ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
+                : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
             }
           >
             ← Anterior
           </Link>
-          <span className="text-neutral-500">
+          <span className="text-neutral-500 dark:text-neutral-400">
             Página {page} de {totalPages}
           </span>
           <Link
@@ -58,8 +58,8 @@ export default async function ProductsPage({
             aria-disabled={!hasNextPage}
             className={
               hasNextPage
-                ? 'font-medium text-neutral-700 hover:text-neutral-900'
-                : 'pointer-events-none text-neutral-300'
+                ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
+                : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
             }
           >
             Siguiente →

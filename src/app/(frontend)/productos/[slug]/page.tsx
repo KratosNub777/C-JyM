@@ -1,3 +1,4 @@
+import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -37,7 +38,7 @@ export default async function ProductPage({
   return (
     <div className="grid gap-8 md:grid-cols-2">
       <div className="flex flex-col gap-3">
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-100">
+        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
           {images[0]?.url ? (
             <Image
               src={images[0].url}
@@ -48,8 +49,9 @@ export default async function ProductPage({
               priority
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-neutral-400">
-              Sin imagen
+            <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-300 dark:text-neutral-600">
+              <ImageSquare size={36} weight="light" />
+              <span className="text-xs text-neutral-400 dark:text-neutral-500">Sin imagen</span>
             </div>
           )}
         </div>
@@ -58,7 +60,7 @@ export default async function ProductPage({
             {images.slice(1).map((image) => (
               <div
                 key={image.id}
-                className="relative aspect-square overflow-hidden rounded-md bg-neutral-100"
+                className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800"
               >
                 <Image
                   src={image.url ?? ''}
@@ -77,24 +79,34 @@ export default async function ProductPage({
         {category && (
           <Link
             href={`/categorias/${category.slug}`}
-            className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
+            className="text-sm font-medium text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             {category.name}
           </Link>
         )}
-        <h1 className="mt-1 text-2xl font-bold">{product.name}</h1>
-        {product.brand && <p className="mt-1 text-neutral-500">{product.brand}</p>}
-        <p className="mt-4 text-3xl font-bold">{formatUsd(product.priceUsd)}</p>
+        <h1 className="mt-1 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+          {product.name}
+        </h1>
+        {product.brand && (
+          <p className="mt-1 text-neutral-500 dark:text-neutral-400">{product.brand}</p>
+        )}
+        <p className="mt-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          {formatUsd(product.priceUsd)}
+        </p>
         {product.priceGs && (
-          <p className="text-neutral-500">Gs. {product.priceGs.toLocaleString('es-PY')}</p>
+          <p className="text-neutral-500 dark:text-neutral-400">
+            Gs. {product.priceGs.toLocaleString('es-PY')}
+          </p>
         )}
 
-        <p className="mt-2 text-sm text-neutral-500">
+        <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
           {product.stock > 0 ? `${product.stock} disponibles` : 'Sin stock'}
         </p>
 
         {product.description && (
-          <div className="mt-6 whitespace-pre-line text-neutral-700">{product.description}</div>
+          <div className="mt-6 whitespace-pre-line text-neutral-700 dark:text-neutral-300">
+            {product.description}
+          </div>
         )}
       </div>
     </div>

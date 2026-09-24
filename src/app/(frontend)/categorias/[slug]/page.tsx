@@ -34,10 +34,14 @@ export default async function CategoryPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">{category.name}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+        {category.name}
+      </h1>
 
       {products.length === 0 ? (
-        <p className="text-neutral-500">No hay productos en esta categoría todavía.</p>
+        <p className="text-neutral-500 dark:text-neutral-400">
+          No hay productos en esta categoría todavía.
+        </p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
