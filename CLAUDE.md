@@ -50,7 +50,7 @@ Cada fase es independiente y facturable por separado. El detalle de alcance/prec
 
 ## Convenciones
 
-- Precios de producto: guardar en USD (`priceUsd`, obligatorio) y opcionalmente Gs (`priceGs`).
+- Precios de producto: **solo guaraníes** (`price`, obligatorio). No se maneja USD — se descartó explícitamente, la empresa no vende en dólares.
 - Variable de entorno de conexión a la base: **`DATABASE_URL`** (no `DATABASE_URI` — así la nombra el adaptador `@payloadcms/db-postgres` generado por `create-payload-app`).
 - Base de datos de desarrollo: Neon (cloud), no local — ver `.env.example`. El usuario gestiona su propia cuenta Neon; el connection string real vive solo en `.env` (gitignored).
 
@@ -73,7 +73,7 @@ src/
     Users.ts              # usuarios admin del CMS (no confundir con clientes — eso es Fase 2/Better Auth)
     Media.ts              # uploads (imágenes de producto)
     Categories.ts          # categorías, soporta jerarquía vía campo `parent`
-    Products.ts             # productos: precio USD/Gs, stock, categoría, imágenes, status
+    Products.ts             # productos: precio en Gs., stock, categoría, imágenes, status
   components/
     ProductCard.tsx        # tarjeta de producto reutilizada en home/listado/categoría
   lib/

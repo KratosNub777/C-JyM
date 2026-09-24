@@ -21,7 +21,7 @@ export function Hero() {
         </h1>
         <p className="max-w-md text-base text-white/80">
           Heladeras, cocinas, lavarropas y más, con la confianza de siempre. Precios claros en
-          USD y guaraníes.
+          guaraníes.
         </p>
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <Link

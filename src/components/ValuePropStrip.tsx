@@ -14,7 +14,7 @@ const items = [
   {
     icon: CreditCard,
     title: 'Precios claros',
-    body: 'En dólares y guaraníes, sin sorpresas.',
+    body: 'En guaraníes, sin sorpresas.',
   },
   {
     icon: Headset,
