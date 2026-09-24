@@ -18,8 +18,10 @@ export default async function HomePage() {
     }),
     payload.find({
       collection: 'categories',
+      where: { parent: { exists: true } },
       limit: 9,
       sort: 'name',
+      depth: 0,
     }),
   ])
 
