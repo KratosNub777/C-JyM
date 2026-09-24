@@ -50,7 +50,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="relative mx-auto flex h-24 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <div className="relative mx-auto flex h-24 max-w-7xl items-center px-4 sm:px-6">
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.png"
@@ -62,14 +62,23 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               />
             </Link>
 
-            <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />
+            <div className="ml-auto flex items-center gap-8">
+              <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />
 
-            <Link
-              href="/productos"
-              className="hidden text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-900 md:block dark:text-neutral-300 dark:hover:text-white"
-            >
-              Productos
-            </Link>
+              <Link
+                href="/ofertas"
+                className="hidden text-sm font-medium text-brand-green-600 transition-colors hover:text-brand-green-700 md:block dark:text-brand-green-100 dark:hover:text-white"
+              >
+                Ofertas
+              </Link>
+
+              <Link
+                href="/productos"
+                className="hidden text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-900 md:block dark:text-neutral-300 dark:hover:text-white"
+              >
+                Productos
+              </Link>
+            </div>
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
