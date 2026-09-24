@@ -18,7 +18,7 @@ export default async function HomePage() {
     }),
     payload.find({
       collection: 'categories',
-      limit: 6,
+      limit: 9,
       sort: 'name',
     }),
   ])
