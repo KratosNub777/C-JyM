@@ -23,22 +23,31 @@ export default async function HomePage() {
     }),
   ])
 
-  const categoriesWithCount = (
-    await Promise.all(
-      categories.map(async (category) => {
-        const { totalDocs } = await payload.count({
-          collection: 'products',
-          where: { category: { equals: category.id }, status: { equals: 'active' } },
-        })
-        return {
-          id: category.id,
-          name: category.name,
-          slug: category.slug,
-          productCount: totalDocs,
-        }
-      }),
-    )
-  ).sort((a, b) => b.productCount - a.productCount)
+  const { docs: activeProductCategories } = await payload.find({
+    collection: 'products',
+    where: { status: { equals: 'active' } },
+    limit: 2000,
+    depth: 0,
+    select: { category: true },
+  })
+
+  const countsByCategory = activeProductCategories.reduce<Record<number, number>>(
+    (counts, product) => {
+      const categoryId = product.category as number
+      counts[categoryId] = (counts[categoryId] ?? 0) + 1
+      return counts
+    },
+    {},
+  )
+
+  const categoriesWithCount = categories
+    .map((category) => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      productCount: countsByCategory[category.id] ?? 0,
+    }))
+    .sort((a, b) => b.productCount - a.productCount)
 
   return (
     <div className="flex flex-col gap-16">
