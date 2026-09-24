@@ -17,7 +17,7 @@ export function Hero() {
 
       <div className="relative flex h-full max-w-lg flex-col justify-center gap-5 px-6 sm:px-10 md:px-14">
         <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
-          Todo para renovar tu hogar.
+          En tu hogar todos los días.
         </h1>
         <p className="max-w-md text-base text-white/80">
           Heladeras, cocinas, lavarropas y más, con la confianza de siempre. Precios claros en
