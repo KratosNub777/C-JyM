@@ -4,11 +4,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import type { Category, Media } from '@/payload-types'
+import { formatGs } from '@/lib/format'
 import { getPayloadClient } from '@/lib/payload'
-
-function formatUsd(value: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
-}
 
 export default async function ProductPage({
   params,
@@ -91,13 +88,8 @@ export default async function ProductPage({
           <p className="mt-1 text-neutral-500 dark:text-neutral-400">{product.brand}</p>
         )}
         <p className="mt-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          {formatUsd(product.priceUsd)}
+          {formatGs(product.price)}
         </p>
-        {product.priceGs && (
-          <p className="text-neutral-500 dark:text-neutral-400">
-            Gs. {product.priceGs.toLocaleString('es-PY')}
-          </p>
-        )}
 
         <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
           {product.stock > 0 ? `${product.stock} disponibles` : 'Sin stock'}

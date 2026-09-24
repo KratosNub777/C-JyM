@@ -199,11 +199,7 @@ export interface Product {
   brand?: string | null;
   category: number | Category;
   images?: (number | Media)[] | null;
-  priceUsd: number;
-  /**
-   * Opcional: si se deja vacío, se puede calcular desde el USD
-   */
-  priceGs?: number | null;
+  price: number;
   stock: number;
   status: 'active' | 'inactive';
   updatedAt: string;
@@ -354,8 +350,7 @@ export interface ProductsSelect<T extends boolean = true> {
   brand?: T;
   category?: T;
   images?: T;
-  priceUsd?: T;
-  priceGs?: T;
+  price?: T;
   stock?: T;
   status?: T;
   updatedAt?: T;

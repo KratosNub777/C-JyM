@@ -3,10 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Media, Product } from '@/payload-types'
-
-function formatUsd(value: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
-}
+import { formatGs } from '@/lib/format'
 
 export function ProductCard({ product }: { product: Product }) {
   const firstImage = product.images?.[0]
@@ -43,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.name}
         </h3>
         <p className="mt-auto text-base font-semibold text-neutral-900 dark:text-neutral-100">
-          {formatUsd(product.priceUsd)}
+          {formatGs(product.price)}
         </p>
       </div>
     </Link>

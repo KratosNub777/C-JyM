@@ -4,7 +4,7 @@ export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'priceUsd', 'stock', 'status'],
+    defaultColumns: ['name', 'category', 'price', 'stock', 'status'],
   },
   access: {
     read: () => true,
@@ -45,25 +45,11 @@ export const Products: CollectionConfig = {
       hasMany: true,
     },
     {
-      type: 'row',
-      fields: [
-        {
-          name: 'priceUsd',
-          label: 'Precio (USD)',
-          type: 'number',
-          required: true,
-          min: 0,
-        },
-        {
-          name: 'priceGs',
-          label: 'Precio (Gs)',
-          type: 'number',
-          min: 0,
-          admin: {
-            description: 'Opcional: si se deja vacío, se puede calcular desde el USD',
-          },
-        },
-      ],
+      name: 'price',
+      label: 'Precio (Gs.)',
+      type: 'number',
+      required: true,
+      min: 0,
     },
     {
       name: 'stock',
