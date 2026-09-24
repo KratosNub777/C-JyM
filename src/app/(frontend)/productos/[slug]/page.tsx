@@ -1,8 +1,9 @@
-import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
+import { ImageSquare, ShoppingCart } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { InstallmentBreakdown } from '@/components/InstallmentBreakdown'
 import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getPayloadClient } from '@/lib/payload'
@@ -31,6 +32,9 @@ export default async function ProductPage({
   const images = (product.images ?? []).filter(
     (image): image is Media => typeof image === 'object',
   )
+
+  const hasDiscount = !!product.compareAtPrice && product.compareAtPrice > product.price
+  const inStock = product.stock > 0
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
@@ -72,31 +76,65 @@ export default async function ProductPage({
         )}
       </div>
 
-      <div>
-        {category && (
-          <Link
-            href={`/categorias/${category.slug}`}
-            className="text-sm font-medium text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
-          >
-            {category.name}
-          </Link>
-        )}
-        <h1 className="mt-1 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-          {product.name}
-        </h1>
-        {product.brand && (
-          <p className="mt-1 text-neutral-500 dark:text-neutral-400">{product.brand}</p>
-        )}
-        <p className="mt-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          {formatGs(product.price)}
-        </p>
+      <div className="flex flex-col gap-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            {category && (
+              <Link
+                href={`/categorias/${category.slug}`}
+                className="text-sm font-medium text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+              >
+                {category.name}
+              </Link>
+            )}
+            <span
+              className={
+                inStock
+                  ? 'text-sm font-medium text-brand-green-600 dark:text-brand-green-100'
+                  : 'text-sm font-medium text-neutral-400 dark:text-neutral-500'
+              }
+            >
+              {inStock ? 'En stock' : 'Sin stock'}
+            </span>
+          </div>
 
-        <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-          {product.stock > 0 ? `${product.stock} disponibles` : 'Sin stock'}
-        </p>
+          <h1 className="mt-1 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+            {product.name}
+          </h1>
+
+          <div className="mt-1 flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+            {product.brand && <span>{product.brand}</span>}
+            {product.sku && <span>COD: {product.sku}</span>}
+          </div>
+        </div>
+
+        <div>
+          {hasDiscount && (
+            <p className="text-base text-neutral-400 line-through dark:text-neutral-500">
+              {formatGs(product.compareAtPrice!)}
+            </p>
+          )}
+          <p className="text-sm font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+            Precio contado
+          </p>
+          <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            {formatGs(product.price)}
+          </p>
+        </div>
+
+        <InstallmentBreakdown price={product.price} compareAtPrice={product.compareAtPrice} />
+
+        <button
+          type="button"
+          disabled
+          className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white opacity-50"
+        >
+          <ShoppingCart size={18} weight="bold" />
+          Agregar al carrito (próximamente)
+        </button>
 
         {product.description && (
-          <div className="mt-6 whitespace-pre-line text-neutral-700 dark:text-neutral-300">
+          <div className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">
             {product.description}
           </div>
         )}
