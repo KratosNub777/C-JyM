@@ -23,10 +23,19 @@ export default async function CategoryPage({
     notFound()
   }
 
+  const { docs: childCategories } = await payload.find({
+    collection: 'categories',
+    where: { parent: { equals: category.id } },
+    limit: 50,
+    depth: 0,
+  })
+
+  const categoryIds = [category.id, ...childCategories.map((child) => child.id)]
+
   const { docs: products } = await payload.find({
     collection: 'products',
     where: {
-      and: [{ category: { equals: category.id } }, { status: { equals: 'active' } }],
+      and: [{ category: { in: categoryIds } }, { status: { equals: 'active' } }],
     },
     limit: 24,
     sort: '-createdAt',
