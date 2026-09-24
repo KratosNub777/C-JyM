@@ -6,6 +6,7 @@ import {
   CaretRight,
   CookingPot,
   Fan,
+  GridFour,
   List,
   Snowflake,
   Television,
@@ -84,9 +85,14 @@ export function HeaderNav({
           <button
             type="button"
             onClick={() => setDesktopOpen((value) => !value)}
-            className="flex items-center gap-1 transition-colors hover:text-neutral-900 dark:hover:text-white"
+            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+              desktopOpen
+                ? 'border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400'
+                : 'border-neutral-300 text-neutral-700 hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600 dark:hover:text-white'
+            }`}
             aria-expanded={desktopOpen}
           >
+            <GridFour size={16} weight="bold" />
             Categorías
             <CaretDown size={14} weight="bold" className={desktopOpen ? 'rotate-180' : ''} />
           </button>

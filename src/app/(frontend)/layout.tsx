@@ -1,4 +1,4 @@
-import { Clock } from '@phosphor-icons/react/dist/ssr'
+import { Clock, Tag } from '@phosphor-icons/react/dist/ssr'
 import { GeistSans } from 'geist/font/sans'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -67,8 +67,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
               <Link
                 href="/ofertas"
-                className="hidden text-sm font-medium text-brand-green-600 transition-colors hover:text-brand-green-700 md:block dark:text-brand-green-100 dark:hover:text-white"
+                className="hidden items-center gap-1.5 rounded-full bg-brand-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-green-700 md:flex"
               >
+                <Tag size={16} weight="fill" />
                 Ofertas
               </Link>
 
