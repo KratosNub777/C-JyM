@@ -2,9 +2,11 @@
 
 ## Qué es esto
 
-Plataforma de catálogo e-commerce para una empresa comercial paraguaya (mediana-grande), enfocada en compras internacionales. Catálogo amplio: ~1.000 productos. Referencia de escala/estilo: tupi.com.py, pero a menor escala.
+Plataforma de catálogo e-commerce para **Comercial José María** (@jmcomercialpy en Instagram, atom.bio/comercialjosemaria08), una casa de **electrodomésticos** paraguaya (heladeras, cocinas, lavarropas, televisores, climatización, pequeños electrodomésticos — marcas propias del rubro: Tokyo, Jam, Philco). Empresa mediana-grande, catálogo amplio: ~1.000 productos. Referencia de escala/estilo: tupi.com.py, pero a menor escala.
 
 Arranca como catálogo visual (sin compra). Login y checkout con pagos reales se agregan en fases posteriores.
+
+**Nota:** la instrucción original de este archivo decía "enfocada en compras internacionales" — eso era una suposición inicial sobre el rubro (se pensó en un catálogo tipo Apple/tecnología). Al revisar el Instagram real de la empresa se confirmó que es una casa de electrodomésticos de venta local, no un importador internacional. El catálogo mock actual (categorías y ~17 productos) ya refleja esto. Si en el futuro se confirma que sí hacen importación directa, ajustar esta sección y el copy de `ValuePropStrip`.
 
 Repo: https://github.com/KratosNub777/C-JyM.git
 
