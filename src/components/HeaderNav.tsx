@@ -16,6 +16,22 @@ export function HeaderNav({ categories }: { categories: CategoryLink[] }) {
   const [desktopOpen, setDesktopOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const desktopMenuRef = useRef<HTMLDivElement>(null)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function openDesktopMenu() {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    setDesktopOpen(true)
+  }
+
+  function scheduleCloseDesktopMenu() {
+    closeTimeoutRef.current = setTimeout(() => setDesktopOpen(false), 150)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!desktopOpen) return
@@ -43,7 +59,12 @@ export function HeaderNav({ categories }: { categories: CategoryLink[] }) {
           </Link>
         ))}
 
-        <div className="relative" ref={desktopMenuRef}>
+        <div
+          className="relative"
+          ref={desktopMenuRef}
+          onMouseEnter={openDesktopMenu}
+          onMouseLeave={scheduleCloseDesktopMenu}
+        >
           <button
             type="button"
             onClick={() => setDesktopOpen((value) => !value)}
