@@ -3,13 +3,13 @@ import { CreditCard, Headset, ShieldCheck, Truck } from '@phosphor-icons/react/d
 const items = [
   {
     icon: Truck,
-    title: 'Envío internacional',
-    body: 'Importamos directo a Paraguay.',
+    title: 'Envío a domicilio',
+    body: 'Te lo llevamos hasta tu casa.',
   },
   {
     icon: ShieldCheck,
-    title: 'Compra protegida',
-    body: 'Garantía en todos los productos.',
+    title: 'Garantía de fábrica',
+    body: 'En todos nuestros electrodomésticos.',
   },
   {
     icon: CreditCard,
@@ -18,8 +18,8 @@ const items = [
   },
   {
     icon: Headset,
-    title: 'Soporte real',
-    body: 'Te ayudamos antes y después de comprar.',
+    title: 'Atención de confianza',
+    body: 'La misma de siempre, ahora también online.',
   },
 ]
 
