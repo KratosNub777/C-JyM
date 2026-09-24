@@ -25,6 +25,14 @@ export const Products: CollectionConfig = {
       },
     },
     {
+      name: 'sku',
+      label: 'Código (SKU)',
+      type: 'text',
+      admin: {
+        description: 'Código interno del producto, ej: 211582',
+      },
+    },
+    {
       name: 'description',
       type: 'textarea',
     },
@@ -46,10 +54,19 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'price',
-      label: 'Precio (Gs.)',
+      label: 'Precio contado (Gs.)',
       type: 'number',
       required: true,
       min: 0,
+    },
+    {
+      name: 'compareAtPrice',
+      label: 'Precio de lista (Gs.), opcional',
+      type: 'number',
+      min: 0,
+      admin: {
+        description: 'Precio tachado antes del descuento. Dejar vacío si no hay descuento.',
+      },
     },
     {
       name: 'stock',

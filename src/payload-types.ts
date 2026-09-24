@@ -195,11 +195,19 @@ export interface Product {
    * Usado en la URL, ej: /productos/iphone-15
    */
   slug: string;
+  /**
+   * Código interno del producto, ej: 211582
+   */
+  sku?: string | null;
   description?: string | null;
   brand?: string | null;
   category: number | Category;
   images?: (number | Media)[] | null;
   price: number;
+  /**
+   * Precio tachado antes del descuento. Dejar vacío si no hay descuento.
+   */
+  compareAtPrice?: number | null;
   stock: number;
   status: 'active' | 'inactive';
   updatedAt: string;
@@ -346,11 +354,13 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface ProductsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  sku?: T;
   description?: T;
   brand?: T;
   category?: T;
   images?: T;
   price?: T;
+  compareAtPrice?: T;
   stock?: T;
   status?: T;
   updatedAt?: T;

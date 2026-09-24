@@ -6,6 +6,11 @@
   --color-brand-400: #2ba0c4;
   --color-brand-600: #117ca2;
   --color-brand-700: #0e6483;
+
+  --color-brand-green-50: #e9f7ee;
+  --color-brand-green-100: #cbeed8;
+  --color-brand-green-600: #078038;
+  --color-brand-green-700: #06692e;
 }
 
 @keyframes fade-up {
