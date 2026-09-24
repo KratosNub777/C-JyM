@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-brand-50: #eef7fa;
+  --color-brand-100: #d3ecf3;
+  --color-brand-400: #2ba0c4;
+  --color-brand-600: #117ca2;
+  --color-brand-700: #0e6483;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
