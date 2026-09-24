@@ -1,4 +1,4 @@
-import { Clock, Tag } from '@phosphor-icons/react/dist/ssr'
+import { Clock, MagnifyingGlass, Tag } from '@phosphor-icons/react/dist/ssr'
 import { GeistSans } from 'geist/font/sans'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -61,6 +61,28 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 className="h-20 w-auto"
               />
             </Link>
+
+            <form
+              action="/buscar"
+              method="get"
+              className="mx-4 hidden max-w-md flex-1 sm:flex"
+            >
+              <div className="relative w-full">
+                <input
+                  type="search"
+                  name="q"
+                  placeholder="Buscar productos..."
+                  className="w-full rounded-full border border-neutral-300 bg-white py-2 pl-4 pr-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-brand-600 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+                <button
+                  type="submit"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+                  aria-label="Buscar"
+                >
+                  <MagnifyingGlass size={18} weight="bold" />
+                </button>
+              </div>
+            </form>
 
             <div className="ml-auto flex items-center gap-8">
               <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />

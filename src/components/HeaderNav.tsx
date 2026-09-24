@@ -8,6 +8,7 @@ import {
   Fan,
   GridFour,
   List,
+  MagnifyingGlass,
   Snowflake,
   Television,
   X,
@@ -162,6 +163,23 @@ export function HeaderNav({
 
       {mobileOpen && (
         <div className="absolute inset-x-0 top-full z-50 max-h-[70vh] overflow-y-auto border-b border-neutral-200 bg-white px-4 py-4 shadow-lg md:hidden dark:border-neutral-800 dark:bg-neutral-900">
+          <form action="/buscar" method="get" className="mb-4 sm:hidden">
+            <div className="relative w-full">
+              <input
+                type="search"
+                name="q"
+                placeholder="Buscar productos..."
+                className="w-full rounded-full border border-neutral-300 bg-white py-2 pl-4 pr-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-brand-600 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+              />
+              <button
+                type="submit"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 dark:text-neutral-400"
+                aria-label="Buscar"
+              >
+                <MagnifyingGlass size={18} weight="bold" />
+              </button>
+            </div>
+          </form>
           <div className="flex flex-col gap-1">
             {topLevelCategories.map((category) => {
               const Icon = ICONS_BY_SLUG[category.slug]
