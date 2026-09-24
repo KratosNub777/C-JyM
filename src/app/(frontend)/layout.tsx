@@ -21,7 +21,23 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     collection: 'categories',
     limit: 50,
     sort: 'name',
+    depth: 0,
   })
+
+  const topLevelCategories = categories
+    .filter((category) => !category.parent)
+    .map((category) => ({ id: category.id, name: category.name, slug: category.slug }))
+
+  const childrenByParent = categories.reduce<Record<number, { id: number; name: string; slug: string }[]>>(
+    (map, category) => {
+      const parentId = typeof category.parent === 'number' ? category.parent : null
+      if (!parentId) return map
+      map[parentId] = map[parentId] ?? []
+      map[parentId].push({ id: category.id, name: category.name, slug: category.slug })
+      return map
+    },
+    {},
+  )
 
   return (
     <html lang="es" className={GeistSans.className}>
@@ -46,13 +62,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               />
             </Link>
 
-            <HeaderNav
-              categories={categories.map((category) => ({
-                id: category.id,
-                name: category.name,
-                slug: category.slug,
-              }))}
-            />
+            <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />
 
             <Link
               href="/productos"
