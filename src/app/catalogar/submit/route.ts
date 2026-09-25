@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { slugify } from '@/lib/slug'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
+import { validateProductFields } from '@/lib/validateProductFields'
 
 type Payload = Awaited<ReturnType<typeof getPayloadClient>>
 
@@ -69,25 +70,20 @@ export async function POST(request: Request) {
   const subcategoryName = formData.get('subcategoryName')
   const photo = formData.get('photo')
 
+  const validationError = validateProductFields({
+    name,
+    hasCategory: Boolean(categoryId || categoryName),
+    price: String(priceRaw ?? ''),
+    stock: String(stockRaw ?? ''),
+    compareAtPrice: compareAtPriceRaw ? String(compareAtPriceRaw) : undefined,
+  })
+  if (validationError) {
+    return NextResponse.json({ ok: false, error: validationError }, { status: 400 })
+  }
+
   const price = Number(priceRaw)
   const stock = Number(stockRaw)
   const compareAtPrice = compareAtPriceRaw ? Number(compareAtPriceRaw) : undefined
-
-  if (!name) {
-    return NextResponse.json({ ok: false, error: 'Falta el nombre.' }, { status: 400 })
-  }
-  if (!categoryId && !categoryName) {
-    return NextResponse.json({ ok: false, error: 'Falta la categoría.' }, { status: 400 })
-  }
-  if (!priceRaw || Number.isNaN(price) || price < 0) {
-    return NextResponse.json({ ok: false, error: 'Precio inválido.' }, { status: 400 })
-  }
-  if (!stockRaw || Number.isNaN(stock) || stock < 0) {
-    return NextResponse.json({ ok: false, error: 'Stock inválido.' }, { status: 400 })
-  }
-  if (compareAtPriceRaw && (Number.isNaN(compareAtPrice) || (compareAtPrice as number) < 0)) {
-    return NextResponse.json({ ok: false, error: 'Precio de lista inválido.' }, { status: 400 })
-  }
 
   // Cosas que este request crea desde cero (no las que reutiliza por id) — si un paso
   // posterior falla, las borramos para no dejar categorías/fotos huérfanas sin producto.

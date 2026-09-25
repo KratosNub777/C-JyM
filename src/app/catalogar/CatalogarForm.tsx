@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react'
 
+import { validateProductFields } from '@/lib/validateProductFields'
+
 type CategoryOption = { id: number; name: string }
 
 const NEW_OPTION = '__new__'
@@ -50,18 +52,19 @@ export function CatalogarForm({
     event.preventDefault()
     setMessage(null)
 
-    if (!name.trim()) return setMessage({ type: 'error', text: 'Falta el nombre.' })
-    if (!categoryId) return setMessage({ type: 'error', text: 'Elegí una categoría.' })
     if (categoryId === NEW_OPTION && !newCategoryName.trim())
       return setMessage({ type: 'error', text: 'Escribí el nombre de la nueva categoría.' })
     if (subcategoryId === NEW_OPTION && !newSubcategoryName.trim())
       return setMessage({ type: 'error', text: 'Escribí el nombre de la nueva subcategoría.' })
-    const priceValue = Number(price)
-    if (!price || Number.isNaN(priceValue) || priceValue < 0)
-      return setMessage({ type: 'error', text: 'Precio inválido.' })
-    const stockValue = Number(stock)
-    if (!stock || Number.isNaN(stockValue) || stockValue < 0)
-      return setMessage({ type: 'error', text: 'Stock inválido.' })
+
+    const validationError = validateProductFields({
+      name,
+      hasCategory: Boolean(categoryId),
+      price,
+      stock,
+      compareAtPrice,
+    })
+    if (validationError) return setMessage({ type: 'error', text: validationError })
 
     const formData = new FormData()
     formData.set('name', name.trim())
