@@ -76,7 +76,7 @@ export function HeaderNav({
 
   return (
     <>
-      <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex dark:text-neutral-300">
+      <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
         <div
           className="relative"
           ref={desktopMenuRef}
@@ -86,10 +86,8 @@ export function HeaderNav({
           <button
             type="button"
             onClick={() => setDesktopOpen((value) => !value)}
-            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-              desktopOpen
-                ? 'border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400'
-                : 'border-neutral-300 text-neutral-700 hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600 dark:hover:text-white'
+            className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-semibold text-white transition-colors ${
+              desktopOpen ? 'bg-white/10' : 'hover:bg-white/10'
             }`}
             aria-expanded={desktopOpen}
           >
@@ -154,7 +152,7 @@ export function HeaderNav({
       <button
         type="button"
         onClick={() => setMobileOpen((value) => !value)}
-        className="text-neutral-700 md:hidden dark:text-neutral-300"
+        className="py-2 text-white md:hidden"
         aria-expanded={mobileOpen}
         aria-label="Abrir menú de categorías"
       >
