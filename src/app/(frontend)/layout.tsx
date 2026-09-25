@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
+import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
 import './styles.css'
@@ -37,25 +38,27 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const payload = await getPayloadClient()
   const { docs: categories } = await payload.find({
     collection: 'categories',
-    limit: 50,
+    limit: 500,
     sort: 'name',
     depth: 0,
   })
 
-  const topLevelCategories = categories
-    .filter((category) => !category.parent)
-    .map((category) => ({ id: category.id, name: category.name, slug: category.slug }))
+  const { topLevel, childrenByParent: childrenByParentDocs } = buildCategoryTree(categories)
 
-  const childrenByParent = categories.reduce<Record<number, { id: number; name: string; slug: string }[]>>(
-    (map, category) => {
-      const parentId = typeof category.parent === 'number' ? category.parent : null
-      if (!parentId) return map
-      map[parentId] = map[parentId] ?? []
-      map[parentId].push({ id: category.id, name: category.name, slug: category.slug })
-      return map
-    },
-    {},
-  )
+  const topLevelCategories = topLevel.map((category) => ({
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+  }))
+
+  const childrenByParent: Record<number, { id: number; name: string; slug: string }[]> = {}
+  for (const [parentId, children] of Object.entries(childrenByParentDocs)) {
+    childrenByParent[Number(parentId)] = children.map((category) => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+    }))
+  }
 
   return (
     <html lang="es" className={GeistSans.className}>
