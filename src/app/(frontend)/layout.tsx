@@ -1,16 +1,34 @@
 import { Clock, MagnifyingGlass, Tag } from '@phosphor-icons/react/dist/ssr'
 import { GeistSans } from 'geist/font/sans'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
 import { getPayloadClient } from '@/lib/payload'
+import { getSiteUrl } from '@/lib/site'
 import './styles.css'
 
-export const metadata = {
-  description: 'Catálogo de electrodomésticos para tu hogar.',
-  title: 'Comercial José María — Catálogo',
+const siteDescription = 'Catálogo de electrodomésticos para tu hogar.'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: 'Comercial José María — Catálogo',
+    template: '%s — Comercial José María',
+  },
+  description: siteDescription,
+  openGraph: {
+    type: 'website',
+    siteName: 'Comercial José María',
+    locale: 'es_PY',
+    title: 'Comercial José María — Catálogo',
+    description: siteDescription,
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {

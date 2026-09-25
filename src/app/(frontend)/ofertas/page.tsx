@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
+
 import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
+
+export const metadata: Metadata = {
+  title: 'Ofertas',
+  description: 'Productos en oferta de Comercial José María.',
+}
 
 export default async function OfertasPage() {
   const payload = await getPayloadClient()

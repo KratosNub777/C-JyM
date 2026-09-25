@@ -1,4 +1,5 @@
 import { ImageSquare, ShoppingCart } from '@phosphor-icons/react/dist/ssr'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -6,7 +7,34 @@ import { notFound } from 'next/navigation'
 import { InstallmentBreakdown } from '@/components/InstallmentBreakdown'
 import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
-import { getPayloadClient } from '@/lib/payload'
+import { getProductBySlug } from '@/lib/products'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+
+  if (!product) {
+    return { title: 'Producto no encontrado' }
+  }
+
+  const image = product.images?.find((img): img is Media => typeof img === 'object')
+  const description = product.description?.slice(0, 160) || `${product.name} en Comercial José María.`
+
+  return {
+    title: product.name,
+    description,
+    openGraph: {
+      title: product.name,
+      description,
+      type: 'website',
+      images: image?.url ? [{ url: image.url, alt: image.alt ?? product.name }] : undefined,
+    },
+  }
+}
 
 export default async function ProductPage({
   params,
@@ -14,15 +42,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const payload = await getPayloadClient()
-
-  const { docs } = await payload.find({
-    collection: 'products',
-    where: { slug: { equals: slug } },
-    limit: 1,
-  })
-
-  const product = docs[0]
+  const product = await getProductBySlug(slug)
 
   if (!product) {
     notFound()

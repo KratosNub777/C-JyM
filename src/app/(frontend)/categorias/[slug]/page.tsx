@@ -1,7 +1,37 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 
 import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
+
+const getCategoryBySlug = cache(async (slug: string) => {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'categories',
+    where: { slug: { equals: slug } },
+    limit: 1,
+  })
+  return docs[0] ?? null
+})
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategoryBySlug(slug)
+
+  if (!category) {
+    return { title: 'Categoría no encontrada' }
+  }
+
+  return {
+    title: category.name,
+    description: `Productos de ${category.name} en Comercial José María.`,
+  }
+}
 
 export default async function CategoryPage({
   params,
@@ -10,14 +40,7 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params
   const payload = await getPayloadClient()
-
-  const { docs: categories } = await payload.find({
-    collection: 'categories',
-    where: { slug: { equals: slug } },
-    limit: 1,
-  })
-
-  const category = categories[0]
+  const category = await getCategoryBySlug(slug)
 
   if (!category) {
     notFound()

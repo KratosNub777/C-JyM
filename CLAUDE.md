@@ -53,6 +53,8 @@ Cada fase es independiente y facturable por separado. El detalle de alcance/prec
 - Precios de producto: **solo guaraníes** (`price`, obligatorio). No se maneja USD — se descartó explícitamente, la empresa no vende en dólares.
 - Variable de entorno de conexión a la base: **`DATABASE_URL`** (no `DATABASE_URI` — así la nombra el adaptador `@payloadcms/db-postgres` generado por `create-payload-app`).
 - Base de datos de desarrollo: Neon (cloud), no local — ver `.env.example`. El usuario gestiona su propia cuenta Neon; el connection string real vive solo en `.env` (gitignored).
+- `SITE_URL`: URL pública del sitio (metadata/OG, sitemap). Sin prefijo `NEXT_PUBLIC_` a propósito — solo se lee en código server-side (`src/lib/site.ts`), nunca en el cliente. En dev queda en `http://localhost:3000`; actualizar cuando se registre el dominio `.com.py`.
+- `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch`.
 
 ### Estructura de carpetas (generada por `create-payload-app` template `blank`, Payload 3.x)
 

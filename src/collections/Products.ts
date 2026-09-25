@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
+import { removeProductFromIndex, syncProductToIndex } from '@/lib/meilisearch'
+
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
@@ -8,6 +10,26 @@ export const Products: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc }) => {
+        try {
+          await syncProductToIndex(doc)
+        } catch (error) {
+          console.error(`No se pudo sincronizar el producto ${doc.id} con Meilisearch:`, error)
+        }
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        try {
+          await removeProductFromIndex(doc.id)
+        } catch (error) {
+          console.error(`No se pudo eliminar el producto ${doc.id} de Meilisearch:`, error)
+        }
+      },
+    ],
   },
   fields: [
     {

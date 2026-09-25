@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
+
+export const metadata: Metadata = {
+  title: 'Productos',
+  description: 'Todo el catálogo de electrodomésticos de Comercial José María.',
+}
 
 const PAGE_SIZE = 24
 
