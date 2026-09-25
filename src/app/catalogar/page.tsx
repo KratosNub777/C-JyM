@@ -2,17 +2,18 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { CatalogarForm } from './CatalogarForm'
+import { getAuthenticatedUser } from '@/lib/auth'
 import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 
 export default async function CatalogarPage() {
-  const payload = await getPayloadClient()
-  const { user } = await payload.auth({ headers: await headers() })
+  const user = await getAuthenticatedUser(await headers())
 
   if (!user) {
     redirect('/admin/login')
   }
 
+  const payload = await getPayloadClient()
   const { docs: categories } = await payload.find({
     collection: 'categories',
     limit: 500,

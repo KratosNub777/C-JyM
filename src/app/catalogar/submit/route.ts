@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
 
 import { slugify } from '@/lib/slug'
+import { getAuthenticatedUser } from '@/lib/auth'
 import { getPayloadClient } from '@/lib/payload'
 
-async function dedupeSlug(
-  payload: Awaited<ReturnType<typeof getPayloadClient>>,
-  collection: 'products' | 'categories',
-  baseSlug: string,
-) {
+type Payload = Awaited<ReturnType<typeof getPayloadClient>>
+
+async function dedupeSlug(payload: Payload, collection: 'products' | 'categories', baseSlug: string) {
   let slug = baseSlug
   let suffix = 2
 
@@ -23,13 +22,37 @@ async function dedupeSlug(
   }
 }
 
+// Busca una categoría existente por id, o crea una nueva por nombre (con slug
+// dedupeado). Se usa tanto para la categoría de nivel superior como para la
+// subcategoría — la única diferencia entre ambas es el `parent`.
+async function resolveCategory(
+  payload: Payload,
+  { id, name, parent }: { id: FormDataEntryValue | null; name: FormDataEntryValue | null; parent?: number },
+) {
+  if (id) {
+    const doc = await payload.findByID({ collection: 'categories', id: Number(id) })
+    return { category: { id: doc.id, name: doc.name }, createdId: undefined as number | undefined }
+  }
+
+  const created = await payload.create({
+    collection: 'categories',
+    data: {
+      name: String(name),
+      slug: await dedupeSlug(payload, 'categories', slugify(String(name))),
+      parent,
+    },
+  })
+  return { category: { id: created.id, name: created.name }, createdId: created.id }
+}
+
 export async function POST(request: Request) {
-  const payload = await getPayloadClient()
-  const { user } = await payload.auth({ headers: request.headers })
+  const user = await getAuthenticatedUser(request.headers)
 
   if (!user) {
     return NextResponse.json({ ok: false, error: 'No autorizado.' }, { status: 401 })
   }
+
+  const payload = await getPayloadClient()
 
   const formData = await request.formData()
 
@@ -85,37 +108,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    let category: { id: number; name: string }
-    if (categoryId) {
-      const doc = await payload.findByID({ collection: 'categories', id: Number(categoryId) })
-      category = { id: doc.id, name: doc.name }
-    } else {
-      const created = await payload.create({
-        collection: 'categories',
-        data: {
-          name: String(categoryName),
-          slug: await dedupeSlug(payload, 'categories', slugify(String(categoryName))),
-        },
-      })
-      category = { id: created.id, name: created.name }
-      createdCategoryId = created.id
-    }
+    const categoryResult = await resolveCategory(payload, { id: categoryId, name: categoryName })
+    const category = categoryResult.category
+    createdCategoryId = categoryResult.createdId
 
     let subcategory: { id: number; name: string } | null = null
-    if (subcategoryId) {
-      const doc = await payload.findByID({ collection: 'categories', id: Number(subcategoryId) })
-      subcategory = { id: doc.id, name: doc.name }
-    } else if (subcategoryName) {
-      const created = await payload.create({
-        collection: 'categories',
-        data: {
-          name: String(subcategoryName),
-          slug: await dedupeSlug(payload, 'categories', slugify(String(subcategoryName))),
-          parent: category.id,
-        },
+    if (subcategoryId || subcategoryName) {
+      const subcategoryResult = await resolveCategory(payload, {
+        id: subcategoryId,
+        name: subcategoryName,
+        parent: category.id,
       })
-      subcategory = { id: created.id, name: created.name }
-      createdSubcategoryId = created.id
+      subcategory = subcategoryResult.category
+      createdSubcategoryId = subcategoryResult.createdId
     }
 
     let imageId: number | undefined
