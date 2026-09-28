@@ -1,33 +1,15 @@
 'use client'
 
-import {
-  Broom,
-  CaretDown,
-  CaretRight,
-  CookingPot,
-  Fan,
-  GridFour,
-  List,
-  MagnifyingGlass,
-  Snowflake,
-  Television,
-  X,
-} from '@phosphor-icons/react'
+import { CaretDown, CaretRight, GridFour, List, MagnifyingGlass, X } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+
+import { ICONS_BY_SLUG } from '@/lib/categories'
 
 type CategoryLink = {
   id: number
   name: string
   slug: string
-}
-
-const ICONS_BY_SLUG: Record<string, typeof Snowflake> = {
-  'linea-blanca': Snowflake,
-  cocina: CookingPot,
-  'climatizacion-grupo': Fan,
-  'audio-tv': Television,
-  'cuidado-del-hogar': Broom,
 }
 
 export function HeaderNav({
