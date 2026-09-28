@@ -1,4 +1,4 @@
-import type { Payload, Where } from 'payload'
+import type { Where } from 'payload'
 
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc'
 
@@ -107,48 +107,4 @@ export function applyFiltersInMemory<
   }
 
   return result
-}
-
-export async function getDistinctBrands(payload: Payload, where: Where): Promise<string[]> {
-  const { values } = await payload.findDistinct({
-    collection: 'products',
-    field: 'brand',
-    where,
-  })
-
-  return values
-    .map((value) => value.brand)
-    .filter((brand): brand is string => !!brand)
-    .sort((a, b) => a.localeCompare(b))
-}
-
-export async function getOnSaleCount(payload: Payload, where: Where): Promise<number> {
-  const { totalDocs } = await payload.count({
-    collection: 'products',
-    where: { and: [where, { compareAtPrice: { greater_than: 0 } }] },
-  })
-  return totalDocs
-}
-
-export async function getPriceBounds(
-  payload: Payload,
-  where: Where,
-): Promise<{ min: number; max: number } | null> {
-  const { docs } = await payload.find({
-    collection: 'products',
-    where,
-    select: { price: true },
-    limit: 500,
-    depth: 0,
-  })
-
-  if (docs.length === 0) return null
-
-  return docs.reduce(
-    (bounds, doc) => ({
-      min: Math.min(bounds.min, doc.price),
-      max: Math.max(bounds.max, doc.price),
-    }),
-    { min: docs[0].price, max: docs[0].price },
-  )
 }
