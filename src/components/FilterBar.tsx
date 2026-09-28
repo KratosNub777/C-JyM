@@ -34,7 +34,7 @@ function SortDropdown({
   const current = SORT_OPTIONS.find((option) => option.value === value) ?? SORT_OPTIONS[0]
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative shrink-0" ref={ref}>
       <span className={LABEL}>Ordenar por</span>
       <button
         type="button"
@@ -96,10 +96,10 @@ function BrandCombobox({
   const filtered = brands.filter((brand) => brand.toLowerCase().includes(query.toLowerCase()))
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative min-w-[200px] flex-1 sm:max-w-sm" ref={ref}>
       <span className={LABEL}>Marca</span>
       <div
-        className={`${CONTROL} w-full flex-wrap px-2 py-1.5 sm:w-64`}
+        className={`${CONTROL} w-full flex-wrap px-2 py-1.5`}
         onClick={() => {
           setOpen(true)
           inputRef.current?.focus()
@@ -251,7 +251,7 @@ export function FilterBar({
         )}
 
         {priceBounds && (
-          <div>
+          <div className="min-w-[220px] flex-1 sm:max-w-md">
             <span className={LABEL}>Precio</span>
             <div className="flex items-center gap-2">
               <input
@@ -261,9 +261,9 @@ export function FilterBar({
                 placeholder={formatGs(priceBounds.min)}
                 value={minInput}
                 onChange={(event) => setMinInput(event.target.value)}
-                className={`${CONTROL} w-24 sm:w-28`}
+                className={`${CONTROL} w-0 min-w-0 flex-1`}
               />
-              <span className="text-neutral-400">—</span>
+              <span className="shrink-0 text-neutral-400">—</span>
               <input
                 type="number"
                 inputMode="numeric"
@@ -271,7 +271,7 @@ export function FilterBar({
                 placeholder={formatGs(priceBounds.max)}
                 value={maxInput}
                 onChange={(event) => setMaxInput(event.target.value)}
-                className={`${CONTROL} w-24 sm:w-28`}
+                className={`${CONTROL} w-0 min-w-0 flex-1`}
               />
               <button
                 type="button"
