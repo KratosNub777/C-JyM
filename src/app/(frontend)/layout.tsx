@@ -1,4 +1,4 @@
-import { Clock, MagnifyingGlass, Tag } from '@phosphor-icons/react/dist/ssr'
+import { Clock, MagnifyingGlass, ShoppingCart, Tag, User } from '@phosphor-icons/react/dist/ssr'
 import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 import Image from 'next/image'
@@ -108,6 +108,27 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 </button>
               </div>
             </form>
+
+            <div className="ml-auto flex items-center gap-1 sm:ml-0">
+              <button
+                type="button"
+                aria-label="Iniciar sesión"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+              >
+                <User size={22} weight="regular" />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Carrito"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+              >
+                <ShoppingCart size={22} weight="regular" />
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
+                  0
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="relative bg-ink-600">
