@@ -36,8 +36,25 @@
   animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(226, 61, 61, 0.55);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(226, 61, 61, 0);
+    transform: scale(1.035);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up {
+  .animate-fade-up,
+  .animate-pulse-glow {
     animation: none;
   }
 }
