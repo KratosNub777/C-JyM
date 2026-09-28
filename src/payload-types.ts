@@ -181,6 +181,14 @@ export interface Category {
    * Dejar vacío si es una categoría de primer nivel
    */
   parent?: (number | null) | Category;
+  /**
+   * Banner promocional opcional para la home (solo aplica a categorías de primer nivel)
+   */
+  bannerImage?: (number | null) | Media;
+  /**
+   * URL opcional a la que lleva el banner al hacer click
+   */
+  bannerLink?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -344,6 +352,8 @@ export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   parent?: T;
+  bannerImage?: T;
+  bannerLink?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -32,5 +32,23 @@ export const Categories: CollectionConfig = {
         description: 'Dejar vacío si es una categoría de primer nivel',
       },
     },
+    {
+      name: 'bannerImage',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+      admin: {
+        description:
+          'Banner promocional opcional para la home (solo aplica a categorías de primer nivel)',
+      },
+    },
+    {
+      name: 'bannerLink',
+      type: 'text',
+      required: false,
+      admin: {
+        description: 'URL opcional a la que lleva el banner al hacer click',
+      },
+    },
   ],
 }
