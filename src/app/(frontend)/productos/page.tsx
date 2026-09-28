@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
 import {
   getDistinctBrands,
+  getOnSaleCount,
   getPriceBounds,
   mergeWhere,
   parseProductFilters,
@@ -34,7 +35,7 @@ export default async function ProductsPage({
 
   const baseWhere: Where[] = [{ status: { equals: 'active' } }]
 
-  const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds] =
+  const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds, onSaleCount] =
     await Promise.all([
       payload.find({
         collection: 'products',
@@ -45,6 +46,7 @@ export default async function ProductsPage({
       }),
       getDistinctBrands(payload, { and: baseWhere }),
       getPriceBounds(payload, { and: baseWhere }),
+      getOnSaleCount(payload, { and: baseWhere }),
     ])
 
   return (
@@ -52,7 +54,12 @@ export default async function ProductsPage({
       <h1 className="mb-6 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Productos</h1>
 
       <div className="mb-6">
-        <FilterBar brands={brands} priceBounds={priceBounds} basePath="/productos" />
+        <FilterBar
+          brands={brands}
+          priceBounds={priceBounds}
+          basePath="/productos"
+          onSaleCount={onSaleCount}
+        />
       </div>
 
       {products.length === 0 ? (
