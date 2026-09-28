@@ -27,6 +27,8 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    // Better Auth owns these tables. Never include them in Payload schema pushes.
+    tablesFilter: ['!user', '!session', '!account', '!verification', '!rate_limit'],
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
