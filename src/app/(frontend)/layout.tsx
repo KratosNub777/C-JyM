@@ -159,7 +159,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
               <Link
                 href="/ofertas"
-                className="ml-auto flex items-center gap-1.5 rounded-full bg-accent-oferta-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-oferta-700"
+                className="animate-pulse-glow ml-auto flex items-center gap-1.5 rounded-full bg-accent-oferta-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-oferta-700"
               >
                 <Tag size={16} weight="fill" />
                 Ofertas

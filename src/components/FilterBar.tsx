@@ -302,11 +302,11 @@ export function FilterBar({
             className={
               filters.onSale
                 ? 'ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600 bg-accent-oferta-600 px-4 text-sm font-semibold text-white transition-colors'
-                : 'ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600/40 bg-accent-oferta-50 px-4 text-sm font-semibold text-accent-oferta-600 transition-colors hover:bg-accent-oferta-100 dark:border-accent-oferta-600/50 dark:bg-accent-oferta-600/10 dark:text-accent-oferta-100 dark:hover:bg-accent-oferta-600/20'
+                : 'animate-pulse-glow ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600/40 bg-accent-oferta-50 px-4 text-sm font-semibold text-accent-oferta-600 transition-colors hover:bg-accent-oferta-100 dark:border-accent-oferta-600/50 dark:bg-accent-oferta-600/10 dark:text-accent-oferta-100 dark:hover:bg-accent-oferta-600/20'
             }
           >
             <Tag size={16} weight="fill" />
-            {onSaleCount} {onSaleCount === 1 ? 'producto en oferta' : 'productos en oferta'}
+            Ofertas
           </button>
         )}
       </div>
