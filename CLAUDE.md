@@ -38,21 +38,17 @@ Repo: https://github.com/KratosNub777/C-JyM.git
 
 Cada fase es independiente y facturable por separado. El detalle de alcance/precio está en la propuesta de presupuesto (documento separado, no en este repo).
 
-## Escalabilidad (a revisar antes del lanzamiento real)
+## Escalabilidad
 
-Hoy cada página pega directo a Postgres sin caché — está bien para el volumen actual
-(catálogo chico, sin tráfico real todavía), pero no aguanta un pico grande de
-usuarios simultáneos así como está. Vercel escala solo (serverless, no hay
-un único servidor que se sature); Neon y Meilisearch escalan subiendo de
-plan/tamaño de cómputo cuando el tráfico lo justifique — eso es una perilla
-que se aprieta y se paga cuando hace falta, no algo para sobre-invertir ahora.
-
-El cuello de botella real es la falta de caché: cada visita a home/categoría/
-producto dispara una query nueva a la base. Antes de un lanzamiento con
-tráfico real, agregar generación estática/ISR (`revalidate`) de Next.js a
-las páginas del catálogo (no cambian segundo a segundo) para que la mayoría
-de las visitas se sirvan desde el borde de Vercel sin tocar la base. Es
-barato de implementar y ya sería buena práctica hoy, no solo por escala futura.
+Las queries de catálogo (productos y categorías) están cacheadas con
+`unstable_cache` (ver `src/lib/productQueries.ts`, `src/lib/categoryQueries.ts`
+y los tags compartidos en `src/lib/cacheTags.ts`), y home + ficha de producto
+usan ISR (`revalidate`) de Next.js. La mayoría de las visitas se sirven desde
+el borde de Vercel sin tocar Postgres. Al editar un producto o categoría desde
+`/admin`, un hook de la colección invalida el tag correspondiente para que el
+cambio se vea sin esperar al revalidate. Vercel escala solo (serverless); Neon
+y Meilisearch escalan subiendo de plan/tamaño de cómputo cuando el tráfico lo
+justifique.
 
 ## Cómo trabajar en este proyecto (modelo/flujo)
 
@@ -81,12 +77,16 @@ src/
       layout.tsx
       page.tsx            # home
       productos/
-        page.tsx           # listado con paginación
-        [slug]/page.tsx     # ficha de producto
+        page.tsx           # listado con filtros, orden y paginación
+        [slug]/page.tsx     # ficha de producto (ISR)
       categorias/
-        [slug]/page.tsx     # productos por categoría
+        [slug]/page.tsx     # productos por categoría, con filtros y orden
+      buscar/page.tsx      # resultados de búsqueda (Meilisearch), con filtros y orden
+      ofertas/page.tsx     # productos en oferta, con filtros y orden
+      sitemap.ts / robots.ts
       styles.css           # entry point de Tailwind (@import 'tailwindcss')
     (payload)/            # admin panel + API de Payload (autogenerado, no tocar a mano)
+    catalogar/            # formulario público fuera del catálogo (no confundir con /admin)
   collections/
     Users.ts              # usuarios admin del CMS (no confundir con clientes — eso es Fase 2/Better Auth)
     Media.ts              # uploads (imágenes de producto)
@@ -94,8 +94,19 @@ src/
     Products.ts             # productos: precio en Gs., stock, categoría, imágenes, status
   components/
     ProductCard.tsx        # tarjeta de producto reutilizada en home/listado/categoría
+    ProductCarousel.tsx, ProductGridSkeleton.tsx
+    FilterBar.tsx           # orden + combobox de marca + rango de precio + toggle de ofertas
+    Pagination.tsx
+    Hero.tsx, CategoryBentoGrid.tsx, CategoryShelf.tsx, ValuePropStrip.tsx, HeaderNav.tsx
+    InstallmentBreakdown.tsx
   lib/
     payload.ts             # helper getPayloadClient() para la Local API de Payload en Server Components
+    productQueries.ts, categoryQueries.ts  # queries cacheadas con unstable_cache
+    cacheTags.ts            # tags de caché compartidos + invalidación desde hooks de colección
+    productFilters.ts       # parseo de filtros de URL (marca, precio, ofertas, orden)
+    products.ts, categories.ts, pricing.ts, format.ts, slug.ts
+    site.ts                 # helper de SITE_URL para metadata/sitemap
+    meilisearch.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
   payload.config.ts        # registro de colecciones + adaptador postgres
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
 ```

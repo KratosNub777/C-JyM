@@ -253,30 +253,32 @@ export function FilterBar({
         {priceBounds && (
           <div className="min-w-[220px] flex-1 sm:max-w-md">
             <span className={LABEL}>Precio</span>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                inputMode="numeric"
-                min={0}
-                placeholder={formatGs(priceBounds.min)}
-                value={minInput}
-                onChange={(event) => setMinInput(event.target.value)}
-                className={`${CONTROL} w-0 min-w-0 flex-1`}
-              />
-              <span className="shrink-0 text-neutral-400">—</span>
-              <input
-                type="number"
-                inputMode="numeric"
-                min={0}
-                placeholder={formatGs(priceBounds.max)}
-                value={maxInput}
-                onChange={(event) => setMaxInput(event.target.value)}
-                className={`${CONTROL} w-0 min-w-0 flex-1`}
-              />
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex min-w-[180px] flex-1 items-center gap-2">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  placeholder={formatGs(priceBounds.min)}
+                  value={minInput}
+                  onChange={(event) => setMinInput(event.target.value)}
+                  className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
+                />
+                <span className="shrink-0 text-neutral-400">—</span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  placeholder={formatGs(priceBounds.max)}
+                  value={maxInput}
+                  onChange={(event) => setMaxInput(event.target.value)}
+                  className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
+                />
+              </div>
               <button
                 type="button"
                 onClick={applyPriceRange}
-                className="h-10 shrink-0 rounded-xl bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+                className="h-10 w-full shrink-0 rounded-xl bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700 sm:w-auto"
               >
                 Aplicar
               </button>
