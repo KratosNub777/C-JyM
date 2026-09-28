@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, CaretDown, X } from '@phosphor-icons/react'
+import { Check, CaretDown, Tag, X } from '@phosphor-icons/react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useRef, useState } from 'react'
 
@@ -172,10 +172,12 @@ export function FilterBar({
   brands,
   priceBounds,
   basePath,
+  onSaleCount,
 }: {
   brands: string[]
   priceBounds: { min: number; max: number } | null
   basePath: string
+  onSaleCount?: number
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -224,6 +226,13 @@ export function FilterBar({
       else params.delete('min')
       if (maxInput) params.set('max', maxInput)
       else params.delete('max')
+    })
+  }
+
+  function toggleOnSale() {
+    navigate((params) => {
+      if (filters.onSale) params.delete('sale')
+      else params.set('sale', '1')
     })
   }
 
@@ -283,6 +292,21 @@ export function FilterBar({
           >
             <X size={14} weight="bold" />
             Limpiar filtros
+          </button>
+        )}
+
+        {!!onSaleCount && onSaleCount > 0 && (
+          <button
+            type="button"
+            onClick={toggleOnSale}
+            className={
+              filters.onSale
+                ? 'ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600 bg-accent-oferta-600 px-4 text-sm font-semibold text-white transition-colors'
+                : 'ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600/40 bg-accent-oferta-50 px-4 text-sm font-semibold text-accent-oferta-600 transition-colors hover:bg-accent-oferta-100 dark:border-accent-oferta-600/50 dark:bg-accent-oferta-600/10 dark:text-accent-oferta-100 dark:hover:bg-accent-oferta-600/20'
+            }
+          >
+            <Tag size={16} weight="fill" />
+            {onSaleCount} {onSaleCount === 1 ? 'producto en oferta' : 'productos en oferta'}
           </button>
         )}
       </div>
