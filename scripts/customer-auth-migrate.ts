@@ -5,7 +5,11 @@ import { auth, customerAuthPool } from '../src/lib/customerAuth/auth'
 
 // Uses the migration engine from the installed Better Auth version, not a floating CLI.
 try {
-  if (!process.env.DATABASE_URL || !process.env.BETTER_AUTH_SECRET || !process.env.BETTER_AUTH_URL) {
+  if (
+    !process.env.DATABASE_URL ||
+    !process.env.BETTER_AUTH_SECRET ||
+    !process.env.BETTER_AUTH_URL
+  ) {
     throw new Error('Faltan DATABASE_URL, BETTER_AUTH_SECRET o BETTER_AUTH_URL.')
   }
   const migration = await getMigrations(auth.options)

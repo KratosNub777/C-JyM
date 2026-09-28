@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { CategoryBentoGrid } from '@/components/CategoryBentoGrid'
 import { CategoryShelf } from '@/components/CategoryShelf'
 import { Hero } from '@/components/Hero'
@@ -77,9 +78,9 @@ export default async function HomePage() {
       {shelves.length === 0 ? (
         <p className="text-neutral-500 dark:text-neutral-400">
           Todavía no hay productos cargados. Agregalos desde el{' '}
-          <a href="/admin" className="underline">
+          <Link href="/admin" className="underline">
             panel de administración
-          </a>
+          </Link>
           .
         </p>
       ) : (
