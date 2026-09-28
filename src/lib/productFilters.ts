@@ -16,6 +16,7 @@ export type ParsedProductFilters = {
   brands: string[]
   minPrice?: number
   maxPrice?: number
+  onSale: boolean
 }
 
 export type RawSearchParams = Record<string, string | string[] | undefined>
@@ -40,7 +41,10 @@ export function parseProductFilters(searchParams: RawSearchParams): ParsedProduc
     ;[minPrice, maxPrice] = [maxPrice, minPrice]
   }
 
-  return { sort, brands, minPrice, maxPrice }
+  const saleRaw = Array.isArray(searchParams.sale) ? searchParams.sale[0] : searchParams.sale
+  const onSale = saleRaw === '1'
+
+  return { sort, brands, minPrice, maxPrice, onSale }
 }
 
 export function sortToPayload(sort: SortOption): string {
@@ -56,6 +60,9 @@ export function filtersToWhere(filters: ParsedProductFilters): Where[] {
   if (filters.maxPrice !== undefined) {
     conditions.push({ price: { less_than_equal: filters.maxPrice } })
   }
+  if (filters.onSale) {
+    conditions.push({ compareAtPrice: { greater_than: 0 } })
+  }
   return conditions
 }
 
@@ -68,12 +75,13 @@ export function hasActiveFilters(filters: ParsedProductFilters): boolean {
     filters.brands.length > 0 ||
     filters.minPrice !== undefined ||
     filters.maxPrice !== undefined ||
+    filters.onSale ||
     filters.sort !== DEFAULT_SORT
   )
 }
 
 export function applyFiltersInMemory<
-  T extends { brand?: string | null; price: number; name: string },
+  T extends { brand?: string | null; price: number; name: string; compareAtPrice?: number | null },
 >(docs: T[], filters: ParsedProductFilters): T[] {
   let result = docs
 
@@ -85,6 +93,9 @@ export function applyFiltersInMemory<
   }
   if (filters.maxPrice !== undefined) {
     result = result.filter((doc) => doc.price <= filters.maxPrice!)
+  }
+  if (filters.onSale) {
+    result = result.filter((doc) => !!doc.compareAtPrice && doc.compareAtPrice > 0)
   }
 
   if (filters.sort === 'price-asc') {
@@ -109,6 +120,14 @@ export async function getDistinctBrands(payload: Payload, where: Where): Promise
     .map((value) => value.brand)
     .filter((brand): brand is string => !!brand)
     .sort((a, b) => a.localeCompare(b))
+}
+
+export async function getOnSaleCount(payload: Payload, where: Where): Promise<number> {
+  const { totalDocs } = await payload.count({
+    collection: 'products',
+    where: { and: [where, { compareAtPrice: { greater_than: 0 } }] },
+  })
+  return totalDocs
 }
 
 export async function getPriceBounds(
