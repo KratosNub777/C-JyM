@@ -1,16 +1,24 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-brand-50: #eef7fa;
-  --color-brand-100: #d3ecf3;
-  --color-brand-400: #2ba0c4;
-  --color-brand-600: #117ca2;
-  --color-brand-700: #0e6483;
+  --color-brand-50: #e7f7ee;
+  --color-brand-100: #c5ecd6;
+  --color-brand-400: #4cc788;
+  --color-brand-600: #16713d;
+  --color-brand-700: #10512c;
 
-  --color-brand-green-50: #e9f7ee;
-  --color-brand-green-100: #cbeed8;
-  --color-brand-green-600: #078038;
-  --color-brand-green-700: #06692e;
+  --color-ink-600: #10182b;
+  --color-ink-700: #0c1120;
+
+  --color-accent-oferta-50: #fbe7e7;
+  --color-accent-oferta-100: #f7caca;
+  --color-accent-oferta-600: #e23d3d;
+  --color-accent-oferta-700: #c22e2e;
+
+  --color-accent-ahorro-50: #e3f4f2;
+  --color-accent-ahorro-100: #bfe5e0;
+  --color-accent-ahorro-600: #0e8074;
+  --color-accent-ahorro-700: #0a655c;
 }
 
 @keyframes fade-up {

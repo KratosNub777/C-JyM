@@ -110,7 +110,7 @@ export default async function ProductPage({
             <span
               className={
                 inStock
-                  ? 'text-sm font-medium text-brand-green-600 dark:text-brand-green-100'
+                  ? 'text-sm font-medium text-accent-ahorro-600 dark:text-accent-ahorro-100'
                   : 'text-sm font-medium text-neutral-400 dark:text-neutral-500'
               }
             >

@@ -42,7 +42,7 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         )}
         {discountPercent && (
-          <span className="absolute left-2 top-2 rounded-full bg-brand-green-600 px-2 py-0.5 text-xs font-semibold text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-accent-oferta-600 px-2 py-0.5 text-xs font-semibold text-white">
             -{discountPercent}%
           </span>
         )}
@@ -58,7 +58,7 @@ export function ProductCard({ product }: { product: Product }) {
           <span
             className={
               inStock
-                ? 'text-xs font-medium text-brand-green-600 dark:text-brand-green-100'
+                ? 'text-xs font-medium text-accent-ahorro-600 dark:text-accent-ahorro-100'
                 : 'text-xs font-medium text-neutral-400 dark:text-neutral-500'
             }
           >

@@ -64,7 +64,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     <html lang="es" className={GeistSans.className}>
       <body className="min-h-screen bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
         <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-          <div className="hidden bg-brand-700 text-white sm:block">
+          <div className="hidden bg-ink-700 text-white sm:block">
             <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-xs sm:px-6">
               <Clock size={14} weight="bold" />
               <span>Lun a Vie 7:30 a 18:30 h · Sáb 7:30 a 16:00 h</span>
@@ -110,7 +110,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </form>
           </div>
 
-          <div className="relative bg-brand-600">
+          <div className="relative bg-ink-600">
             <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-2 sm:px-6">
               <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />
 
@@ -123,7 +123,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
               <Link
                 href="/ofertas"
-                className="ml-auto flex items-center gap-1.5 rounded-full bg-brand-green-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-brand-green-700"
+                className="ml-auto flex items-center gap-1.5 rounded-full bg-accent-oferta-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-oferta-700"
               >
                 <Tag size={16} weight="fill" />
                 Ofertas

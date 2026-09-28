@@ -130,7 +130,7 @@ export function CatalogarForm({
         <p
           className={
             message.type === 'success'
-              ? 'rounded-lg bg-brand-green-50 px-3 py-2 text-sm text-brand-green-600 dark:bg-brand-green-100/10'
+              ? 'rounded-lg bg-accent-ahorro-50 px-3 py-2 text-sm text-accent-ahorro-600 dark:bg-accent-ahorro-100/10'
               : 'rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10'
           }
         >
