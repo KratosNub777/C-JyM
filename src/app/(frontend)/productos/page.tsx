@@ -1,8 +1,18 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import type { Where } from 'payload'
 
+import { FilterBar } from '@/components/FilterBar'
+import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
+import {
+  getDistinctBrands,
+  getPriceBounds,
+  mergeWhere,
+  parseProductFilters,
+  sortToPayload,
+  type RawSearchParams,
+} from '@/lib/productFilters'
 
 export const metadata: Metadata = {
   title: 'Productos',
@@ -14,24 +24,36 @@ const PAGE_SIZE = 24
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<RawSearchParams & { page?: string }>
 }) {
-  const { page: pageParam } = await searchParams
-  const page = Number(pageParam) || 1
+  const resolvedParams = await searchParams
+  const page = Number(resolvedParams.page) || 1
+  const filters = parseProductFilters(resolvedParams)
 
   const payload = await getPayloadClient()
 
-  const { docs: products, totalPages, hasNextPage, hasPrevPage } = await payload.find({
-    collection: 'products',
-    where: { status: { equals: 'active' } },
-    limit: PAGE_SIZE,
-    page,
-    sort: '-createdAt',
-  })
+  const baseWhere: Where[] = [{ status: { equals: 'active' } }]
+
+  const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds] =
+    await Promise.all([
+      payload.find({
+        collection: 'products',
+        where: mergeWhere(baseWhere, filters),
+        limit: PAGE_SIZE,
+        page,
+        sort: sortToPayload(filters.sort),
+      }),
+      getDistinctBrands(payload, { and: baseWhere }),
+      getPriceBounds(payload, { and: baseWhere }),
+    ])
 
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Productos</h1>
+
+      <div className="mb-6">
+        <FilterBar brands={brands} priceBounds={priceBounds} basePath="/productos" />
+      </div>
 
       {products.length === 0 ? (
         <p className="text-neutral-500 dark:text-neutral-400">No hay productos para mostrar.</p>
@@ -43,35 +65,14 @@ export default async function ProductsPage({
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-4 text-sm">
-          <Link
-            href={`/productos?page=${page - 1}`}
-            aria-disabled={!hasPrevPage}
-            className={
-              hasPrevPage
-                ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
-                : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
-            }
-          >
-            ← Anterior
-          </Link>
-          <span className="text-neutral-500 dark:text-neutral-400">
-            Página {page} de {totalPages}
-          </span>
-          <Link
-            href={`/productos?page=${page + 1}`}
-            aria-disabled={!hasNextPage}
-            className={
-              hasNextPage
-                ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
-                : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
-            }
-          >
-            Siguiente →
-          </Link>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        basePath="/productos"
+        searchParams={resolvedParams}
+      />
     </div>
   )
 }
