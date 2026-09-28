@@ -1,9 +1,22 @@
 import type { Metadata } from 'next'
+import type { Where } from 'payload'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 
+import { FilterBar } from '@/components/FilterBar'
+import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
 import { getPayloadClient } from '@/lib/payload'
+import {
+  getDistinctBrands,
+  getPriceBounds,
+  mergeWhere,
+  parseProductFilters,
+  sortToPayload,
+  type RawSearchParams,
+} from '@/lib/productFilters'
+
+const PAGE_SIZE = 24
 
 const getCategoryBySlug = cache(async (slug: string) => {
   const payload = await getPayloadClient()
@@ -35,10 +48,16 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<RawSearchParams & { page?: string }>
 }) {
   const { slug } = await params
+  const resolvedParams = await searchParams
+  const page = Number(resolvedParams.page) || 1
+  const filters = parseProductFilters(resolvedParams)
+
   const payload = await getPayloadClient()
   const category = await getCategoryBySlug(slug)
 
@@ -54,21 +73,33 @@ export default async function CategoryPage({
   })
 
   const categoryIds = [category.id, ...childCategories.map((child) => child.id)]
+  const baseWhere: Where[] = [
+    { category: { in: categoryIds } },
+    { status: { equals: 'active' } },
+  ]
 
-  const { docs: products } = await payload.find({
-    collection: 'products',
-    where: {
-      and: [{ category: { in: categoryIds } }, { status: { equals: 'active' } }],
-    },
-    limit: 24,
-    sort: '-createdAt',
-  })
+  const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds] =
+    await Promise.all([
+      payload.find({
+        collection: 'products',
+        where: mergeWhere(baseWhere, filters),
+        limit: PAGE_SIZE,
+        page,
+        sort: sortToPayload(filters.sort),
+      }),
+      getDistinctBrands(payload, { and: baseWhere }),
+      getPriceBounds(payload, { and: baseWhere }),
+    ])
 
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
         {category.name}
       </h1>
+
+      <div className="mb-6">
+        <FilterBar brands={brands} priceBounds={priceBounds} basePath={`/categorias/${slug}`} />
+      </div>
 
       {products.length === 0 ? (
         <p className="text-neutral-500 dark:text-neutral-400">
@@ -81,6 +112,15 @@ export default async function CategoryPage({
           ))}
         </div>
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        basePath={`/categorias/${slug}`}
+        searchParams={resolvedParams}
+      />
     </div>
   )
 }
