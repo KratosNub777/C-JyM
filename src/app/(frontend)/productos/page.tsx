@@ -4,16 +4,8 @@ import type { Where } from 'payload'
 import { FilterBar } from '@/components/FilterBar'
 import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
-import { getPayloadClient } from '@/lib/payload'
-import {
-  getDistinctBrands,
-  getOnSaleCount,
-  getPriceBounds,
-  mergeWhere,
-  parseProductFilters,
-  sortToPayload,
-  type RawSearchParams,
-} from '@/lib/productFilters'
+import { mergeWhere, parseProductFilters, sortToPayload, type RawSearchParams } from '@/lib/productFilters'
+import { getCachedProducts, getDistinctBrands, getOnSaleCount, getPriceBounds } from '@/lib/productQueries'
 
 export const metadata: Metadata = {
   title: 'Productos',
@@ -31,22 +23,14 @@ export default async function ProductsPage({
   const page = Number(resolvedParams.page) || 1
   const filters = parseProductFilters(resolvedParams)
 
-  const payload = await getPayloadClient()
-
   const baseWhere: Where[] = [{ status: { equals: 'active' } }]
 
   const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds, onSaleCount] =
     await Promise.all([
-      payload.find({
-        collection: 'products',
-        where: mergeWhere(baseWhere, filters),
-        limit: PAGE_SIZE,
-        page,
-        sort: sortToPayload(filters.sort),
-      }),
-      getDistinctBrands(payload, { and: baseWhere }),
-      getPriceBounds(payload, { and: baseWhere }),
-      getOnSaleCount(payload, { and: baseWhere }),
+      getCachedProducts(mergeWhere(baseWhere, filters), sortToPayload(filters.sort), page, PAGE_SIZE),
+      getDistinctBrands({ and: baseWhere }),
+      getPriceBounds({ and: baseWhere }),
+      getOnSaleCount({ and: baseWhere }),
     ])
 
   return (

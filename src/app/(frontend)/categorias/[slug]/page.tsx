@@ -1,33 +1,15 @@
 import type { Metadata } from 'next'
 import type { Where } from 'payload'
 import { notFound } from 'next/navigation'
-import { cache } from 'react'
 
 import { FilterBar } from '@/components/FilterBar'
 import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
-import { getPayloadClient } from '@/lib/payload'
-import {
-  getDistinctBrands,
-  getOnSaleCount,
-  getPriceBounds,
-  mergeWhere,
-  parseProductFilters,
-  sortToPayload,
-  type RawSearchParams,
-} from '@/lib/productFilters'
+import { getCachedCategoryBySlug, getCachedChildCategories } from '@/lib/categoryQueries'
+import { mergeWhere, parseProductFilters, sortToPayload, type RawSearchParams } from '@/lib/productFilters'
+import { getCachedProducts, getDistinctBrands, getOnSaleCount, getPriceBounds } from '@/lib/productQueries'
 
 const PAGE_SIZE = 24
-
-const getCategoryBySlug = cache(async (slug: string) => {
-  const payload = await getPayloadClient()
-  const { docs } = await payload.find({
-    collection: 'categories',
-    where: { slug: { equals: slug } },
-    limit: 1,
-  })
-  return docs[0] ?? null
-})
 
 export async function generateMetadata({
   params,
@@ -35,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const category = await getCategoryBySlug(slug)
+  const category = await getCachedCategoryBySlug(slug)
 
   if (!category) {
     return { title: 'Categoría no encontrada' }
@@ -59,19 +41,13 @@ export default async function CategoryPage({
   const page = Number(resolvedParams.page) || 1
   const filters = parseProductFilters(resolvedParams)
 
-  const payload = await getPayloadClient()
-  const category = await getCategoryBySlug(slug)
+  const category = await getCachedCategoryBySlug(slug)
 
   if (!category) {
     notFound()
   }
 
-  const { docs: childCategories } = await payload.find({
-    collection: 'categories',
-    where: { parent: { equals: category.id } },
-    limit: 50,
-    depth: 0,
-  })
+  const childCategories = await getCachedChildCategories(category.id)
 
   const categoryIds = [category.id, ...childCategories.map((child) => child.id)]
   const baseWhere: Where[] = [
@@ -81,16 +57,10 @@ export default async function CategoryPage({
 
   const [{ docs: products, totalPages, hasNextPage, hasPrevPage }, brands, priceBounds, onSaleCount] =
     await Promise.all([
-      payload.find({
-        collection: 'products',
-        where: mergeWhere(baseWhere, filters),
-        limit: PAGE_SIZE,
-        page,
-        sort: sortToPayload(filters.sort),
-      }),
-      getDistinctBrands(payload, { and: baseWhere }),
-      getPriceBounds(payload, { and: baseWhere }),
-      getOnSaleCount(payload, { and: baseWhere }),
+      getCachedProducts(mergeWhere(baseWhere, filters), sortToPayload(filters.sort), page, PAGE_SIZE),
+      getDistinctBrands({ and: baseWhere }),
+      getPriceBounds({ and: baseWhere }),
+      getOnSaleCount({ and: baseWhere }),
     ])
 
   return (

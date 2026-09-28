@@ -9,6 +9,10 @@ import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getProductBySlug } from '@/lib/products'
 
+// Debe ser un literal estático (analizable en build time) — no se puede
+// importar CATALOG_REVALIDATE_SECONDS acá; mantener en sync manualmente.
+export const revalidate = 300
+
 export async function generateMetadata({
   params,
 }: {

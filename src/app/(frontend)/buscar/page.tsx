@@ -4,13 +4,8 @@ import { FilterBar } from '@/components/FilterBar'
 import { ProductCard } from '@/components/ProductCard'
 import { getProductsIndex } from '@/lib/meilisearch'
 import { getPayloadClient } from '@/lib/payload'
-import {
-  applyFiltersInMemory,
-  getDistinctBrands,
-  getPriceBounds,
-  parseProductFilters,
-  type RawSearchParams,
-} from '@/lib/productFilters'
+import { applyFiltersInMemory, parseProductFilters, type RawSearchParams } from '@/lib/productFilters'
+import { getDistinctBrands, getPriceBounds } from '@/lib/productQueries'
 import type { Product } from '@/payload-types'
 
 export const metadata: Metadata = {
@@ -55,11 +50,10 @@ export default async function SearchPage({
   const rawProducts = query ? await searchProducts(query) : []
   const products = query ? applyFiltersInMemory(rawProducts, filters) : []
 
-  const payload = await getPayloadClient()
   const [brands, priceBounds] = query
     ? await Promise.all([
-        getDistinctBrands(payload, { status: { equals: 'active' } }),
-        getPriceBounds(payload, { status: { equals: 'active' } }),
+        getDistinctBrands({ status: { equals: 'active' } }),
+        getPriceBounds({ status: { equals: 'active' } }),
       ])
     : [[], null]
 

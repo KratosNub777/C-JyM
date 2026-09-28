@@ -3,35 +3,15 @@ import { CategoryShelf } from '@/components/CategoryShelf'
 import { Hero } from '@/components/Hero'
 import { ValuePropStrip } from '@/components/ValuePropStrip'
 import { buildCategoryTree, getParentId } from '@/lib/categories'
-import { getPayloadClient } from '@/lib/payload'
+import { getCachedHomeData } from '@/lib/categoryQueries'
 import type { Product } from '@/payload-types'
 
-export default async function HomePage() {
-  const payload = await getPayloadClient()
+// Debe ser un literal estático (analizable en build time) — no se puede
+// importar CATALOG_REVALIDATE_SECONDS acá; mantener en sync manualmente.
+export const revalidate = 300
 
-  const [{ docs: subcategories }, { docs: allCategories }, { docs: activeProducts }] =
-    await Promise.all([
-      payload.find({
-        collection: 'categories',
-        where: { parent: { exists: true } },
-        limit: 9,
-        sort: 'name',
-        depth: 0,
-      }),
-      payload.find({
-        collection: 'categories',
-        limit: 500,
-        sort: 'name',
-        depth: 1,
-      }),
-      payload.find({
-        collection: 'products',
-        where: { status: { equals: 'active' } },
-        limit: 200,
-        depth: 1,
-        sort: '-createdAt',
-      }),
-    ])
+export default async function HomePage() {
+  const { subcategories, allCategories, activeProducts } = await getCachedHomeData()
 
   const countsByCategory = activeProducts.reduce<Record<number, number>>((counts, product) => {
     const categoryId = typeof product.category === 'object' ? product.category.id : product.category
