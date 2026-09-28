@@ -1,8 +1,16 @@
 import type { Metadata } from 'next'
 
+import { FilterBar } from '@/components/FilterBar'
 import { ProductCard } from '@/components/ProductCard'
 import { getProductsIndex } from '@/lib/meilisearch'
 import { getPayloadClient } from '@/lib/payload'
+import {
+  applyFiltersInMemory,
+  getDistinctBrands,
+  getPriceBounds,
+  parseProductFilters,
+  type RawSearchParams,
+} from '@/lib/productFilters'
 import type { Product } from '@/payload-types'
 
 export const metadata: Metadata = {
@@ -37,12 +45,23 @@ async function searchProducts(query: string): Promise<Product[]> {
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<RawSearchParams & { q?: string }>
 }) {
-  const { q } = await searchParams
+  const resolvedParams = await searchParams
+  const q = Array.isArray(resolvedParams.q) ? resolvedParams.q[0] : resolvedParams.q
   const query = q?.trim() ?? ''
+  const filters = parseProductFilters(resolvedParams)
 
-  const products = query ? await searchProducts(query) : []
+  const rawProducts = query ? await searchProducts(query) : []
+  const products = query ? applyFiltersInMemory(rawProducts, filters) : []
+
+  const payload = await getPayloadClient()
+  const [brands, priceBounds] = query
+    ? await Promise.all([
+        getDistinctBrands(payload, { status: { equals: 'active' } }),
+        getPriceBounds(payload, { status: { equals: 'active' } }),
+      ])
+    : [[], null]
 
   return (
     <div>
@@ -54,20 +73,29 @@ export default async function SearchPage({
         <p className="text-neutral-500 dark:text-neutral-400">
           Escribí algo en el buscador para empezar.
         </p>
-      ) : products.length === 0 ? (
-        <p className="text-neutral-500 dark:text-neutral-400">
-          No encontramos productos que coincidan con tu búsqueda.
-        </p>
       ) : (
         <>
-          <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
-            {products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
-          </p>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div className="mb-6">
+            <FilterBar brands={brands} priceBounds={priceBounds} basePath="/buscar" />
           </div>
+
+          {products.length === 0 ? (
+            <p className="text-neutral-500 dark:text-neutral-400">
+              No encontramos productos que coincidan con tu búsqueda.
+            </p>
+          ) : (
+            <>
+              <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
+                {products.length}{' '}
+                {products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
+              </p>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
