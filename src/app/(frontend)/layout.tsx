@@ -101,10 +101,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 />
                 <button
                   type="submit"
-                  className="flex items-center gap-1.5 bg-brand-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+                  aria-label="Buscar"
+                  className="flex items-center justify-center bg-brand-600 px-5 text-white transition-colors hover:bg-brand-700"
                 >
                   <MagnifyingGlass size={16} weight="bold" />
-                  Buscar
                 </button>
               </div>
             </form>
