@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   Tag,
   Truck,
-  User,
   UsersThree,
   WhatsappLogo,
 } from '@phosphor-icons/react/dist/ssr'
@@ -21,6 +20,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
+import { UserMenu } from '@/components/UserMenu'
 import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
@@ -125,13 +125,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </form>
 
             <div className="ml-auto flex items-center gap-1 sm:ml-0">
-              <button
-                type="button"
-                aria-label="Iniciar sesión"
-                className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-              >
-                <User size={22} weight="regular" />
-              </button>
+              <UserMenu />
 
               <button
                 type="button"

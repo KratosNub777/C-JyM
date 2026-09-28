@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     categories: Category;
     products: Product;
+    addresses: Address;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    addresses: AddressesSelect<false> | AddressesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -223,6 +225,43 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: number;
+  /**
+   * ID de Better Auth; independiente de los usuarios internos de Payload.
+   */
+  customerId: string;
+  fullName: string;
+  phone: string;
+  department:
+    | 'Asunción'
+    | 'Central'
+    | 'Alto Paraná'
+    | 'Itapúa'
+    | 'Caaguazú'
+    | 'San Pedro'
+    | 'Cordillera'
+    | 'Guairá'
+    | 'Caazapá'
+    | 'Misiones'
+    | 'Paraguarí'
+    | 'Ñeembucú'
+    | 'Amambay'
+    | 'Canindeyú'
+    | 'Presidente Hayes'
+    | 'Concepción'
+    | 'Alto Paraguay'
+    | 'Boquerón';
+  city: string;
+  addressLine: string;
+  isDefault?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -260,6 +299,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'addresses';
+        value: number | Address;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -373,6 +416,21 @@ export interface ProductsSelect<T extends boolean = true> {
   compareAtPrice?: T;
   stock?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses_select".
+ */
+export interface AddressesSelect<T extends boolean = true> {
+  customerId?: T;
+  fullName?: T;
+  phone?: T;
+  department?: T;
+  city?: T;
+  addressLine?: T;
+  isDefault?: T;
   updatedAt?: T;
   createdAt?: T;
 }

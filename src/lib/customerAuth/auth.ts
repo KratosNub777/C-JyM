@@ -3,12 +3,14 @@ import { Pool } from 'pg'
 
 // Reuse connections during Next.js development reloads.
 const globalAuth = globalThis as typeof globalThis & { customerAuthPool?: Pool }
-export const customerAuthPool = globalAuth.customerAuthPool ?? new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 5,
-  idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 10_000,
-})
+export const customerAuthPool =
+  globalAuth.customerAuthPool ??
+  new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 5,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
+  })
 if (process.env.NODE_ENV !== 'production') globalAuth.customerAuthPool = customerAuthPool
 
 export const auth = betterAuth({
