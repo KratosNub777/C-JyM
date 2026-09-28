@@ -1,4 +1,19 @@
-import { Clock, MagnifyingGlass, ShoppingCart, Tag, User } from '@phosphor-icons/react/dist/ssr'
+import {
+  ArrowsClockwise,
+  Clock,
+  EnvelopeSimple,
+  FileText,
+  InstagramLogo,
+  MagnifyingGlass,
+  MapPin,
+  ShieldCheck,
+  ShoppingCart,
+  Tag,
+  Truck,
+  User,
+  UsersThree,
+  WhatsappLogo,
+} from '@phosphor-icons/react/dist/ssr'
 import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 import Image from 'next/image'
@@ -153,8 +168,131 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
-        <footer className="mt-16 border-t border-neutral-200 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-          © {new Date().getFullYear()} Comercial José María. Catálogo de productos.
+        <footer className="mt-16 bg-ink-700 text-white">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+              <div className="shrink-0">
+                <Image
+                  src="/logo-dark.png"
+                  alt="Comercial José María"
+                  width={280}
+                  height={140}
+                  className="h-12 w-auto"
+                />
+                <div className="mt-4 flex items-center gap-3">
+                  <a
+                    href="https://wa.me/595000000000"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="WhatsApp de Comercial José María"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand-600"
+                  >
+                    <WhatsappLogo size={18} weight="regular" />
+                  </a>
+                  <a
+                    href="https://instagram.com/jmcomercialpy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram de Comercial José María"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand-600"
+                  >
+                    <InstagramLogo size={18} weight="regular" />
+                  </a>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 lg:flex-1 lg:px-10">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Información</h3>
+                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                    <Link
+                      href="/terminos"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                    >
+                      <FileText size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Términos y condiciones
+                    </Link>
+                    <Link
+                      href="/garantia"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                    >
+                      <ArrowsClockwise size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Garantía y devoluciones
+                    </Link>
+                    <Link
+                      href="/privacidad"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                    >
+                      <ShieldCheck size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Políticas de privacidad
+                    </Link>
+                  </nav>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Institucional</h3>
+                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                    <Link
+                      href="/quienes-somos"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                    >
+                      <UsersThree size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Nosotros
+                    </Link>
+                    <Link
+                      href="/contacto"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                    >
+                      <EnvelopeSimple size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Contacto
+                    </Link>
+                  </nav>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Horario y ubicación</h3>
+                  <div className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                    <div className="flex items-center gap-2">
+                      <Clock size={16} weight="regular" className="shrink-0 text-white/50" />
+                      Lun a Vie 7:30 a 18:30 h · Sáb 7:30 a 16:00 h
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Truck size={16} weight="regular" className="shrink-0 text-white/50" />
+                      {/* TODO(owner): confirmar política real de entregas */}
+                      Entregas próximamente
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <MapPin size={16} weight="regular" className="mt-0.5 shrink-0 text-white/50" />
+                      {/* TODO(owner): reemplazar con la dirección real del local */}
+                      Dirección próximamente
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="shrink-0">
+                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-xs text-white/70">
+                  <ShieldCheck size={20} weight="regular" className="shrink-0 text-white/50" />
+                  {/* TODO(owner): reemplazar por el badge real de la pasarela de pago (Fase 3) */}
+                  <span>
+                    Compra segura
+                    <br />
+                    Próximamente pago online
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs text-white/70 w-fit">
+                <MapPin size={14} weight="regular" className="shrink-0 text-white/50" />
+                Dirección próximamente, Paraguay
+              </div>
+              <p className="text-xs text-white/50">
+                © {new Date().getFullYear()} Comercial José María. Catálogo de productos.
+              </p>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
