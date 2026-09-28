@@ -1,4 +1,16 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import type { CollectionConfig } from 'payload'
+
+import { CATEGORIES_TAG, REVALIDATE_IMMEDIATELY } from '@/lib/cacheTags'
+
+function revalidateCategoriesCache() {
+  try {
+    revalidateTag(CATEGORIES_TAG, REVALIDATE_IMMEDIATELY)
+    revalidatePath('/')
+  } catch (error) {
+    console.error('No se pudo revalidar la caché de categorías:', error)
+  }
+}
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -8,6 +20,18 @@ export const Categories: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [
+      async () => {
+        revalidateCategoriesCache()
+      },
+    ],
+    afterDelete: [
+      async () => {
+        revalidateCategoriesCache()
+      },
+    ],
   },
   fields: [
     {

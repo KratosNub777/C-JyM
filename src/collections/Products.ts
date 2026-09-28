@@ -1,5 +1,7 @@
+import { revalidateTag } from 'next/cache'
 import type { CollectionConfig } from 'payload'
 
+import { PRODUCTS_TAG, REVALIDATE_IMMEDIATELY } from '@/lib/cacheTags'
 import { removeProductFromIndex, syncProductToIndex } from '@/lib/meilisearch'
 
 export const Products: CollectionConfig = {
@@ -19,6 +21,11 @@ export const Products: CollectionConfig = {
         } catch (error) {
           console.error(`No se pudo sincronizar el producto ${doc.id} con Meilisearch:`, error)
         }
+        try {
+          revalidateTag(PRODUCTS_TAG, REVALIDATE_IMMEDIATELY)
+        } catch (error) {
+          console.error('No se pudo revalidar la caché de productos:', error)
+        }
       },
     ],
     afterDelete: [
@@ -27,6 +34,11 @@ export const Products: CollectionConfig = {
           await removeProductFromIndex(doc.id)
         } catch (error) {
           console.error(`No se pudo eliminar el producto ${doc.id} de Meilisearch:`, error)
+        }
+        try {
+          revalidateTag(PRODUCTS_TAG, REVALIDATE_IMMEDIATELY)
+        } catch (error) {
+          console.error('No se pudo revalidar la caché de productos:', error)
         }
       },
     ],
