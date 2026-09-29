@@ -66,6 +66,7 @@ justifique.
 - Variable de entorno de conexión a la base: **`DATABASE_URL`** (no `DATABASE_URI` — así la nombra el adaptador `@payloadcms/db-postgres` generado por `create-payload-app`).
 - Base de datos de desarrollo: Neon (cloud), no local — ver `.env.example`. El usuario gestiona su propia cuenta Neon; el connection string real vive solo en `.env` (gitignored).
 - `SITE_URL`: URL pública del sitio (metadata/OG, sitemap). Sin prefijo `NEXT_PUBLIC_` a propósito — solo se lee en código server-side (`src/lib/site.ts`), nunca en el cliente. En dev queda en `http://localhost:3000`; actualizar cuando se registre el dominio `.com.py`.
+- Identidades separadas: los **clientes** (Better Auth, tablas propias) y el **equipo** (Payload `users`, `/admin` y `/catalogar`) no comparten sesión ni cookies. Una sesión de cliente nunca da acceso al CMS. `customerId` de direcciones y pedidos siempre se deriva de la sesión en el servidor, nunca de un formulario.
 - Pedidos (`Orders`) y direcciones se mutan solo desde server actions con `overrideAccess: true` y filtro por dueño; el stock se reserva/devuelve dentro de transacciones con bloqueos (ver `src/lib/checkout/`).
 - `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch`.
 
