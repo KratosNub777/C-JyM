@@ -35,12 +35,15 @@ export const Orders: CollectionConfig = {
       options: [
         { label: 'Pendiente de pago', value: 'pending_payment' },
         { label: 'Cancelado', value: 'cancelled' },
+        { label: 'Vencido', value: 'expired' },
       ],
     },
     { name: 'subtotal', type: 'number', required: true, min: 0 },
     { name: 'shippingFee', label: 'Costo de entrega', type: 'number', required: true, min: 0 },
     { name: 'total', type: 'number', required: true, min: 0 },
     { name: 'cancelledAt', label: 'Cancelado el', type: 'date' },
+    { name: 'expiresAt', label: 'Reserva hasta', type: 'date', index: true },
+    { name: 'expiredAt', label: 'Vencido el', type: 'date' },
     {
       name: 'items',
       label: 'Productos',

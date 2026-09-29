@@ -276,11 +276,13 @@ export interface Order {
   phone: string;
   notes?: string | null;
   fulfillment: 'pickup';
-  status: 'pending_payment' | 'cancelled';
+  status: 'pending_payment' | 'cancelled' | 'expired';
   subtotal: number;
   shippingFee: number;
   total: number;
   cancelledAt?: string | null;
+  expiresAt?: string | null;
+  expiredAt?: string | null;
   items: {
     productId: number;
     name: string;
@@ -490,6 +492,8 @@ export interface OrdersSelect<T extends boolean = true> {
   shippingFee?: T;
   total?: T;
   cancelledAt?: T;
+  expiresAt?: T;
+  expiredAt?: T;
   items?:
     | T
     | {
