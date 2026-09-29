@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 import {
   CART_STORAGE_KEY,
   MAX_CART_ITEMS,
+  isProductId,
   parseStoredCart,
   quantityLimit,
   type CartItem,
@@ -82,7 +83,7 @@ export function useCart() {
 export function addToCart(productId: number, stock: number): boolean {
   readStorage()
   const limit = quantityLimit(stock)
-  if (!Number.isSafeInteger(productId) || productId <= 0 || !limit) return false
+  if (!isProductId(productId) || !limit) return false
   const existing = snapshot.items.find((item) => item.productId === productId)
   if (existing && existing.quantity >= limit) return false
   if (!existing && snapshot.items.length >= MAX_CART_ITEMS) return false

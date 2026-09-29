@@ -1,5 +1,5 @@
 import { getPayloadClient } from '@/lib/payload'
-import { MAX_CART_ITEMS } from '@/lib/cart/model'
+import { isProductId, MAX_CART_ITEMS } from '@/lib/cart/model'
 
 export const runtime = 'nodejs'
 
@@ -10,9 +10,7 @@ export async function GET(request: Request) {
     !idsParam ||
     idsParam.length > 2_000 ||
     values.length > MAX_CART_ITEMS ||
-    values.some(
-      (value) => !/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) <= 0,
-    )
+    values.some((value) => !/^\d+$/.test(value) || !isProductId(Number(value)))
   ) {
     return Response.json({ error: 'Lista de productos inválida.' }, { status: 400 })
   }

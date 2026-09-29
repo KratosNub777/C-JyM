@@ -1,6 +1,14 @@
 export const CART_STORAGE_KEY = 'c-jym.cart.v1'
 export const MAX_CART_ITEMS = 100
 export const MAX_CART_QUANTITY = 999
+// Payload uses PostgreSQL serial IDs (signed 32-bit integers).
+export const MAX_PRODUCT_ID = 2_147_483_647
+
+export function isProductId(value: unknown): value is number {
+  return (
+    typeof value === 'number' && Number.isSafeInteger(value) && value > 0 && value <= MAX_PRODUCT_ID
+  )
+}
 
 export type CartItem = { productId: number; quantity: number }
 export type CartProduct = {
@@ -26,8 +34,7 @@ export function parseStoredCart(raw: string | null): CartItem[] {
     for (const item of value.items) {
       if (
         !item ||
-        !Number.isSafeInteger(item.productId) ||
-        item.productId <= 0 ||
+        !isProductId(item.productId) ||
         !Number.isSafeInteger(item.quantity) ||
         item.quantity <= 0
       )
