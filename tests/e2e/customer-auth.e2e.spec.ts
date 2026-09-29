@@ -21,6 +21,9 @@ test.afterAll(async () => {
 })
 
 async function register(page: Page, userEmail: string, name: string) {
+  // El rate limit de Better Auth vive en Postgres; los E2E previos (checkout) agotan la ventana de
+  // /sign-up y este registro caería en 429. Solo limpia contadores efímeros de la base de desarrollo.
+  await pool.query('DELETE FROM rate_limit')
   await page.goto(`${base}/registrarse`)
   await page.getByLabel('Nombre completo').fill(name)
   await page.getByLabel('Email', { exact: true }).fill(userEmail)
