@@ -106,6 +106,9 @@ src/
     productFilters.ts       # parseo de filtros de URL (marca, precio, ofertas, orden)
     products.ts, categories.ts, pricing.ts, format.ts, slug.ts
     site.ts                 # helper de SITE_URL para metadata/sitemap
+    customerAuth/           # instancia de Better Auth, sesión de servidor, cliente y validación de direcciones
+    cart/                   # modelo y store del carrito
+    checkout/               # creación/cancelación/vencimiento de pedidos, transacciones, política de reserva, cron
     meilisearch.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
   payload.config.ts        # registro de colecciones + adaptador postgres
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
