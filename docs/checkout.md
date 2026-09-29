@@ -13,7 +13,11 @@ Segunda parte de la Fase 3. Desde `/carrito`, el cliente inicia sesión y confir
 - El carrito se actualiza después de recibir confirmación; se restan las unidades compradas conservando otros productos agregados durante el checkout.
 - Cancelar un pedido pendiente devuelve el stock dentro de otra transacción. Los reintentos concurrentes devuelven stock una sola vez. Un pedido cancelado mantiene su clave de idempotencia y no se recrea al reintentar.
 
-Los productos permanecen reservados hasta cancelar el pedido. **Todavía no hay vencimiento automático**: antes del lanzamiento comercial hay que acordar un plazo de reserva y el proceso para pedidos impagos. Tampoco se debe eliminar un producto con reservas pendientes; si fue eliminado, la cancelación se detiene para evitar una devolución parcial de stock.
+Los pedidos impagos reservan stock durante **24 horas**, según el plazo acordado. Cada pedido guarda `expiresAt`; cambiar `ORDER_RESERVATION_HOURS` solo cambia el plazo de los nuevos pedidos. El proceso automático marca los pedidos vencidos como `expired`, guarda `expiredAt` y devuelve el stock en una única transacción. El detalle del pedido muestra la fecha límite en hora de Paraguay y distingue pedidos vencidos de cancelaciones voluntarias.
+
+La devolución manual y la automática comparten bloqueos y lógica de stock: si coinciden, se devuelve una sola vez. Los pedidos vencidos conservan su clave de idempotencia; reintentarlos no crea un pedido nuevo ni vuelve a reservar productos. Los pedidos anteriores sin fecha límite reciben `createdAt + 24 horas` al procesarlos por primera vez; no se prolonga la reserva desde el momento de la actualización.
+
+Tampoco se debe eliminar un producto con reservas pendientes. Si falta un producto, la operación se revierte, el pedido permanece pendiente y el job informa el error para revisión. Un fallo de un pedido no revierte otras expiraciones ya confirmadas del lote.
 
 El índice actual de Meilisearch no contiene stock. La reserva actualiza PostgreSQL y, después del commit, invalida la caché del catálogo. Un fallo de caché no cambia un pedido confirmado a un error de compra.
 
@@ -23,6 +27,26 @@ Cada Server Action exige sesión de Better Auth. La identidad y el email no se a
 
 `Orders` permite lectura a los administradores del CMS. Crear, editar o borrar por REST/GraphQL/panel está bloqueado para que ninguna modificación manual saltee la transacción de stock. Esta entrega no incorpora estados de pago/aprobación/despacho del panel de gestión de la Fase 4.
 
+## Proceso automático
+
+El servicio de expiración vive en `POST /api/cron/expire-orders` (también admite GET para schedulers). Exige `Authorization: Bearer <CRON_SECRET>` con un secreto de al menos 32 caracteres; sin configuración falla cerrado. No acepta IDs ni fechas del solicitante, no devuelve datos de clientes y responde `Cache-Control: no-store`. Usa la hora de PostgreSQL para decidir qué reservas vencieron.
+
+Procesa hasta 25 pedidos por lote con un presupuesto de 20 segundos y bloqueos `FOR UPDATE SKIP LOCKED` para admitir ejecuciones simultáneas. Informa `expired`, `skipped`, `failed`, `backfilled` y `hasMore`. Devuelve HTTP 503 si hay errores, permitiendo al scheduler reintentar. La caché del catálogo se invalida después de las transacciones.
+
+Con el servidor web iniciado, ejecutar en otro proceso:
+
+```powershell
+npm run orders:worker
+```
+
+El worker consulta el endpoint cada 60 segundos y procesa más lotes si hay pendientes, sin solapar sus propias solicitudes. Requiere `SITE_URL` y `CRON_SECRET`; `RESERVATION_POLL_SECONDS` permite ajustar el intervalo. Fuera de localhost exige HTTPS y no sigue redirects para evitar reenviar el secreto. Para una única ejecución: `npm run orders:expire`.
+
+En producción hay que mantener el worker activo como servicio separado (por ejemplo, junto al backend previsto en Railway), o configurar un scheduler del hosting que llame al mismo endpoint. La liberación ocurre en la siguiente ejecución, normalmente hasta un minuto después del plazo con el worker activo; si el servicio se detiene, procesa el atraso al reiniciarse. **El endpoint por sí solo no programa ejecuciones.**
+
+Vercel Hobby limita los cron jobs a una ejecución diaria; una revisión por minuto requiere un scheduler adecuado al plan o el worker separado. [Límites oficiales de Vercel Cron](https://vercel.com/docs/cron-jobs/usage-and-pricing).
+
+La configuración de desarrollo usa `ORDER_RESERVATION_HOURS=24` y un `CRON_SECRET` generado en `.env` (gitignored). En producción, aplicar [002-reservation-expiration.sql](../migrations/checkout/002-reservation-expiration.sql) después del esquema inicial de Orders y antes de desplegar esta versión; luego configurar un secreto propio y activar el servicio. El script de migración no se ejecuta automáticamente.
+
 ## Validación
 
 ```powershell
@@ -30,14 +54,17 @@ npm run generate:types
 npx tsc --noEmit
 npm run lint
 npm run test:int -- tests/int/checkout.int.spec.ts tests/int/checkout-auth.int.spec.ts tests/int/checkout-client.int.spec.ts
+npm run test:int -- tests/int/reservation-expiration.int.spec.ts tests/int/expiration-route.int.spec.ts tests/int/reservation-worker.int.spec.ts
 npm run test:e2e -- tests/e2e/checkout.e2e.spec.ts --workers=1
 npm run build
 ```
 
 Las pruebas de base crean productos exclusivos de prueba y los eliminan al finalizar. Cubren compra concurrente de la última unidad, idempotencia, cambios de precio, rollback, aislamiento de clientes y devolución única de stock. Las pruebas de navegador cubren ingreso desde el carrito, confirmación, cancelación, privacidad y recuperación de una respuesta perdida, además de comprobar el layout móvil.
 
+Las pruebas de expiración cubren vencimientos reales en PostgreSQL, carreras entre cancelación y expiración, ejecución repetida, errores y reintentos, pedidos antiguos y límites de lote. El worker se prueba contra un servidor HTTP aislado. El E2E de vencimiento usa el mismo servicio con IDs exclusivos de sus fixtures, sin expirar pedidos ajenos de desarrollo.
+
 ## Pendiente para completar la Fase 3
 
-Pasarela Bancard/Pagopar, confirmación verificada de pagos, expiración acordada de reservas, emails transaccionales, datos reales del local y políticas comerciales. Se necesitan migraciones de producción (incluido el esquema de Orders); el push automático del esquema solo aplica en desarrollo. La Fase 3 sigue abierta: requiere revisión de código y seguridad antes de su cierre y lanzamiento.
+Pasarela Bancard/Pagopar, confirmación verificada de pagos, emails transaccionales, datos reales del local y políticas comerciales. La futura confirmación de pago debe verificar la fecha límite y cambiar el estado dentro de la transacción del pedido, de modo que la expiración nunca libere stock de un pago confirmado. Actualmente la aplicación no registra pagos externos ni estados de pago completado. Se necesitan migraciones de producción (incluido el esquema inicial de Orders); el push automático del esquema solo aplica en desarrollo. La Fase 3 sigue abierta: requiere revisión de código y seguridad antes de su cierre y lanzamiento.
 
 Referencias de implementación: [transacciones de Payload](https://payloadcms.com/docs/database/transactions) y [bloqueos de PostgreSQL](https://www.postgresql.org/docs/current/explicit-locking.html).
