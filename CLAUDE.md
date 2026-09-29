@@ -99,6 +99,7 @@ src/
     Pagination.tsx
     Hero.tsx, CategoryBentoGrid.tsx, CategoryShelf.tsx, ValuePropStrip.tsx, HeaderNav.tsx
     InstallmentBreakdown.tsx
+    cart/, checkout/, customerAuth/, UserMenu.tsx   # UI de carrito, checkout y auth de clientes
   lib/
     payload.ts             # helper getPayloadClient() para la Local API de Payload en Server Components
     productQueries.ts, categoryQueries.ts  # queries cacheadas con unstable_cache
