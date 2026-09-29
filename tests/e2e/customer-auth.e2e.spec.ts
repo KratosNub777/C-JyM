@@ -131,7 +131,9 @@ test('Payload admins retain CMS access without gaining a customer session', asyn
   test.setTimeout(120_000)
   const { getPayload } = await import('payload')
   const { default: config } = await import('../../src/payload.config')
-  const payload = await getPayload({ config })
+  // Instancia propia: otros specs destruyen la instancia 'default' que getPayload deja en caché
+  // dentro del mismo worker, y un pool cerrado cuelga payload.create hasta el timeout.
+  const payload = await getPayload({ config, key: `customer-auth-e2e-${run}` })
   let adminId: number | undefined
   try {
     const adminEmail = `fase2-admin-${randomUUID()}@example.com`
