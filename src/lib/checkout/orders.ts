@@ -1,42 +1,18 @@
 import { createHash } from 'node:crypto'
-import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+import { sql } from '@payloadcms/db-postgres'
 import type { Payload } from 'payload'
 import type { Order } from '@/payload-types'
-import { parseCheckout, type CheckoutResult } from './model'
+import { parseCheckout } from './model'
+import {
+  databaseNow,
+  OrderError as CheckoutError,
+  releaseOrderStock,
+  withOrderTransaction as transaction,
+  type OrderResult as Result,
+} from './orderTransactions'
+import { reservationDeadline, reservationHours } from './reservationPolicy'
 
 type Customer = { id: string; email: string }
-type Result = CheckoutResult & { changedProductIds?: number[] }
-class CheckoutError extends Error {
-  constructor(
-    public code: Exclude<CheckoutResult, { ok: true }>['code'],
-    message: string,
-  ) {
-    super(message)
-  }
-}
-
-async function transaction(
-  payload: Payload,
-  work: (
-    req: { transactionID: string | number },
-    db: NonNullable<PostgresAdapter['sessions']>[string]['db'],
-  ) => Promise<Result>,
-): Promise<Result> {
-  const transactionID = await payload.db.beginTransaction()
-  if (!transactionID) throw new Error('Checkout requires database transactions')
-  const sessions = payload.db.sessions as PostgresAdapter['sessions']
-  try {
-    const result = await work({ transactionID }, sessions[transactionID].db)
-    await payload.db.commitTransaction(transactionID)
-    return result
-  } catch (error) {
-    await payload.db.rollbackTransaction(transactionID)
-    if (error instanceof CheckoutError)
-      return { ok: false, code: error.code, message: error.message }
-    throw error
-  }
-}
-
 export async function createCheckoutOrder(
   payload: Payload,
   customer: Customer,
@@ -46,6 +22,7 @@ export async function createCheckoutOrder(
   if (!input)
     return { ok: false, code: 'INVALID', message: 'Revisá los datos del pedido y del contacto.' }
   const checkoutKey = `${customer.id}:${input.requestId}`
+  const hours = reservationHours()
   const requestHash = createHash('sha256')
     .update(JSON.stringify({ ...input, email: customer.email }))
     .digest('hex')
@@ -130,6 +107,9 @@ export async function createCheckoutOrder(
         sql: sql`UPDATE products SET stock = stock - ${item.quantity}, updated_at = NOW() WHERE id = ${item.productId}`,
       })
     }
+    const expiresAt = new Date(
+      (await databaseNow(payload, db)).getTime() + hours * 3600000,
+    ).toISOString()
     const order = await payload.create({
       collection: 'orders',
       req,
@@ -144,6 +124,7 @@ export async function createCheckoutOrder(
         notes: input.notes,
         fulfillment: 'pickup',
         status: 'pending_payment',
+        expiresAt,
         subtotal,
         shippingFee: 0,
         total: subtotal,
@@ -178,7 +159,7 @@ export async function cancelCheckoutOrder(
   const result = await transaction(payload, async (req, db) => {
     await payload.db.execute({
       db,
-      sql: sql`SELECT id FROM orders WHERE id = ${orderId} FOR UPDATE`,
+      sql: sql`SELECT id FROM orders WHERE id = ${orderId} AND customer_id = ${customerId} FOR UPDATE`,
     })
     const found = await payload.find({
       collection: 'orders',
@@ -190,35 +171,12 @@ export async function cancelCheckoutOrder(
     })
     const order = found.docs[0]
     if (!order) throw new CheckoutError('INVALID', 'El pedido no existe.')
-    if (order.status === 'cancelled') return { ok: true, orderId }
+    if (order.status === 'cancelled' || order.status === 'expired') return { ok: true, orderId }
     if (order.status !== 'pending_payment')
       throw new CheckoutError('CONFLICT', 'Este pedido ya no se puede cancelar.')
-    const items = [...order.items].sort((a, b) => a.productId - b.productId)
-    const ids = items.map((item) => item.productId)
-    const locked = await payload.db.execute({
-      db,
-      sql: sql`SELECT id FROM products WHERE id IN (${sql.join(
-        ids.map((id) => sql`${id}`),
-        sql`, `,
-      )}) ORDER BY id FOR UPDATE`,
-    })
-    if (locked.rows.length !== ids.length)
-      throw new CheckoutError(
-        'CONFLICT',
-        'No pudimos devolver el stock. Contactá al local para cancelar este pedido.',
-      )
-    for (const item of items)
-      await payload.db.execute({
-        db,
-        sql: sql`UPDATE products SET stock = stock + ${item.quantity}, updated_at = NOW() WHERE id = ${item.productId}`,
-      })
-    await payload.update({
-      collection: 'orders',
-      id: orderId,
-      req,
-      overrideAccess: true,
-      data: { status: 'cancelled', cancelledAt: new Date().toISOString() },
-    })
+    const now = await databaseNow(payload, db)
+    const status = new Date(reservationDeadline(order)) <= now ? 'expired' : 'cancelled'
+    const ids = await releaseOrderStock(payload, order, req, db, status)
     return { ok: true, orderId, changedProductIds: ids }
   })
   if (result.ok) {
@@ -228,7 +186,8 @@ export async function cancelCheckoutOrder(
       depth: 0,
       overrideAccess: true,
     })
-    if (saved.status !== 'cancelled') throw new Error('Cancellation commit could not be verified')
+    if (saved.status !== 'cancelled' && saved.status !== 'expired')
+      throw new Error('Cancellation commit could not be verified')
   }
   return result
 }
