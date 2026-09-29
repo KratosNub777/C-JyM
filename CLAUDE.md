@@ -86,6 +86,10 @@ src/
       sitemap.ts / robots.ts
       styles.css           # entry point de Tailwind (@import 'tailwindcss')
     (payload)/            # admin panel + API de Payload (autogenerado, no tocar a mano)
+    api/
+      auth/[...all]/         # handler de Better Auth
+      carrito/               # consulta de precios y stock actuales por IDs
+      cron/expire-orders/    # vence pedidos impagos (Bearer CRON_SECRET)
     catalogar/            # formulario público fuera del catálogo (no confundir con /admin)
   collections/
     Users.ts              # usuarios admin del CMS (no confundir con clientes — eso es Fase 2/Better Auth)
