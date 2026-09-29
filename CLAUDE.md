@@ -124,3 +124,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Pruebas
+
+- `npm run test:int` (Vitest) y `npm run test:e2e` (Playwright, el script incluye el loader de `tsx`; no correr `npx playwright` directo). **Ambos corren contra la base Neon de desarrollo** y crean/eliminan sus propios fixtures — nunca apuntar `DATABASE_URL` a producción.
+- Playwright corre con `workers: 1` a propósito: los E2E comparten base (stock, pedidos, clientes) y en paralelo se interfieren.
+- Al escribir E2E nuevos: (1) el rate limit de Better Auth vive en Postgres y `/sign-up` se agota tras pocos registros seguidos — limpiar `rate_limit` antes de registrar (ver `register()` en `customer-auth.e2e.spec.ts`); (2) `getPayload()` cachea la instancia `default` por worker y otros specs la destruyen en su `afterAll` — usar `getPayload({ config, key: ... })` propio para no heredar un pool cerrado.
+- Antes de desplegar: definir `SITE_URL` con la URL HTTPS real (el build avisa si falta en producción).
