@@ -36,6 +36,8 @@ Repo: https://github.com/KratosNub777/C-JyM.git
 3. **Fase 3 — Carrito + checkout + pagos.** Integración con Bancard o Pagopar, manejo de stock en tiempo real, emails transaccionales. Requiere especial cuidado en seguridad (correr `/security-review` antes de cerrar esta fase).
 4. **Fase 4 — Panel de pedidos y post-venta.** Gestión de estados de pedido, historial de compras, notificaciones, reportes básicos.
 
+**Estado actual:** Fase 1 y Fase 2 completas (verificadas: tipos, lint, build, Vitest y Playwright). La **Fase 3 está en curso**: ya hay carrito persistente, checkout con retiro en el local, reserva atómica de stock y vencimiento automático de pedidos impagos; falta la pasarela de pago, confirmación verificada, emails transaccionales y revisión de seguridad (ver `docs/checkout.md`, sección "Pendiente para completar la Fase 3"). Docs por área: `docs/fase-2-autenticacion.md`, `docs/carrito.md`, `docs/checkout.md`.
+
 Cada fase es independiente y facturable por separado. El detalle de alcance/precio está en la propuesta de presupuesto (documento separado, no en este repo).
 
 ## Escalabilidad
