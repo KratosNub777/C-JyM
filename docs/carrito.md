@@ -11,7 +11,7 @@ El carrito está disponible para visitantes y clientes en `/carrito`. Se puede a
 - Límites defensivos: 100 productos distintos y 999 unidades por producto, además del stock disponible. Se descartan IDs/cantidades inválidos y se recupera un carrito vacío ante almacenamiento corrupto.
 - El subtotal omite productos sin disponibilidad. Las cantidades superiores al stock se señalan para que el cliente las ajuste.
 
-El carrito no reserva ni descuenta stock y todavía no crea pedidos. Checkout, entrega, pasarela de pagos y confirmación del pedido siguen pendientes para las siguientes partes de la Fase 3. El futuro checkout deberá recalcular precios y validar/reservar stock en el servidor.
+El carrito por sí solo no reserva ni descuenta stock. Ahora permite continuar a un [checkout con retiro en el local](checkout.md): el servidor recalcula precios, valida stock y crea un pedido pendiente de pago. La integración de la pasarela sigue pendiente para completar la Fase 3.
 
 ## Verificación
 
