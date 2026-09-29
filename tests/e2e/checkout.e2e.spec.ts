@@ -6,12 +6,14 @@ import { getPayload, type Payload } from 'payload'
 import config from '../../src/payload.config'
 import { CART_STORAGE_KEY } from '../../src/lib/cart/model'
 import { orderReference } from '../../src/lib/checkout/model'
+import { expirePendingOrders } from '../../src/lib/checkout/expireOrders'
 
 const base = 'http://localhost:3000'
 const run = randomUUID()
 const email = `checkout-ui-${run}@example.com`
 const otherEmail = `checkout-ui-other-${run}@example.com`
 const lostEmail = `checkout-ui-lost-${run}@example.com`
+const expiredEmail = `checkout-ui-expired-${run}@example.com`
 const password = `Test-${run}!`
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 let payload: Payload
@@ -42,7 +44,7 @@ test.beforeAll(async () => {
 })
 test.afterAll(async () => {
   const customers = await pool.query('SELECT id FROM "user" WHERE email = ANY($1)', [
-    [email, otherEmail, lostEmail],
+    [email, otherEmail, lostEmail, expiredEmail],
   ])
   if (payload) {
     if (customers.rows.length)
@@ -54,7 +56,9 @@ test.afterAll(async () => {
     if (productId) await payload.delete({ collection: 'products', id: productId })
     await payload.destroy()
   }
-  await pool.query('DELETE FROM "user" WHERE email = ANY($1)', [[email, otherEmail, lostEmail]])
+  await pool.query('DELETE FROM "user" WHERE email = ANY($1)', [
+    [email, otherEmail, lostEmail, expiredEmail],
+  ])
   await pool.end()
 })
 
@@ -247,4 +251,58 @@ test('lost confirmation response can be retried after reload without a second re
   await page.getByRole('button', { name: 'Cancelar pedido', exact: true }).click()
   await page.getByRole('button', { name: 'Sí, cancelar pedido', exact: true }).click()
   await expect(page.getByRole('status')).toHaveText('Cancelado')
+})
+
+test('reservation deadline and expired receipt are shown without a second stock return', async ({
+  page,
+}) => {
+  test.setTimeout(120000)
+  await page.goto(`${base}/registrarse?next=/checkout`)
+  await register(page, expiredEmail)
+  await expect(page).toHaveURL(`${base}/checkout`)
+  await page.evaluate(
+    ({ key, id }) =>
+      localStorage.setItem(
+        key,
+        JSON.stringify({ version: 1, items: [{ productId: id, quantity: 1 }] }),
+      ),
+    { key: CART_STORAGE_KEY, id: productId },
+  )
+  await page.reload()
+  await expect(
+    page.getByText('Al confirmar reservamos el stock durante 24 horas.', { exact: false }),
+  ).toBeVisible()
+  await page.getByLabel('Teléfono', { exact: true }).fill('0981123456')
+  await page.getByRole('button', { name: 'Confirmar pedido', exact: true }).click()
+  await expect(page).toHaveURL(/\/cuenta\/pedidos\/\d+$/)
+  const id = Number(page.url().split('/').at(-1))
+  await expect(page.getByText('Reserva hasta el', { exact: false })).toBeVisible()
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.screenshot({ path: '.playwright-cli/reservation-deadline-mobile.png', fullPage: true })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
+  expect((await page.request.post(`${base}/api/cron/expire-orders`)).status()).toBe(401)
+  await pool.query(
+    "UPDATE orders SET expires_at = clock_timestamp() - INTERVAL '1 minute' WHERE id = $1",
+    [id],
+  )
+  // Same batch service as the worker, scoped to this fixture to protect other development orders.
+  expect((await expirePendingOrders(payload, { orderIds: [id] })).expired).toBe(1)
+  await page.reload()
+  await expect(page.getByRole('status')).toHaveText('Vencido')
+  await expect(
+    page.getByText('Tu pedido venció y el stock reservado se liberó.', { exact: false }),
+  ).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Cancelar pedido', exact: true })).toHaveCount(0)
+  expect(
+    (await pool.query('SELECT stock::integer AS stock FROM products WHERE id = $1', [productId]))
+      .rows[0].stock,
+  ).toBe(3)
+  expect((await expirePendingOrders(payload, { orderIds: [id] })).expired).toBe(0)
+  await page.screenshot({ path: '.playwright-cli/reservation-expired-mobile.png', fullPage: true })
+  await page.goto(`${base}/cuenta/pedidos`)
+  await expect(
+    page.getByRole('link', { name: new RegExp(`${orderReference(id)}.*Vencido`) }),
+  ).toBeVisible()
 })
