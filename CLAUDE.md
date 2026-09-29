@@ -92,6 +92,7 @@ src/
     Media.ts              # uploads (imágenes de producto)
     Categories.ts          # categorías, soporta jerarquía vía campo `parent`
     Products.ts             # productos: precio en Gs., stock, categoría, imágenes, status
+    Orders.ts               # pedidos con snapshot de precios; sin create/update/delete públicos, todo pasa por checkout
   components/
     ProductCard.tsx        # tarjeta de producto reutilizada en home/listado/categoría
     ProductCarousel.tsx, ProductGridSkeleton.tsx
