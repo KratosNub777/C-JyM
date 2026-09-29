@@ -7,7 +7,6 @@ import {
   MagnifyingGlass,
   MapPin,
   ShieldCheck,
-  ShoppingCart,
   Tag,
   Truck,
   UsersThree,
@@ -21,6 +20,8 @@ import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
 import { UserMenu } from '@/components/UserMenu'
+import { CartLink } from '@/components/cart/CartLink'
+import { CartFeedback } from '@/components/cart/CartFeedback'
 import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
@@ -127,16 +128,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             <div className="ml-auto flex items-center gap-1 sm:ml-0">
               <UserMenu />
 
-              <button
-                type="button"
-                aria-label="Carrito"
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-              >
-                <ShoppingCart size={22} weight="regular" />
-                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
-                  0
-                </span>
-              </button>
+              <CartLink />
             </div>
           </div>
 
@@ -162,6 +154,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
+        <CartFeedback />
         <footer className="mt-16 bg-ink-700 text-white">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">

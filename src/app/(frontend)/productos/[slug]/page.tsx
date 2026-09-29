@@ -1,10 +1,11 @@
-import { ImageSquare, ShoppingCart } from '@phosphor-icons/react/dist/ssr'
+import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { InstallmentBreakdown } from '@/components/InstallmentBreakdown'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getProductBySlug } from '@/lib/products'
@@ -26,7 +27,8 @@ export async function generateMetadata({
   }
 
   const image = product.images?.find((img): img is Media => typeof img === 'object')
-  const description = product.description?.slice(0, 160) || `${product.name} en Comercial José María.`
+  const description =
+    product.description?.slice(0, 160) || `${product.name} en Comercial José María.`
 
   return {
     title: product.name,
@@ -40,11 +42,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
@@ -53,9 +51,7 @@ export default async function ProductPage({
   }
 
   const category = typeof product.category === 'object' ? (product.category as Category) : null
-  const images = (product.images ?? []).filter(
-    (image): image is Media => typeof image === 'object',
-  )
+  const images = (product.images ?? []).filter((image): image is Media => typeof image === 'object')
 
   const hasDiscount = !!product.compareAtPrice && product.compareAtPrice > product.price
   const inStock = product.stock > 0
@@ -148,14 +144,12 @@ export default async function ProductPage({
 
         <InstallmentBreakdown price={product.price} compareAtPrice={product.compareAtPrice} />
 
-        <button
-          type="button"
-          disabled
-          className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white opacity-50"
-        >
-          <ShoppingCart size={18} weight="bold" />
-          Agregar al carrito (próximamente)
-        </button>
+        <AddToCartButton
+          productId={product.id}
+          name={product.name}
+          stock={product.stock}
+          active={product.status === 'active'}
+        />
 
         {product.description && (
           <div className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">

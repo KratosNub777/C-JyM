@@ -1,10 +1,11 @@
-import { ImageSquare, ShoppingCart } from '@phosphor-icons/react/dist/ssr'
+import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Media, Product } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getInstallmentOptions } from '@/lib/pricing'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
 
 export function ProductCard({ product }: { product: Product }) {
   const firstImage = product.images?.[0]
@@ -22,10 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
   const inStock = product.stock > 0
 
   return (
-    <Link
-      href={`/productos/${product.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
-    >
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
       <div className="relative aspect-square w-full bg-neutral-100 dark:bg-neutral-800">
         {image?.url ? (
           <Image
@@ -67,7 +65,12 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <h3 className="line-clamp-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">
-          {product.name}
+          <Link
+            href={`/productos/${product.slug}`}
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-brand-600"
+          >
+            {product.name}
+          </Link>
         </h3>
 
         <div className="mt-auto flex items-end justify-between gap-2 pt-1">
@@ -85,14 +88,17 @@ export function ProductCard({ product }: { product: Product }) {
             </p>
           </div>
 
-          <span
-            aria-hidden="true"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition group-hover:bg-brand-700"
-          >
-            <ShoppingCart size={16} weight="bold" />
-          </span>
+          <div className="relative z-10">
+            <AddToCartButton
+              productId={product.id}
+              name={product.name}
+              stock={product.stock}
+              active={product.status === 'active'}
+              compact
+            />
+          </div>
         </div>
       </div>
-    </Link>
+    </article>
   )
 }
