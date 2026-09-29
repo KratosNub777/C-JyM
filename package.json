@@ -18,7 +18,9 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "auth:generate": "tsx scripts/customer-auth-migrate.ts --generate",
-    "auth:migrate": "tsx scripts/customer-auth-migrate.ts"
+    "auth:migrate": "tsx scripts/customer-auth-migrate.ts",
+    "orders:worker": "node scripts/reservation-worker.mjs",
+    "orders:expire": "node scripts/reservation-worker.mjs --once"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.90.2",
