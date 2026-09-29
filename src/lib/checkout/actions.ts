@@ -1,10 +1,9 @@
 'use server'
 
 import { headers } from 'next/headers'
-import { revalidatePath, revalidateTag } from 'next/cache'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { getPayloadClient } from '@/lib/payload'
-import { PRODUCTS_TAG, REVALIDATE_IMMEDIATELY } from '@/lib/cacheTags'
+import { refreshOrderCache as refreshOrders } from './refreshOrderCache'
 import { createCheckoutOrder, cancelCheckoutOrder } from './orders'
 import type { CheckoutResult } from './model'
 
@@ -41,16 +40,5 @@ export async function cancelOrder(orderId: number): Promise<CheckoutResult> {
       code: 'FAILED',
       message: 'No pudimos cancelar el pedido. Intentá nuevamente.',
     }
-  }
-}
-
-function refreshOrders(orderId: number) {
-  // Cache errors cannot turn an already committed order into a failed checkout.
-  try {
-    revalidateTag(PRODUCTS_TAG, REVALIDATE_IMMEDIATELY)
-    revalidatePath('/cuenta/pedidos')
-    revalidatePath(`/cuenta/pedidos/${orderId}`)
-  } catch (error) {
-    console.error('No se pudo revalidar después del pedido:', error)
   }
 }
