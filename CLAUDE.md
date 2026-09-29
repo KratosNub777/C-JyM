@@ -86,6 +86,9 @@ src/
       sitemap.ts / robots.ts
       styles.css           # entry point de Tailwind (@import 'tailwindcss')
     (payload)/            # admin panel + API de Payload (autogenerado, no tocar a mano)
+      ingresar/ registrarse/  # login y registro de clientes (`?next=/checkout` es el único destino alternativo permitido)
+      cuenta/                 # área privada: perfil, direcciones/, pedidos/ y pedidos/[id]
+      carrito/ checkout/      # carrito (localStorage + precios/stock actuales vía /api/carrito) y checkout con retiro en el local
     api/
       auth/[...all]/         # handler de Better Auth
       carrito/               # consulta de precios y stock actuales por IDs
