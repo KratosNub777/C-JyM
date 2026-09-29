@@ -118,6 +118,16 @@ export function clearCart() {
   save([])
 }
 
+export function consumeCartItems(purchased: CartItem[]) {
+  readStorage()
+  const quantities = new Map(purchased.map((item) => [item.productId, item.quantity]))
+  save(
+    snapshot.items
+      .map((item) => ({ ...item, quantity: item.quantity - (quantities.get(item.productId) ?? 0) }))
+      .filter((item) => item.quantity > 0),
+  )
+}
+
 export function showCartNotice(message: string, error = false) {
   snapshot = { ...snapshot, notice: { message, error } }
   notify()

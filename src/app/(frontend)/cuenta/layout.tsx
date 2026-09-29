@@ -20,6 +20,9 @@ export default async function AccountLayout({ children }: { children: React.Reac
         <Link href="/cuenta/direcciones" className="hover:text-brand-600">
           Mis direcciones
         </Link>
+        <Link href="/cuenta/pedidos" className="hover:text-brand-600">
+          Mis pedidos
+        </Link>
       </nav>
       {children}
     </div>

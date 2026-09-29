@@ -72,6 +72,13 @@ export function UserMenu() {
             >
               Mis direcciones
             </Link>
+            <Link
+              href="/cuenta/pedidos"
+              onClick={close}
+              className="rounded-lg px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              Mis pedidos
+            </Link>
             <SignOutButton className="w-full rounded-lg px-3 py-2 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800" />
           </nav>
         </div>

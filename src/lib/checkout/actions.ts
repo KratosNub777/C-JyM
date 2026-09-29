@@ -14,7 +14,7 @@ export async function placeOrder(input: unknown): Promise<CheckoutResult> {
     return { ok: false, code: 'AUTH', message: 'Ingresá a tu cuenta para confirmar el pedido.' }
   try {
     const result = await createCheckoutOrder(await getPayloadClient(), session.user, input)
-    if (result.ok && result.changedProductIds?.length) refreshOrders()
+    if (result.ok && result.changedProductIds?.length) refreshOrders(result.orderId)
     return result.ok ? { ok: true, orderId: result.orderId } : result
   } catch (error) {
     console.error('No se pudo confirmar el pedido:', error)
@@ -32,7 +32,7 @@ export async function cancelOrder(orderId: number): Promise<CheckoutResult> {
     return { ok: false, code: 'AUTH', message: 'Ingresá a tu cuenta para cancelar el pedido.' }
   try {
     const result = await cancelCheckoutOrder(await getPayloadClient(), session.user.id, orderId)
-    if (result.ok) refreshOrders()
+    if (result.ok) refreshOrders(result.orderId)
     return result.ok ? { ok: true, orderId: result.orderId } : result
   } catch (error) {
     console.error('No se pudo cancelar el pedido:', error)
@@ -44,11 +44,12 @@ export async function cancelOrder(orderId: number): Promise<CheckoutResult> {
   }
 }
 
-function refreshOrders() {
+function refreshOrders(orderId: number) {
   // Cache errors cannot turn an already committed order into a failed checkout.
   try {
     revalidateTag(PRODUCTS_TAG, REVALIDATE_IMMEDIATELY)
-    revalidatePath('/cuenta/pedidos', 'layout')
+    revalidatePath('/cuenta/pedidos')
+    revalidatePath(`/cuenta/pedidos/${orderId}`)
   } catch (error) {
     console.error('No se pudo revalidar después del pedido:', error)
   }

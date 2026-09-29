@@ -8,7 +8,13 @@ import { authClient } from '@/lib/customerAuth/client'
 const inputClass =
   'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-base outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 dark:border-neutral-700 dark:bg-neutral-900'
 
-export function CustomerAuthForm({ register = false }: { register?: boolean }) {
+export function CustomerAuthForm({
+  register = false,
+  destination = '/cuenta',
+}: {
+  register?: boolean
+  destination?: '/cuenta' | '/checkout'
+}) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -40,7 +46,7 @@ export function CustomerAuthForm({ register = false }: { register?: boolean }) {
           )
         return
       }
-      router.replace('/cuenta')
+      router.replace(destination)
       router.refresh()
     } catch {
       setMessage('No pudimos conectarnos. Intentá nuevamente.')
@@ -136,7 +142,7 @@ export function CustomerAuthForm({ register = false }: { register?: boolean }) {
       <p className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
         {register ? '¿Ya tenés una cuenta?' : '¿Todavía no tenés cuenta?'}{' '}
         <Link
-          href={register ? '/ingresar' : '/registrarse'}
+          href={`${register ? '/ingresar' : '/registrarse'}${destination === '/checkout' ? '?next=/checkout' : ''}`}
           className="font-semibold text-brand-600 underline-offset-4 hover:underline dark:text-brand-400"
         >
           {register ? 'Ingresá' : 'Registrate'}

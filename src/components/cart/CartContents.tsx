@@ -280,15 +280,16 @@ export function CartContents() {
                 </p>
               )}
               <p className="mt-5 border-t border-neutral-200 pt-5 text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-                La compra online estará disponible próximamente. Mientras tanto, podés preparar tu
-                carrito.
+                Confirmá tu pedido con retiro en el local. Quedará pendiente de pago.
               </p>
-              <Link
-                href="/productos"
-                className="mt-5 flex justify-center rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
-              >
-                Seguir viendo productos
-              </Link>
+              {!hasUnavailable && (
+                <Link
+                  href="/checkout"
+                  className="mt-5 flex justify-center rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+                >
+                  Continuar al checkout
+                </Link>
+              )}
               <p className="mt-4 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
                 Guardar productos en el carrito no reserva el stock. Los precios y la disponibilidad
                 pueden cambiar.
