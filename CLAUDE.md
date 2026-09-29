@@ -36,6 +36,8 @@ Repo: https://github.com/KratosNub777/C-JyM.git
 3. **Fase 3 — Carrito + checkout + pagos.** Integración con Bancard o Pagopar, manejo de stock en tiempo real, emails transaccionales. Requiere especial cuidado en seguridad (correr `/security-review` antes de cerrar esta fase).
 4. **Fase 4 — Panel de pedidos y post-venta.** Gestión de estados de pedido, historial de compras, notificaciones, reportes básicos.
 
+**Estado actual:** Fase 1 y Fase 2 completas (verificadas: tipos, lint, build, Vitest y Playwright). La **Fase 3 está en curso**: ya hay carrito persistente, checkout con retiro en el local, reserva atómica de stock y vencimiento automático de pedidos impagos; falta la pasarela de pago, confirmación verificada, emails transaccionales y revisión de seguridad (ver `docs/checkout.md`, sección "Pendiente para completar la Fase 3"). Docs por área: `docs/fase-2-autenticacion.md`, `docs/carrito.md`, `docs/checkout.md`.
+
 Cada fase es independiente y facturable por separado. El detalle de alcance/precio está en la propuesta de presupuesto (documento separado, no en este repo).
 
 ## Escalabilidad
@@ -66,6 +68,10 @@ justifique.
 - Variable de entorno de conexión a la base: **`DATABASE_URL`** (no `DATABASE_URI` — así la nombra el adaptador `@payloadcms/db-postgres` generado por `create-payload-app`).
 - Base de datos de desarrollo: Neon (cloud), no local — ver `.env.example`. El usuario gestiona su propia cuenta Neon; el connection string real vive solo en `.env` (gitignored).
 - `SITE_URL`: URL pública del sitio (metadata/OG, sitemap). Sin prefijo `NEXT_PUBLIC_` a propósito — solo se lee en código server-side (`src/lib/site.ts`), nunca en el cliente. En dev queda en `http://localhost:3000`; actualizar cuando se registre el dominio `.com.py`.
+- `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL`: auth de clientes (Fase 2). El secreto es aleatorio, ≥32 caracteres y distinto de `PAYLOAD_SECRET`. Las tablas de Better Auth (`user`, `session`, `account`, `verification`, `rate_limit`) las crea `npm run auth:migrate` y están excluidas del `tablesFilter` de Payload — mantener esa exclusión.
+- `ORDER_RESERVATION_HOURS` (1–168, default 24): plazo de reserva de stock de un pedido impago; se guarda en cada pedido. `CRON_SECRET` (≥32 caracteres): protege `POST /api/cron/expire-orders`. `RESERVATION_POLL_SECONDS`: intervalo del worker (`npm run orders:worker`; `npm run orders:expire` corre una vez).
+- Identidades separadas: los **clientes** (Better Auth, tablas propias) y el **equipo** (Payload `users`, `/admin` y `/catalogar`) no comparten sesión ni cookies. Una sesión de cliente nunca da acceso al CMS. `customerId` de direcciones y pedidos siempre se deriva de la sesión en el servidor, nunca de un formulario.
+- Pedidos (`Orders`) y direcciones se mutan solo desde server actions con `overrideAccess: true` y filtro por dueño; el stock se reserva/devuelve dentro de transacciones con bloqueos (ver `src/lib/checkout/`).
 - `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch`.
 
 ### Estructura de carpetas (generada por `create-payload-app` template `blank`, Payload 3.x)
@@ -86,12 +92,21 @@ src/
       sitemap.ts / robots.ts
       styles.css           # entry point de Tailwind (@import 'tailwindcss')
     (payload)/            # admin panel + API de Payload (autogenerado, no tocar a mano)
+      ingresar/ registrarse/  # login y registro de clientes (`?next=/checkout` es el único destino alternativo permitido)
+      cuenta/                 # área privada: perfil, direcciones/, pedidos/ y pedidos/[id]
+      carrito/ checkout/      # carrito (localStorage + precios/stock actuales vía /api/carrito) y checkout con retiro en el local
+    api/
+      auth/[...all]/         # handler de Better Auth
+      carrito/               # consulta de precios y stock actuales por IDs
+      cron/expire-orders/    # vence pedidos impagos (Bearer CRON_SECRET)
     catalogar/            # formulario público fuera del catálogo (no confundir con /admin)
   collections/
     Users.ts              # usuarios admin del CMS (no confundir con clientes — eso es Fase 2/Better Auth)
     Media.ts              # uploads (imágenes de producto)
     Categories.ts          # categorías, soporta jerarquía vía campo `parent`
     Products.ts             # productos: precio en Gs., stock, categoría, imágenes, status
+    Addresses.ts            # direcciones de clientes (customerId de Better Auth); solo el equipo lee por REST
+    Orders.ts               # pedidos con snapshot de precios; sin create/update/delete públicos, todo pasa por checkout
   components/
     ProductCard.tsx        # tarjeta de producto reutilizada en home/listado/categoría
     ProductCarousel.tsx, ProductGridSkeleton.tsx
@@ -99,6 +114,7 @@ src/
     Pagination.tsx
     Hero.tsx, CategoryBentoGrid.tsx, CategoryShelf.tsx, ValuePropStrip.tsx, HeaderNav.tsx
     InstallmentBreakdown.tsx
+    cart/, checkout/, customerAuth/, UserMenu.tsx   # UI de carrito, checkout y auth de clientes
   lib/
     payload.ts             # helper getPayloadClient() para la Local API de Payload en Server Components
     productQueries.ts, categoryQueries.ts  # queries cacheadas con unstable_cache
@@ -106,11 +122,15 @@ src/
     productFilters.ts       # parseo de filtros de URL (marca, precio, ofertas, orden)
     products.ts, categories.ts, pricing.ts, format.ts, slug.ts
     site.ts                 # helper de SITE_URL para metadata/sitemap
+    customerAuth/           # instancia de Better Auth, sesión de servidor, cliente y validación de direcciones
+    cart/                   # modelo y store del carrito
+    checkout/               # creación/cancelación/vencimiento de pedidos, transacciones, política de reserva, cron
     meilisearch.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
   payload.config.ts        # registro de colecciones + adaptador postgres
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
 ```
 
+- `migrations/`: SQL de referencia para producción (`customer-auth/`, `checkout/`). El push automático de Payload solo aplica en desarrollo; antes de desplegar hay que preparar las migraciones de Payload (incluido el esquema de Orders).
 - Alias de import: `@/*` → `src/*`, `@payload-config` → `src/payload.config.ts` (ya configurados en `tsconfig.json`).
 - Después de agregar/editar campos en una colección, correr `npm run generate:types` para actualizar `payload-types.ts`.
 - Las páginas del frontend usan la **Local API** de Payload (`getPayloadClient()` + `payload.find(...)`) en vez de llamar a la API REST — es más rápido porque no hay round-trip HTTP dentro del mismo proceso Next.js.
@@ -124,3 +144,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Pruebas
+
+- `npm run test:int` (Vitest) y `npm run test:e2e` (Playwright, el script incluye el loader de `tsx`; no correr `npx playwright` directo). **Ambos corren contra la base Neon de desarrollo** y crean/eliminan sus propios fixtures — nunca apuntar `DATABASE_URL` a producción.
+- Playwright corre con `workers: 1` a propósito: los E2E comparten base (stock, pedidos, clientes) y en paralelo se interfieren.
+- Al escribir E2E nuevos: (1) el rate limit de Better Auth vive en Postgres y `/sign-up` se agota tras pocos registros seguidos — limpiar `rate_limit` antes de registrar (ver `register()` en `customer-auth.e2e.spec.ts`); (2) `getPayload()` cachea la instancia `default` por worker y otros specs la destruyen en su `afterAll` — usar `getPayload({ config, key: ... })` propio para no heredar un pool cerrado.
+- Antes de desplegar: definir `SITE_URL` con la URL HTTPS real (el build avisa si falta en producción).
