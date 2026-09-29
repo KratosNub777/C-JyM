@@ -19,11 +19,13 @@ export function CheckoutForm({
   name,
   email,
   phone,
+  reservationHours,
 }: {
   customerId: string
   name: string
   email: string
   phone: string
+  reservationHours: number
 }) {
   const router = useRouter()
   const { items, ready } = useCart()
@@ -194,7 +196,8 @@ export function CheckoutForm({
               María antes de acercarte al local.
             </p>
             <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-              Al confirmar reservamos el stock. Podés cancelar desde tu cuenta si cambiás de idea.
+              Al confirmar reservamos el stock durante {reservationHours} horas. Si no se paga a
+              tiempo, el pedido vence y se libera el stock. También podés cancelar desde tu cuenta.
             </p>
           </section>
         </div>

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { CheckoutForm } from '@/components/checkout/CheckoutForm'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { getPayloadClient } from '@/lib/payload'
+import { reservationHours } from '@/lib/checkout/reservationPolicy'
 
 export const metadata: Metadata = {
   title: 'Confirmar pedido',
@@ -27,6 +28,7 @@ export default async function CheckoutPage() {
       name={addresses.docs[0]?.fullName ?? session.user.name}
       email={session.user.email}
       phone={addresses.docs[0]?.phone ?? ''}
+      reservationHours={reservationHours()}
     />
   )
 }
