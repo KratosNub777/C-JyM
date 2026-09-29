@@ -49,8 +49,12 @@ export default async function OrdersPage({
                 <span>
                   <span className="font-semibold">{orderReference(order.id)}</span>
                   <span className="mt-2 block text-sm text-neutral-500">
-                    {order.status === 'cancelled' ? 'Cancelado' : 'Pendiente de pago'} · Retiro en
-                    el local
+                    {order.status === 'expired'
+                      ? 'Vencido'
+                      : order.status === 'cancelled'
+                        ? 'Cancelado'
+                        : 'Pendiente de pago'}{' '}
+                    · Retiro en el local
                   </span>
                 </span>
                 <span className="font-semibold">{formatGs(order.total)} →</span>
