@@ -6,6 +6,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { orderReference } from '@/lib/checkout/model'
 import { formatGs } from '@/lib/format'
 import { CancelOrderButton } from '@/components/checkout/CancelOrderButton'
+import { reservationDeadline } from '@/lib/checkout/reservationPolicy'
 
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getCustomerSession(await headers())
@@ -33,15 +34,32 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       <h1 className="mt-5 text-3xl font-semibold">Pedido {orderReference(order.id)}</h1>
       <p
         role="status"
-        className={`mt-4 inline-block rounded-full px-4 py-2 text-sm font-medium ${order.status === 'cancelled' ? 'bg-neutral-100 dark:bg-neutral-800' : 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200'}`}
+        className={`mt-4 inline-block rounded-full px-4 py-2 text-sm font-medium ${order.status !== 'pending_payment' ? 'bg-neutral-100 dark:bg-neutral-800' : 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200'}`}
       >
-        {order.status === 'cancelled' ? 'Cancelado' : 'Pendiente de pago'}
+        {order.status === 'expired'
+          ? 'Vencido'
+          : order.status === 'cancelled'
+            ? 'Cancelado'
+            : 'Pendiente de pago'}
       </p>
       <p className="mt-5 text-sm text-neutral-500 dark:text-neutral-400">
-        {order.status === 'cancelled'
-          ? 'Tu pedido fue cancelado y el stock reservado se liberó.'
-          : 'Tu pedido está registrado y el stock está reservado. Coordiná el pago y el retiro con el local. No se realizó ningún cobro online.'}
+        {order.status === 'expired'
+          ? 'El plazo para pagar terminó. Tu pedido venció y el stock reservado se liberó. Podés armar un nuevo carrito con los precios y la disponibilidad actuales.'
+          : order.status === 'cancelled'
+            ? 'Tu pedido fue cancelado y el stock reservado se liberó.'
+            : 'Tu pedido está registrado y el stock está reservado. Coordiná el pago y el retiro con el local. No se realizó ningún cobro online.'}
       </p>
+      {order.status === 'pending_payment' && (
+        <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          Reserva hasta el{' '}
+          {new Intl.DateTimeFormat('es-PY', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+            timeZone: 'America/Asuncion',
+          }).format(new Date(reservationDeadline(order)))}{' '}
+          (hora de Paraguay). Si el pedido sigue impago, vencerá automáticamente.
+        </p>
+      )}
       <section className="mt-7 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-7 dark:border-neutral-800 dark:bg-neutral-900/40">
         <h2 className="text-lg font-semibold">Resumen del pedido</h2>
         <ul className="mt-5 divide-y divide-neutral-200 dark:divide-neutral-800">
