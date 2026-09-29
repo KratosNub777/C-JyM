@@ -111,6 +111,7 @@ src/
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
 ```
 
+- `migrations/`: SQL de referencia para producción (`customer-auth/`, `checkout/`). El push automático de Payload solo aplica en desarrollo; antes de desplegar hay que preparar las migraciones de Payload (incluido el esquema de Orders).
 - Alias de import: `@/*` → `src/*`, `@payload-config` → `src/payload.config.ts` (ya configurados en `tsconfig.json`).
 - Después de agregar/editar campos en una colección, correr `npm run generate:types` para actualizar `payload-types.ts`.
 - Las páginas del frontend usan la **Local API** de Payload (`getPayloadClient()` + `payload.find(...)`) en vez de llamar a la API REST — es más rápido porque no hay round-trip HTTP dentro del mismo proceso Next.js.
