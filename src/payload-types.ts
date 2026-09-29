@@ -72,6 +72,7 @@ export interface Config {
     categories: Category;
     products: Product;
     addresses: Address;
+    orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -262,6 +264,38 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  customerId: string;
+  checkoutKey: string;
+  requestHash: string;
+  customerName: string;
+  customerEmail: string;
+  phone: string;
+  notes?: string | null;
+  fulfillment: 'pickup';
+  status: 'pending_payment' | 'cancelled';
+  subtotal: number;
+  shippingFee: number;
+  total: number;
+  cancelledAt?: string | null;
+  items: {
+    productId: number;
+    name: string;
+    slug: string;
+    sku?: string | null;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -303,6 +337,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'addresses';
         value: number | Address;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -431,6 +469,39 @@ export interface AddressesSelect<T extends boolean = true> {
   city?: T;
   addressLine?: T;
   isDefault?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  customerId?: T;
+  checkoutKey?: T;
+  requestHash?: T;
+  customerName?: T;
+  customerEmail?: T;
+  phone?: T;
+  notes?: T;
+  fulfillment?: T;
+  status?: T;
+  subtotal?: T;
+  shippingFee?: T;
+  total?: T;
+  cancelledAt?: T;
+  items?:
+    | T
+    | {
+        productId?: T;
+        name?: T;
+        slug?: T;
+        sku?: T;
+        quantity?: T;
+        unitPrice?: T;
+        lineTotal?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
