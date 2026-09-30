@@ -4,8 +4,13 @@ import { emailOTP } from 'better-auth/plugins'
 import { after } from 'next/server'
 import { Pool } from 'pg'
 import { sendEmail } from '@/lib/email/mailer'
+import { assertHttpsInProduction } from '@/lib/security/https'
 import { codeEmail, isCodeEmailKind } from './emails'
 import { trustedAuthOrigins } from './origins'
+
+// En producción exige BETTER_AUTH_URL con https: de ahí depende que las cookies de sesión salgan
+// con `Secure` y que el login no se sirva por HTTP por un error de configuración.
+assertHttpsInProduction()
 
 // Un código de 6 dígitos vale 5 minutos y admite 5 intentos: alcanza para que el cliente lo copie
 // del email sin dejar margen para adivinarlo.
