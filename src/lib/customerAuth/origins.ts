@@ -1,3 +1,5 @@
+import { isSecureUrl } from '@/lib/security/https'
+
 type Env = Record<string, string | undefined>
 
 // Orígenes extra desde los que se acepta iniciar sesión, además de BETTER_AUTH_URL (que Better Auth
@@ -12,8 +14,8 @@ export function trustedAuthOrigins(env: Env = process.env): string[] {
       const url = new URL(value.trim())
       // Better Auth interpreta `*` como comodín y `new URL` lo acepta en el host: rechazarlo acá
       // evita confiar por accidente en, por ejemplo, todo *.vercel.app.
-      if ((url.protocol === 'https:' || url.protocol === 'http:') && !url.host.includes('*'))
-        origins.add(url.origin)
+      // Solo https (o http hacia localhost): un origen http público permitiría iniciar sesión sin TLS.
+      if (isSecureUrl(url.origin) && !url.host.includes('*')) origins.add(url.origin)
     } catch {
       // Se ignora: una entrada mal escrita no debe romper el arranque de la app.
     }
