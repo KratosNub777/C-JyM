@@ -49,3 +49,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /.playwright-cli/
+
+# Instrucciones locales para Claude Code (no se versionan)
+/CLAUDE.md
