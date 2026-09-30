@@ -19,7 +19,7 @@ Repo: https://github.com/KratosNub777/C-JyM.git
 - **Auth (Fase 2):** Better Auth
 - **Pagos (Fase 3):** Bancard o Pagopar — a definir cuál según lo que la empresa tenga habilitado (ver pregunta abierta en la propuesta de presupuesto)
 - **Imágenes:** Cloudflare R2 o Cloudinary
-- **Hosting planeado:** Vercel (frontend) + Railway (Payload + Meilisearch) + Neon/Supabase (Postgres)
+- **Hosting planeado:** Vercel (Next.js con Payload embebido, `/admin` incluido, y Vercel Cron para el vencimiento de reservas) + Railway (solo Meilisearch, ver `docs/meilisearch.md`) + Neon/Supabase (Postgres)
 - **Dominio:** .com.py — se registra en NIC Paraguay a nombre de la empresa (requiere RUC), no a nombre del desarrollador
 
 ## Por qué este stack (decisiones ya tomadas, no volver a discutir sin razón nueva)
