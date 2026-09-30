@@ -126,6 +126,7 @@ src/
     customerAuth/           # instancia de Better Auth, sesión de servidor, cliente y validación de direcciones
     cart/                   # modelo y store del carrito
     checkout/               # creación/cancelación/vencimiento de pedidos, transacciones, política de reserva, cron
+    transaction.ts          # withTransaction: begin/commit/rollback compartido (pedidos y direcciones)
     meilisearch.ts, searchFallback.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
   payload.config.ts        # registro de colecciones + adaptador postgres
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
