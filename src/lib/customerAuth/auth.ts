@@ -29,5 +29,12 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
   },
   // Persist limits across serverless instances as well as development requests.
-  rateLimit: { enabled: true, storage: 'database', modelName: 'rate_limit' },
+  rateLimit: {
+    enabled: true,
+    storage: 'database',
+    modelName: 'rate_limit',
+    // El menú del header consulta la sesión en cada página vista. Es de solo lectura y sin cookie
+    // responde null sin tocar la base; contarla acá sumaría una escritura en Postgres por visita.
+    customRules: { '/get-session': false },
+  },
 })
