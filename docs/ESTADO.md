@@ -7,26 +7,25 @@
 
 - **Fase:** 3 en curso (carrito, checkout con retiro, reserva de stock y vencimiento listos; falta pasarela, confirmación verificada, emails transaccionales y `/security-review`). Detalle en `docs/checkout.md`.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `docs/bitacora-de-sesion` (creada desde `main`; solo agrega este archivo y la referencia en `CLAUDE.md`).
+- **Rama activa:** `docs/bitacora-de-sesion` (creada desde `main`; contiene el fix de registro y este archivo).
 
-## Trabajo sin commitear (NO es de la rama activa)
+## Trabajo sin commitear
 
-Quedó en el working tree al crear esta rama; pertenece a `fix/registro-cuenta-sin-verificar` (mismo commit que `main`):
+Nada. El fix de cuentas sin verificar (account squatting) quedó commiteado en esta misma rama (`b82a5e3`, `0e51bf1`, `03625b6`); la rama `fix/registro-cuenta-sin-verificar` sigue en `main`, sin commits propios.
 
-- `src/lib/customerAuth/auth.ts`: hook `before` en `/sign-up/email` que borra una cuenta **sin verificar** con el mismo email, para que quien la creó primero no conserve su contraseña (account squatting). Cuentas verificadas no se tocan.
-- `tests/e2e/customer-auth.e2e.spec.ts`: e2e `the real owner replaces an unverified account…` + `squatEmail` en los fixtures.
-- Falta: correr `npm run test:e2e` (auth), commitear en su rama y mergear.
+- `src/lib/customerAuth/auth.ts`: hook `before` en `/sign-up/email` que borra una cuenta **sin verificar** con el mismo email; las verificadas no se tocan.
+- Falta: correr `npm run test:e2e` (auth) para confirmar, y mergear a `main`.
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
-| 2026-09-29 | docs/bitacora-de-sesion | Se crea este archivo y se referencia desde `CLAUDE.md`. |
+| 2026-09-29 | docs/bitacora-de-sesion | Fix registro: reemplaza cuenta sin verificar (auth.ts + e2e + doc). Se crea este archivo y se referencia desde `CLAUDE.md`. |
 | (previo) | main | `.claude/` deja de versionarse; diseño de pagos Bancard/Pagopar; docs de verificación de email por código y recuperación de contraseña; login con confirmar contraseña. |
 
 ## Próximos pasos sugeridos
 
-1. Cerrar y mergear `fix/registro-cuenta-sin-verificar` (ver arriba).
+1. Verificar con e2e y mergear esta rama a `main`.
 2. Decidir pasarela (`docs/pagos-diseno.md`) y seguir con Fase 3.
 
 ## Reglas de mantenimiento (para Claude)
