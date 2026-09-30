@@ -1,9 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ sendMail: vi.fn(), createTransport: vi.fn() }))
+const mocks = vi.hoisted(() => ({
+  sendMail: vi.fn(),
+  verify: vi.fn(),
+  createTransport: vi.fn(),
+}))
 vi.mock('nodemailer', () => ({ default: { createTransport: mocks.createTransport } }))
 
-import { sendEmail, smtpConfigFromEnv } from '@/lib/email/mailer'
+import { describeSmtpError, sendEmail, smtpConfigFromEnv, verifySmtp } from '@/lib/email/mailer'
 
 const email = {
   to: 'cliente@example.com',
@@ -98,5 +102,65 @@ describe('sendEmail', () => {
       expect.objectContaining({ secure: true, requireTLS: false, auth: undefined }),
     )
     expect(mocks.sendMail).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('verifySmtp', () => {
+  const config = {
+    host: 'smtp.example.com',
+    port: 587,
+    user: 'u',
+    password: 'p',
+    from: 'a@example.com',
+  }
+
+  it('checks the connection without sending anything', async () => {
+    mocks.createTransport.mockReturnValue({ sendMail: mocks.sendMail, verify: mocks.verify })
+    mocks.verify.mockResolvedValue(true)
+    await verifySmtp(config)
+    expect(mocks.verify).toHaveBeenCalledTimes(1)
+    expect(mocks.sendMail).not.toHaveBeenCalled()
+  })
+
+  it('propagates the transport error so the caller can explain it', async () => {
+    mocks.createTransport.mockReturnValue({ sendMail: mocks.sendMail, verify: mocks.verify })
+    mocks.verify.mockRejectedValue(Object.assign(new Error('Invalid login'), { code: 'EAUTH' }))
+    await expect(verifySmtp(config)).rejects.toThrow('Invalid login')
+  })
+})
+
+describe('describeSmtpError', () => {
+  const config = { host: 'smtp.example.com', port: 587 }
+
+  it('points Gmail users to an app password when the login is rejected', () => {
+    expect(describeSmtpError({ code: 'EAUTH' }, config)).toMatch(/contraseña de aplicación/)
+    expect(describeSmtpError({ responseCode: 535 }, config)).toMatch(/SMTP_PASSWORD/)
+  })
+
+  it('names the host and setting for network failures', () => {
+    expect(describeSmtpError({ code: 'ENOTFOUND' }, config)).toMatch(
+      /smtp\.example\.com.*SMTP_HOST/,
+    )
+    expect(describeSmtpError({ code: 'ECONNREFUSED' }, config)).toMatch(/smtp\.example\.com:587/)
+    expect(describeSmtpError({ code: 'ETIMEDOUT' }, config)).toMatch(/firewall/)
+    expect(
+      describeSmtpError({ code: 'ESOCKET', message: 'connect ECONNREFUSED 127.0.0.1:1' }, config),
+    ).toMatch(/rechazó la conexión/)
+  })
+
+  it('recognises a TLS mismatch between the port and the mode', () => {
+    expect(describeSmtpError({ code: 'ESOCKET', message: 'wrong version number' }, config)).toMatch(
+      /STARTTLS.*TLS directo/,
+    )
+  })
+
+  it('explains rejected senders and recipients', () => {
+    expect(describeSmtpError({ code: 'EENVELOPE' }, config)).toMatch(/SMTP_FROM/)
+    expect(describeSmtpError({ responseCode: 550 }, config)).toMatch(/remitente/)
+  })
+
+  it('falls back to the original message and tolerates non-errors', () => {
+    expect(describeSmtpError({ message: 'algo raro' })).toBe('algo raro')
+    expect(describeSmtpError(undefined)).toMatch(/desconocido/)
   })
 })
