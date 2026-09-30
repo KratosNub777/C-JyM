@@ -25,6 +25,15 @@ describe('trustedAuthOrigins', () => {
     ).toEqual([])
   })
 
+  it('keeps http only for localhost and drops it for public hosts', () => {
+    expect(
+      trustedAuthOrigins({
+        BETTER_AUTH_TRUSTED_ORIGINS:
+          'http://tienda.com.py,http://localhost:3000,http://127.0.0.1:3000,https://www.tienda.com.py',
+      }),
+    ).toEqual(['http://localhost:3000', 'http://127.0.0.1:3000', 'https://www.tienda.com.py'])
+  })
+
   it('adds the Vercel deployment, branch and production hosts over https', () => {
     expect(
       trustedAuthOrigins({

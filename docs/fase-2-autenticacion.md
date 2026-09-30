@@ -13,6 +13,16 @@ Better Auth maneja clientes con email y contraseña. Payload mantiene el acceso 
 
 Las tablas `user`, `session`, `account`, `verification` y `rate_limit` son propiedad de Better Auth y están excluidas del `tablesFilter` de Payload. Mantener esta exclusión al agregar migraciones. `jose` 6 está declarado explícitamente porque el proyecto instala con `legacy-peer-deps` y Better Auth lo requiere; Payload conserva su propia versión 5.
 
+## HTTPS
+
+Vercel redirige HTTP a HTTPS por sí solo; la app no repite ese redirect. Lo que sí exige:
+
+- En producción `BETTER_AUTH_URL` es obligatoria y con `https://` (solo se acepta `http://` hacia `localhost`). Si falta o es insegura, la app no arranca y el mensaje dice cuál es el problema. De ella depende que la cookie de sesión de clientes salga con `Secure` y el prefijo `__Secure-`.
+- `BETTER_AUTH_TRUSTED_ORIGINS` y los orígenes de los previews solo admiten `https://` (o `http://` hacia localhost).
+- `SITE_URL` insegura en producción genera una advertencia en el log, porque el sitemap y los metadatos publicarían enlaces http.
+- Todas las respuestas llevan `Strict-Transport-Security: max-age=31536000` en producción (`src/lib/security/headers.ts`). No incluye `includeSubDomains` ni `preload`: se pueden sumar cuando se confirme que todo el dominio `.com.py` usa HTTPS, porque `preload` es difícil de revertir.
+- La cookie de sesión del panel de Payload lleva `Secure`, `HttpOnly` y `SameSite=Lax` en producción.
+
 ## Comportamiento y límites
 
 - El registro pide la contraseña dos veces y **no inicia sesión hasta verificar el email** con un código de 6 dígitos enviado por correo. El código vence a los 5 minutos, admite 5 intentos y se guarda cifrado con `BETTER_AUTH_SECRET`; se puede pedir uno nuevo (60 s entre reenvíos y 3 pedidos por minuto por IP). Al verificarlo se inicia sesión. Contraseñas de 8 a 128 caracteres. Sin login social ni roles comerciales en esta fase.
