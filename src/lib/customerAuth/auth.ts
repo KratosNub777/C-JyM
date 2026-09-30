@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth'
+import { createAuthMiddleware } from 'better-auth/api'
 import { emailOTP } from 'better-auth/plugins'
 import { after } from 'next/server'
 import { Pool } from 'pg'
@@ -64,6 +65,20 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
   },
   advanced: { backgroundTasks: { handler: sendAfterResponse } },
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== '/sign-up/email') return
+      const email = typeof ctx.body?.email === 'string' ? ctx.body.email.toLowerCase() : ''
+      if (!email) return
+      // Una cuenta sin verificar no demostró ser dueña del email. Si quedara en pie, quien la creó
+      // primero conservaría su contraseña y podría entrar cuando el verdadero dueño se registre y
+      // verifique el código. El último registro sin verificar reemplaza al anterior; las cuentas
+      // verificadas no se tocan (ahí Better Auth responde igual que con un email nuevo).
+      const existing = await ctx.context.internalAdapter.findUserByEmail(email)
+      if (existing?.user && !existing.user.emailVerified)
+        await ctx.context.internalAdapter.deleteUser(existing.user.id)
+    }),
+  },
   plugins: [
     emailOTP({
       overrideDefaultEmailVerification: true,
