@@ -52,3 +52,14 @@ node_modules/
 
 # Instrucciones locales para Claude Code (no se versionan)
 /CLAUDE.md
+
+# Variables de entorno: se ignora cualquier variante, solo se versiona el ejemplo
+.env*
+!.env.example
+
+# Claves privadas y configuracion local de herramientas
+*.key
+/.claude/settings.local.json
+
+# Instrucciones locales para agentes de IA (no se versionan)
+/AGENTS.md
