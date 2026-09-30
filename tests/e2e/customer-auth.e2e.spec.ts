@@ -16,7 +16,8 @@ const otherEmail = `fase2-other-${run}@example.com`
 const mismatchEmail = `fase2-mismatch-${run}@example.com`
 const codeEmail = `fase2-code-${run}@example.com`
 const resetEmail = `fase2-reset-${run}@example.com`
-const fixtureEmails = [email, otherEmail, mismatchEmail, codeEmail, resetEmail]
+const squatEmail = `fase2-squat-${run}@example.com`
+const fixtureEmails = [email, otherEmail, mismatchEmail, codeEmail, resetEmail, squatEmail]
 const password = `Test-${run}!`
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
@@ -121,6 +122,40 @@ test('an account cannot sign in until its email is verified with the emailed cod
     codeEmail,
   ])
   expect(verified.rows).toEqual([{ emailVerified: true }])
+})
+
+test('the real owner replaces an unverified account registered first with their email', async ({
+  page,
+}) => {
+  test.setTimeout(120_000)
+  const attackerPassword = `Atacante-${run}!`
+  const ownerPassword = `Duenio-${run}!`
+  await resetAuthRateLimits()
+  // Alguien registra el email de otra persona y no puede verificarlo.
+  const squat = await page.request.post(`${base}/api/auth/sign-up/email`, {
+    headers: { origin: base },
+    data: { email: squatEmail, password: attackerPassword, name: 'Atacante' },
+  })
+  expect(squat.ok()).toBe(true)
+
+  // El verdadero dueño se registra con su propia contraseña y verifica el código.
+  await page.goto(`${base}/registrarse`)
+  await fillRegistration(page, { name: 'Dueño Real', email: squatEmail, password: ownerPassword })
+  await submitVerificationCode(page, squatEmail)
+  await expect(page).toHaveURL(`${base}/cuenta`)
+
+  // Solo sirve la contraseña del dueño.
+  await resetAuthRateLimits()
+  const attacker = await page.request.post(`${base}/api/auth/sign-in/email`, {
+    headers: { origin: base },
+    data: { email: squatEmail, password: attackerPassword },
+  })
+  expect(attacker.status()).toBe(401)
+  const owner = await page.request.post(`${base}/api/auth/sign-in/email`, {
+    headers: { origin: base },
+    data: { email: squatEmail, password: ownerPassword },
+  })
+  expect(owner.status()).toBe(200)
 })
 
 test('a customer can recover the password with an emailed code', async ({ page }) => {
