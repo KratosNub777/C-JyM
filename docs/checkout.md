@@ -45,7 +45,7 @@ En producción `vercel.json` programa una llamada diaria (`0 9 * * *`, 06:00 en 
 
 Si se necesita precisión de minutos sin cambiar de plan, el worker (`npm run orders:worker`) puede correr como servicio separado (por ejemplo en Railway) con `SITE_URL` y `CRON_SECRET`. En ese caso conviene quitar la entrada de `crons` para no ejecutar dos programadores; ambos son seguros si coinciden porque el servicio usa `FOR UPDATE SKIP LOCKED`. La liberación ocurre en la siguiente ejecución; si el programador se detiene, procesa el atraso al reiniciarse. **El endpoint por sí solo no programa ejecuciones.**
 
-La configuración de desarrollo usa `ORDER_RESERVATION_HOURS=24` y un `CRON_SECRET` generado en `.env` (gitignored). En producción, aplicar [002-reservation-expiration.sql](../migrations/checkout/002-reservation-expiration.sql) después del esquema inicial de Orders y antes de desplegar esta versión; luego configurar un secreto propio y activar el servicio. El script de migración no se ejecuta automáticamente.
+La configuración de desarrollo usa `ORDER_RESERVATION_HOURS=24` y un `CRON_SECRET` generado en `.env` (gitignored). En producción no hay que aplicar SQL a mano: la migración inicial de Payload (`migrations/*_initial.ts`) ya incluye el plazo de reserva (`expires_at`, `expired_at`) y el estado `expired`. Después hay que configurar un `CRON_SECRET` propio y activar el proceso automático (ver [despliegue](despliegue.md)).
 
 ## Validación
 
@@ -65,6 +65,6 @@ Las pruebas de expiración cubren vencimientos reales en PostgreSQL, carreras en
 
 ## Pendiente para completar la Fase 3
 
-Pasarela Bancard/Pagopar, confirmación verificada de pagos, emails transaccionales, datos reales del local y políticas comerciales. La futura confirmación de pago debe verificar la fecha límite y cambiar el estado dentro de la transacción del pedido, de modo que la expiración nunca libere stock de un pago confirmado. Actualmente la aplicación no registra pagos externos ni estados de pago completado. Se necesitan migraciones de producción (incluido el esquema inicial de Orders); el push automático del esquema solo aplica en desarrollo. La Fase 3 sigue abierta: requiere revisión de código y seguridad antes de su cierre y lanzamiento.
+Pasarela Bancard/Pagopar, confirmación verificada de pagos, emails transaccionales, datos reales del local y políticas comerciales. La futura confirmación de pago debe verificar la fecha límite y cambiar el estado dentro de la transacción del pedido, de modo que la expiración nunca libere stock de un pago confirmado. Actualmente la aplicación no registra pagos externos ni estados de pago completado. Las migraciones de producción existen (ver [despliegue](despliegue.md)); cada cambio de esquema de esta fase (estado `paid`, tabla de pagos) necesitará una migración nueva con `npm run db:migrate:create`, porque el push automático del esquema solo aplica en desarrollo. La Fase 3 sigue abierta: requiere revisión de código y seguridad antes de su cierre y lanzamiento.
 
 Referencias de implementación: [transacciones de Payload](https://payloadcms.com/docs/database/transactions) y [bloqueos de PostgreSQL](https://www.postgresql.org/docs/current/explicit-locking.html).
