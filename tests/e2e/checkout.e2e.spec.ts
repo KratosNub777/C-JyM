@@ -7,6 +7,11 @@ import config from '../../src/payload.config'
 import { CART_STORAGE_KEY } from '../../src/lib/cart/model'
 import { orderReference } from '../../src/lib/checkout/model'
 import { expirePendingOrders } from '../../src/lib/checkout/expireOrders'
+import {
+  fillRegistration,
+  resetAuthRateLimits,
+  submitVerificationCode,
+} from '../helpers/customerAuth'
 
 const base = 'http://localhost:3000'
 const run = randomUUID()
@@ -59,14 +64,16 @@ test.afterAll(async () => {
   await pool.query('DELETE FROM "user" WHERE email = ANY($1)', [
     [email, otherEmail, lostEmail, expiredEmail],
   ])
+  await pool.query('DELETE FROM verification WHERE identifier LIKE ANY($1)', [
+    [email, otherEmail, lostEmail, expiredEmail].map((item) => `%${item}`),
+  ])
   await pool.end()
 })
 
 async function register(page: Page, userEmail: string) {
-  await page.getByLabel('Nombre completo', { exact: true }).fill('Cliente Checkout')
-  await page.getByLabel('Email', { exact: true }).fill(userEmail)
-  await page.getByLabel('Contraseña', { exact: true }).fill(password)
-  await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click()
+  await resetAuthRateLimits()
+  await fillRegistration(page, { name: 'Cliente Checkout', email: userEmail, password })
+  await submitVerificationCode(page, userEmail)
 }
 
 test('guest cart survives signup, checkout/cancellation work, and foreign orders stay private', async ({

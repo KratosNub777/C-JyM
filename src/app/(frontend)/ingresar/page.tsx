@@ -9,9 +9,19 @@ export const metadata: Metadata = { title: 'Ingresar', robots: { index: false, f
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; restablecida?: string }>
 }) {
-  const destination = (await searchParams).next === '/checkout' ? '/checkout' : '/cuenta'
+  const params = await searchParams
+  const destination = params.next === '/checkout' ? '/checkout' : '/cuenta'
   if (await getCustomerSession(await headers())) redirect(destination)
-  return <CustomerAuthForm destination={destination} />
+  return (
+    <CustomerAuthForm
+      destination={destination}
+      notice={
+        params.restablecida === '1'
+          ? 'Actualizamos tu contraseña. Ingresá con la nueva.'
+          : undefined
+      }
+    />
+  )
 }
