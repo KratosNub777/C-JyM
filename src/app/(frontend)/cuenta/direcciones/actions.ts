@@ -4,7 +4,7 @@ import { sql } from '@payloadcms/db-postgres'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { getCustomerSession } from '@/lib/customerAuth/session'
-import { parseAddress, type AddressResult } from '@/lib/customerAuth/addressFields'
+import { MAX_ADDRESSES, parseAddress, type AddressResult } from '@/lib/customerAuth/addressFields'
 import { getPayloadClient } from '@/lib/payload'
 import { withTransaction } from '@/lib/transaction'
 
@@ -47,6 +47,19 @@ async function mutateAddress(
           req,
         })
         if (!existing.docs.length) throw new AddressError('La dirección no existe.')
+      }
+      if (operation === 'create') {
+        // Counted under the customer's advisory lock, so parallel creates cannot exceed the limit.
+        const { totalDocs } = await payload.count({
+          collection: 'addresses',
+          where: owner,
+          overrideAccess: true,
+          req,
+        })
+        if (totalDocs >= MAX_ADDRESSES)
+          throw new AddressError(
+            `Podés guardar hasta ${MAX_ADDRESSES} direcciones. Eliminá una para agregar otra.`,
+          )
       }
       if (data?.isDefault) {
         const cleared = await payload.update({
