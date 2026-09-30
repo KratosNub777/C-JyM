@@ -7,11 +7,11 @@
 
 - **Fase:** 3 en curso (carrito, checkout con retiro, reserva de stock y vencimiento listos; falta pasarela, confirmación verificada, emails transaccionales y `/security-review`). Detalle en `docs/checkout.md`.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `main` (local 4+ commits por delante de `origin/main`, sin push).
+- **Rama activa:** `main` (sincronizada con `origin/main`).
 
 ## Trabajo sin commitear
 
-Nada. Todo está mergeado en `main` local; falta `git push`.
+Nada. Todo está mergeado y pusheado a `origin/main`.
 
 - Fix de registro ya en `main`: `auth.ts` tiene un hook `before` en `/sign-up/email` que borra una cuenta **sin verificar** con el mismo email (evita account squatting); las verificadas no se tocan. e2e de auth 6/6 OK (2026-09-29).
 
@@ -19,7 +19,7 @@ Nada. Todo está mergeado en `main` local; falta `git push`.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
-| 2026-09-29 | main | Merge de `docs/bitacora-de-sesion` y `fix/registro-cuenta-sin-verificar`. e2e de auth 6/6 OK. Fix registro: reemplaza cuenta sin verificar (auth.ts + e2e + doc). Se crea este archivo y se referencia desde `CLAUDE.md`. |
+| 2026-09-29 | main | Push a origin. Merge de `docs/bitacora-de-sesion` y `fix/registro-cuenta-sin-verificar`. e2e de auth 6/6 OK. Fix registro: reemplaza cuenta sin verificar (auth.ts + e2e + doc). Se crea este archivo y se referencia desde `CLAUDE.md`. |
 | (previo) | main | `.claude/` deja de versionarse; diseño de pagos Bancard/Pagopar; docs de verificación de email por código y recuperación de contraseña; login con confirmar contraseña. |
 
 ## Próximos pasos sugeridos
