@@ -19,6 +19,9 @@ export const departments = [
   'Boquerón',
 ] as const
 
+// Límite por cliente: evita filas ilimitadas y una página de direcciones sin acotar.
+export const MAX_ADDRESSES = 20
+
 export type AddressInput = {
   fullName: string
   phone: string
