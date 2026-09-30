@@ -59,7 +59,7 @@ node_modules/
 
 # Claves privadas y configuracion local de herramientas
 *.key
-/.claude/settings.local.json
+/.claude/
 
 # Instrucciones locales para agentes de IA (no se versionan)
 /AGENTS.md
