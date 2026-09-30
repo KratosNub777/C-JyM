@@ -54,6 +54,6 @@ npm run test:e2e -- tests/e2e/customer-auth.e2e.spec.ts --reporter=line
 
 Los E2E leen los códigos con `auth.api.getVerificationOTP` (API de servidor, ver `tests/helpers/customerAuth.ts`). El E2E crea varios clientes y un administrador temporales en la base de desarrollo y los elimina junto con sus direcciones al terminar. El comando npm incluye el loader TS necesario para importar la configuración de Payload. Usar una base de pruebas/desarrollo, nunca producción.
 
-Antes del despliegue: configurar los secretos y la URL HTTPS real, ejecutar la migración de Better Auth y preparar/aplicar las migraciones de Payload para la base de destino. La sincronización automática de desarrollo no reemplaza las migraciones de producción.
+Antes del despliegue: configurar los secretos y la URL HTTPS real, correr `npm run db:setup` contra la base de destino (migraciones de Payload y de Better Auth). La sincronización automática de desarrollo no reemplaza las migraciones de producción. Pasos completos en [despliegue](despliegue.md).
 
 Referencias: [instalación de Better Auth](https://better-auth.com/docs/installation), [integración con Next.js](https://better-auth.com/docs/integrations/next).
