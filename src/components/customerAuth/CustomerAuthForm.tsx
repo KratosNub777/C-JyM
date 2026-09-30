@@ -4,17 +4,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 import { authClient } from '@/lib/customerAuth/client'
-import { authFailureMessage } from '@/lib/customerAuth/errors'
-
-const inputClass =
-  'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-base outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 dark:border-neutral-700 dark:bg-neutral-900'
+import { authFailureMessage, isEmailNotVerified } from '@/lib/customerAuth/errors'
+import { savePendingEmail } from '@/lib/customerAuth/pendingEmail'
+import { AuthCard, authButtonClass, authInputClass as inputClass } from './AuthCard'
 
 export function CustomerAuthForm({
   register = false,
   destination = '/cuenta',
+  notice,
 }: {
   register?: boolean
   destination?: '/cuenta' | '/checkout'
+  notice?: string
 }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -44,8 +45,23 @@ export function CustomerAuthForm({
       const result = register
         ? await authClient.signUp.email({ email, password, name })
         : await authClient.signIn.email({ email, password })
+      const verifyUrl = `/verificar-email${destination === '/checkout' ? '?next=/checkout' : ''}`
+      if (!register && isEmailNotVerified(result.error)) {
+        // La contraseña era correcta pero falta verificar el email: el servidor ya envió un código.
+        savePendingEmail(email)
+        router.replace(verifyUrl)
+        return
+      }
       if (result.error) {
         setMessage(authFailureMessage(register ? 'signUp' : 'signIn', result.error.status))
+        return
+      }
+      if (register) {
+        // El registro no envía el código por sí mismo (ver auth.ts): se pide apenas termina. La
+        // respuesta es la misma para un email nuevo o existente, así no se revela cuál es.
+        savePendingEmail(email)
+        await authClient.emailOtp.sendVerificationOtp({ email, type: 'email-verification' })
+        router.replace(verifyUrl)
         return
       }
       router.replace(destination)
@@ -58,18 +74,19 @@ export function CustomerAuthForm({
   }
 
   return (
-    <section className="mx-auto max-w-md rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 dark:border-neutral-800 dark:bg-neutral-900/40">
-      <p className="text-sm font-medium text-brand-600 dark:text-brand-400">
-        Tu cuenta en Comercial José María
-      </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        {register ? 'Creá tu cuenta' : 'Bienvenido de nuevo'}
-      </h1>
-      <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-        {register
+    <AuthCard
+      title={register ? 'Creá tu cuenta' : 'Bienvenido de nuevo'}
+      subtitle={
+        register
           ? 'Guardá tus datos y direcciones en un solo lugar.'
-          : 'Ingresá para ver tu perfil y tus direcciones.'}
-      </p>
+          : 'Ingresá para ver tu perfil y tus direcciones.'
+      }
+    >
+      {notice && (
+        <p role="status" className="mt-4 rounded-lg bg-brand-600/10 p-3 text-sm">
+          {notice}
+        </p>
+      )}
       <form onSubmit={submit} className="mt-7 space-y-5" aria-busy={submitting}>
         <fieldset disabled={submitting} className="space-y-5">
           {register && (
@@ -126,6 +143,14 @@ export function CustomerAuthForm({
                 Usá entre 8 y 128 caracteres.
               </p>
             )}
+            {!register && (
+              <Link
+                href="/olvide-contrasena"
+                className="mt-3 inline-block text-sm font-medium text-brand-600 underline-offset-4 hover:underline dark:text-brand-400"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            )}
           </div>
           {register && (
             <div>
@@ -152,11 +177,7 @@ export function CustomerAuthForm({
             {message}
           </p>
         )}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-full bg-brand-600 px-5 py-3 text-base font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className={authButtonClass}>
           {submitting ? 'Un momento…' : register ? 'Crear cuenta' : 'Ingresar'}
         </button>
       </form>
@@ -169,6 +190,6 @@ export function CustomerAuthForm({
           {register ? 'Ingresá' : 'Registrate'}
         </Link>
       </p>
-    </section>
+    </AuthCard>
   )
 }
