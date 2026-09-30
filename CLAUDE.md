@@ -48,7 +48,7 @@ y los tags compartidos en `src/lib/cacheTags.ts`), y home + ficha de producto
 usan ISR (`revalidate`) de Next.js. La mayoría de las visitas se sirven desde
 el borde de Vercel sin tocar Postgres. Al editar un producto o categoría desde
 `/admin`, un hook de la colección invalida el tag correspondiente para que el
-cambio se vea sin esperar al revalidate. Vercel escala solo (serverless); Neon
+cambio se vea sin esperar al revalidate. El menú de usuario consulta `/api/auth/get-session` en cada página: es una invocación de función barata (sin cookie responde sin tocar Postgres y está exenta del rate limit en la base), no una query al catálogo. Vercel escala solo (serverless); Neon
 y Meilisearch escalan subiendo de plan/tamaño de cómputo cuando el tráfico lo
 justifique.
 
