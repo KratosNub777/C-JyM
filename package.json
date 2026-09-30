@@ -11,6 +11,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "meilisearch:key": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/meilisearch-key.ts",
     "meilisearch:sync": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/meilisearch-setup.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",

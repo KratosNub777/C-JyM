@@ -19,7 +19,7 @@ Repo: https://github.com/KratosNub777/C-JyM.git
 - **Auth (Fase 2):** Better Auth
 - **Pagos (Fase 3):** Bancard o Pagopar — a definir cuál según lo que la empresa tenga habilitado (ver pregunta abierta en la propuesta de presupuesto)
 - **Imágenes:** Cloudflare R2 o Cloudinary
-- **Hosting planeado:** Vercel (frontend) + Railway (Payload + Meilisearch) + Neon/Supabase (Postgres)
+- **Hosting planeado:** Vercel (Next.js con Payload embebido, `/admin` incluido, y Vercel Cron para el vencimiento de reservas) + Railway (solo Meilisearch, ver `docs/meilisearch.md`) + Neon/Supabase (Postgres)
 - **Dominio:** .com.py — se registra en NIC Paraguay a nombre de la empresa (requiere RUC), no a nombre del desarrollador
 
 ## Por qué este stack (decisiones ya tomadas, no volver a discutir sin razón nueva)
@@ -72,7 +72,7 @@ justifique.
 - `ORDER_RESERVATION_HOURS` (1–168, default 24): plazo de reserva de stock de un pedido impago; se guarda en cada pedido. `CRON_SECRET` (≥32 caracteres): protege `POST /api/cron/expire-orders`. `RESERVATION_POLL_SECONDS`: intervalo del worker (`npm run orders:worker`; `npm run orders:expire` corre una vez).
 - Identidades separadas: los **clientes** (Better Auth, tablas propias) y el **equipo** (Payload `users`, `/admin` y `/catalogar`) no comparten sesión ni cookies. Una sesión de cliente nunca da acceso al CMS. `customerId` de direcciones y pedidos siempre se deriva de la sesión en el servidor, nunca de un formulario.
 - Pedidos (`Orders`) y direcciones se mutan solo desde server actions con `overrideAccess: true` y filtro por dueño; el stock se reserva/devuelve dentro de transacciones con bloqueos (ver `src/lib/checkout/`).
-- `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch`.
+- `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch` y la clave es la maestra del compose. En producción la app usa una clave acotada al índice `products` (`npm run meilisearch:key`); `MEILISEARCH_MASTER_KEY` es solo para los scripts `meilisearch:sync` y `meilisearch:key`, nunca en el hosting de la app. Si Meilisearch cae, `/buscar` busca en Postgres (`src/lib/searchFallback.ts`). Detalle y pasos de Railway en `docs/meilisearch.md`.
 
 ### Estructura de carpetas (generada por `create-payload-app` template `blank`, Payload 3.x)
 
@@ -125,7 +125,7 @@ src/
     customerAuth/           # instancia de Better Auth, sesión de servidor, cliente y validación de direcciones
     cart/                   # modelo y store del carrito
     checkout/               # creación/cancelación/vencimiento de pedidos, transacciones, política de reserva, cron
-    meilisearch.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
+    meilisearch.ts, searchFallback.ts, auth.ts, useClickOutside.ts, validateProductFields.ts
   payload.config.ts        # registro de colecciones + adaptador postgres
   payload-types.ts         # tipos autogenerados — correr `npm run generate:types` tras editar una colección
 ```

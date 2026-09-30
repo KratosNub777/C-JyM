@@ -6,6 +6,7 @@ import { getProductsIndex } from '@/lib/meilisearch'
 import { getPayloadClient } from '@/lib/payload'
 import { applyFiltersInMemory, parseProductFilters, type RawSearchParams } from '@/lib/productFilters'
 import { getDistinctBrands, getPriceBounds } from '@/lib/productQueries'
+import { fallbackSearchWhere } from '@/lib/searchFallback'
 import type { Product } from '@/payload-types'
 
 export const metadata: Metadata = {
@@ -20,8 +21,15 @@ async function searchProducts(query: string): Promise<Product[]> {
     const results = await getProductsIndex().search(query, { limit: 48 })
     hitIds = results.hits.map((hit) => hit.id)
   } catch (error) {
-    console.error('Meilisearch no respondió, la búsqueda devuelve vacío:', error)
-    return []
+    console.error('Meilisearch no respondió, se busca directo en Postgres:', error)
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'products',
+      where: fallbackSearchWhere(query),
+      sort: 'name',
+      limit: 48,
+    })
+    return docs
   }
 
   if (hitIds.length === 0) return []
