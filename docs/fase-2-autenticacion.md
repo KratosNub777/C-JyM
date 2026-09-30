@@ -5,7 +5,7 @@ Better Auth maneja clientes con email y contraseña. Payload mantiene el acceso 
 ## Desarrollo
 
 1. `npm install`.
-2. Configurar `DATABASE_URL`, `PAYLOAD_SECRET`, `BETTER_AUTH_SECRET` y `BETTER_AUTH_URL` en `.env`. El secreto de Better Auth debe ser aleatorio, de al menos 32 caracteres, diferente del de Payload. La URL local es `http://localhost:3000`.
+2. Configurar `DATABASE_URL`, `PAYLOAD_SECRET`, `BETTER_AUTH_SECRET` y `BETTER_AUTH_URL` en `.env`. El secreto de Better Auth debe ser aleatorio, de al menos 32 caracteres, diferente del de Payload. La URL local es `http://localhost:3000`. Better Auth solo acepta iniciar sesión desde `BETTER_AUTH_URL`; para otros orígenes de producción (p. ej. la variante con o sin `www`) listar las URLs exactas, sin comodines, en `BETTER_AUTH_TRUSTED_ORIGINS` separadas por coma. Las URLs de deploy y de rama de los previews de Vercel se confían solas.
 3. `npm run auth:migrate` crea o actualiza las tablas de Better Auth usando la versión instalada. Se puede repetir; no borra usuarios. `npm run auth:generate` genera el SQL pendiente para revisión en `migrations/customer-auth/schema.sql`.
 4. `npm run dev`. Payload sincroniza su esquema de desarrollo, incluida la colección `addresses`.
 5. Abrir `/registrarse`, `/ingresar`, `/cuenta` o `/cuenta/direcciones`.
