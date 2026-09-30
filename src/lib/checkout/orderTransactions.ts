@@ -1,11 +1,16 @@
-import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+import { sql } from '@payloadcms/db-postgres'
 import type { Payload } from 'payload'
 import type { Order } from '@/payload-types'
+import {
+  withTransaction,
+  type TransactionDatabase,
+  type TransactionRequest,
+} from '@/lib/transaction'
 import type { CheckoutResult } from './model'
 
 export type OrderResult = CheckoutResult & { changedProductIds?: number[] }
-export type OrderRequest = { transactionID: string | number }
-export type OrderDatabase = NonNullable<PostgresAdapter['sessions']>[string]['db']
+export type OrderRequest = TransactionRequest
+export type OrderDatabase = TransactionDatabase
 
 export class OrderError extends Error {
   constructor(
@@ -20,15 +25,9 @@ export async function withOrderTransaction(
   payload: Payload,
   work: (req: OrderRequest, db: OrderDatabase) => Promise<OrderResult>,
 ): Promise<OrderResult> {
-  const transactionID = await payload.db.beginTransaction()
-  if (!transactionID) throw new Error('Checkout requires database transactions')
-  const sessions = payload.db.sessions as PostgresAdapter['sessions']
   try {
-    const result = await work({ transactionID }, sessions[transactionID].db)
-    await payload.db.commitTransaction(transactionID)
-    return result
+    return await withTransaction(payload, work)
   } catch (error) {
-    await payload.db.rollbackTransaction(transactionID)
     if (error instanceof OrderError) return { ok: false, code: error.code, message: error.message }
     throw error
   }
