@@ -20,6 +20,7 @@ export function CustomerAuthForm({
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [mismatch, setMismatch] = useState(false)
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -31,8 +32,14 @@ export function CustomerAuthForm({
       setMessage('Escribí tu nombre.')
       return
     }
+    if (register && password !== String(form.get('confirmPassword') ?? '')) {
+      setMessage('Las contraseñas no coinciden. Volvé a escribirlas.')
+      setMismatch(true)
+      return
+    }
     setSubmitting(true)
     setMessage('')
+    setMismatch(false)
     try {
       const result = register
         ? await authClient.signUp.email({ email, password, name })
@@ -120,6 +127,25 @@ export function CustomerAuthForm({
               </p>
             )}
           </div>
+          {register && (
+            <div>
+              <label htmlFor="customer-password-confirm" className="block text-sm font-medium">
+                Confirmar contraseña
+              </label>
+              <input
+                id="customer-password-confirm"
+                name="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                maxLength={128}
+                aria-invalid={mismatch}
+                onChange={() => setMismatch(false)}
+                className={`${inputClass} mt-2`}
+              />
+            </div>
+          )}
         </fieldset>
         {message && (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
