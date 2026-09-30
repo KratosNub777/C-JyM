@@ -72,7 +72,7 @@ justifique.
 - `ORDER_RESERVATION_HOURS` (1–168, default 24): plazo de reserva de stock de un pedido impago; se guarda en cada pedido. `CRON_SECRET` (≥32 caracteres): protege `POST /api/cron/expire-orders`. `RESERVATION_POLL_SECONDS`: intervalo del worker (`npm run orders:worker`; `npm run orders:expire` corre una vez).
 - Identidades separadas: los **clientes** (Better Auth, tablas propias) y el **equipo** (Payload `users`, `/admin` y `/catalogar`) no comparten sesión ni cookies. Una sesión de cliente nunca da acceso al CMS. `customerId` de direcciones y pedidos siempre se deriva de la sesión en el servidor, nunca de un formulario.
 - Pedidos (`Orders`) y direcciones se mutan solo desde server actions con `overrideAccess: true` y filtro por dueño; el stock se reserva/devuelve dentro de transacciones con bloqueos (ver `src/lib/checkout/`).
-- `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch`.
+- `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY`: instancia de Meilisearch que sincroniza `Products` (ver hooks en `src/collections/Products.ts`). En dev se levanta con `docker compose up -d meilisearch` y la clave es la maestra del compose. En producción la app usa una clave acotada al índice `products` (`npm run meilisearch:key`); `MEILISEARCH_MASTER_KEY` es solo para los scripts `meilisearch:sync` y `meilisearch:key`, nunca en el hosting de la app. Si Meilisearch cae, `/buscar` busca en Postgres (`src/lib/searchFallback.ts`). Detalle y pasos de Railway en `docs/meilisearch.md`.
 
 ### Estructura de carpetas (generada por `create-payload-app` template `blank`, Payload 3.x)
 
