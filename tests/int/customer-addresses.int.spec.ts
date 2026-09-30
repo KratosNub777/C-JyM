@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     sessions: { tx: { db: {} } },
   },
   find: vi.fn(),
+  count: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidate }))
 vi.mock('@/lib/customerAuth/session', () => ({ getCustomerSession: mocks.session }))
 vi.mock('@/lib/payload', () => ({ getPayloadClient: mocks.payload }))
 
+import { MAX_ADDRESSES } from '@/lib/customerAuth/addressFields'
 import {
   createAddress,
   deleteAddress,
@@ -50,6 +52,7 @@ describe('Customer address authorization and transactions', () => {
     mocks.payload.mockResolvedValue(mocks)
     mocks.db.beginTransaction.mockResolvedValue('tx')
     mocks.find.mockResolvedValue({ docs: [{ id: 7 }] })
+    mocks.count.mockResolvedValue({ totalDocs: 0 })
     mocks.update.mockResolvedValue({ docs: [{ id: 7 }], errors: [] })
     mocks.delete.mockResolvedValue({ docs: [{ id: 7 }], errors: [] })
     mocks.create.mockResolvedValue({ id: 7 })
@@ -122,5 +125,24 @@ describe('Customer address authorization and transactions', () => {
     expect((await updateAddress(7, form())).success).toBe(false)
     expect(mocks.db.rollbackTransaction).toHaveBeenCalledWith('tx')
     expect(mocks.revalidate).not.toHaveBeenCalled()
+  })
+
+  it('refuses to create more than the maximum number of addresses', async () => {
+    mocks.count.mockResolvedValue({ totalDocs: MAX_ADDRESSES })
+    const result = await createAddress(form(true))
+    expect(result).toEqual({ success: false, error: expect.stringContaining(`${MAX_ADDRESSES}`) })
+    expect(mocks.count).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { customerId: { equals: 'customer-a' } } }),
+    )
+    expect(mocks.update).not.toHaveBeenCalled()
+    expect(mocks.create).not.toHaveBeenCalled()
+    expect(mocks.db.rollbackTransaction).toHaveBeenCalledWith('tx')
+    expect(mocks.db.commitTransaction).not.toHaveBeenCalled()
+  })
+
+  it('still allows editing and deleting when the limit is reached', async () => {
+    mocks.count.mockResolvedValue({ totalDocs: MAX_ADDRESSES })
+    expect((await updateAddress(7, form())).success).toBe(true)
+    expect((await deleteAddress(7)).success).toBe(true)
   })
 })
