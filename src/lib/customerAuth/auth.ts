@@ -8,7 +8,9 @@ export const customerAuthPool =
   globalAuth.customerAuthPool ??
   new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 5,
+    // Cada instancia serverless abre este pool además del de Payload; con pocas conexiones por
+    // instancia se evita agotar el límite de Neon. Usar además el endpoint con pooler de Neon.
+    max: process.env.NODE_ENV === 'production' ? 3 : 5,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
   })
