@@ -1,6 +1,6 @@
 import 'dotenv/config'
 
-import { getProductsIndex } from '@/lib/meilisearch'
+import { getProductsIndex, toProductDocument } from '@/lib/meilisearch'
 import { getPayloadClient } from '@/lib/payload'
 
 async function main() {
@@ -26,18 +26,7 @@ async function main() {
     })
 
     if (docs.length > 0) {
-      await index.addDocuments(
-        docs.map((product) => ({
-          id: product.id,
-          name: product.name,
-          brand: product.brand ?? null,
-          sku: product.sku ?? null,
-          description: product.description ?? null,
-          price: product.price,
-          compareAtPrice: product.compareAtPrice ?? null,
-          category: typeof product.category === 'object' ? product.category.id : product.category,
-        })),
-      )
+      await index.addDocuments(docs.map(toProductDocument))
       total += docs.length
     }
 
