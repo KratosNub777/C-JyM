@@ -1,11 +1,15 @@
 'use server'
 
-import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+import { sql } from '@payloadcms/db-postgres'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { parseAddress, type AddressResult } from '@/lib/customerAuth/addressFields'
 import { getPayloadClient } from '@/lib/payload'
+import { withTransaction } from '@/lib/transaction'
+
+// Expected failures with a message that is safe to show; anything else becomes a generic error.
+class AddressError extends Error {}
 
 async function mutateAddress(
   operation: 'create' | 'update' | 'delete',
@@ -23,73 +27,67 @@ async function mutateAddress(
   }
 
   const payload = await getPayloadClient()
-  const sessions = payload.db.sessions as PostgresAdapter['sessions']
-  const transactionID = await payload.db.beginTransaction()
-  if (!transactionID) return { success: false, error: 'No se pudo guardar. Intentá nuevamente.' }
-  const req = { transactionID }
   const owner = { customerId: { equals: session.user.id } }
   const target = { and: [owner, { id: { equals: id } }] }
   try {
-    // Serialize mutations for this customer, including requests from different tabs/instances.
-    // Clearing the old default and saving the new one share the same transaction.
-    await payload.db.execute({
-      db: sessions[transactionID].db,
-      sql: sql`SELECT pg_advisory_xact_lock(hashtextextended(${session.user.id}, 0))`,
-    })
-    if (operation !== 'create') {
-      const existing = await payload.find({
-        collection: 'addresses',
-        where: target,
-        limit: 1,
-        depth: 0,
-        overrideAccess: true,
-        req,
+    await withTransaction(payload, async (req, db) => {
+      // Serialize mutations for this customer, including requests from different tabs/instances.
+      // Clearing the old default and saving the new one share the same transaction.
+      await payload.db.execute({
+        db,
+        sql: sql`SELECT pg_advisory_xact_lock(hashtextextended(${session.user.id}, 0))`,
       })
-      if (!existing.docs.length) {
-        await payload.db.rollbackTransaction(transactionID)
-        return { success: false, error: 'La dirección no existe.' }
+      if (operation !== 'create') {
+        const existing = await payload.find({
+          collection: 'addresses',
+          where: target,
+          limit: 1,
+          depth: 0,
+          overrideAccess: true,
+          req,
+        })
+        if (!existing.docs.length) throw new AddressError('La dirección no existe.')
       }
-    }
-    if (data?.isDefault) {
-      const cleared = await payload.update({
-        collection: 'addresses',
-        where: owner,
-        data: { isDefault: false },
-        overrideAccess: true,
-        req,
-      })
-      if (cleared.errors.length) throw new Error('Unable to clear default address')
-    }
-    if (operation === 'create' && data) {
-      await payload.create({
-        collection: 'addresses',
-        data: { ...data, customerId: session.user.id },
-        overrideAccess: true,
-        req,
-      })
-    } else if (operation === 'update' && data) {
-      const updated = await payload.update({
-        collection: 'addresses',
-        where: target,
-        data,
-        overrideAccess: true,
-        req,
-      })
-      if (updated.errors.length || updated.docs.length !== 1)
-        throw new Error('Unable to update address')
-    } else {
-      const deleted = await payload.delete({
-        collection: 'addresses',
-        where: target,
-        overrideAccess: true,
-        req,
-      })
-      if (deleted.errors.length || deleted.docs.length !== 1)
-        throw new Error('Unable to delete address')
-    }
-    await payload.db.commitTransaction(transactionID)
-  } catch {
-    await payload.db.rollbackTransaction(transactionID)
+      if (data?.isDefault) {
+        const cleared = await payload.update({
+          collection: 'addresses',
+          where: owner,
+          data: { isDefault: false },
+          overrideAccess: true,
+          req,
+        })
+        if (cleared.errors.length) throw new Error('Unable to clear default address')
+      }
+      if (operation === 'create' && data) {
+        await payload.create({
+          collection: 'addresses',
+          data: { ...data, customerId: session.user.id },
+          overrideAccess: true,
+          req,
+        })
+      } else if (operation === 'update' && data) {
+        const updated = await payload.update({
+          collection: 'addresses',
+          where: target,
+          data,
+          overrideAccess: true,
+          req,
+        })
+        if (updated.errors.length || updated.docs.length !== 1)
+          throw new Error('Unable to update address')
+      } else {
+        const deleted = await payload.delete({
+          collection: 'addresses',
+          where: target,
+          overrideAccess: true,
+          req,
+        })
+        if (deleted.errors.length || deleted.docs.length !== 1)
+          throw new Error('Unable to delete address')
+      }
+    })
+  } catch (error) {
+    if (error instanceof AddressError) return { success: false, error: error.message }
     return { success: false, error: 'No se pudo guardar el cambio. Intentá nuevamente.' }
   }
   revalidatePath('/cuenta/direcciones')
