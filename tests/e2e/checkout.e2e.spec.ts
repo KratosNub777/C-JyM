@@ -66,6 +66,7 @@ async function register(page: Page, userEmail: string) {
   await page.getByLabel('Nombre completo', { exact: true }).fill('Cliente Checkout')
   await page.getByLabel('Email', { exact: true }).fill(userEmail)
   await page.getByLabel('Contraseña', { exact: true }).fill(password)
+  await page.getByLabel('Confirmar contraseña', { exact: true }).fill(password)
   await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click()
 }
 
