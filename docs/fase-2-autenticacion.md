@@ -7,15 +7,20 @@ Better Auth maneja clientes con email y contraseña. Payload mantiene el acceso 
 1. `npm install`.
 2. Configurar `DATABASE_URL`, `PAYLOAD_SECRET`, `BETTER_AUTH_SECRET` y `BETTER_AUTH_URL` en `.env`. El secreto de Better Auth debe ser aleatorio, de al menos 32 caracteres, diferente del de Payload. La URL local es `http://localhost:3000`. Better Auth solo acepta iniciar sesión desde `BETTER_AUTH_URL`; para otros orígenes de producción (p. ej. la variante con o sin `www`) listar las URLs exactas, sin comodines, en `BETTER_AUTH_TRUSTED_ORIGINS` separadas por coma. Las URLs de deploy y de rama de los previews de Vercel se confían solas.
 3. `npm run auth:migrate` crea o actualiza las tablas de Better Auth usando la versión instalada. Se puede repetir; no borra usuarios. `npm run auth:generate` genera el SQL pendiente para revisión en `migrations/customer-auth/schema.sql`.
-4. `npm run dev`. Payload sincroniza su esquema de desarrollo, incluida la colección `addresses`.
-5. Abrir `/registrarse`, `/ingresar`, `/cuenta` o `/cuenta/direcciones`.
+4. Opcional: configurar `SMTP_*` para que los códigos salgan por email real (ver `.env.example`). Sin SMTP, en desarrollo el email con el código se imprime en la consola del servidor.
+5. `npm run dev`. Payload sincroniza su esquema de desarrollo, incluida la colección `addresses`.
+6. Abrir `/registrarse`, `/ingresar`, `/cuenta` o `/cuenta/direcciones`.
 
 Las tablas `user`, `session`, `account`, `verification` y `rate_limit` son propiedad de Better Auth y están excluidas del `tablesFilter` de Payload. Mantener esta exclusión al agregar migraciones. `jose` 6 está declarado explícitamente porque el proyecto instala con `legacy-peer-deps` y Better Auth lo requiere; Payload conserva su propia versión 5.
 
 ## Comportamiento y límites
 
-- El registro inicia sesión automáticamente. Contraseñas de 8 a 128 caracteres, sin verificación de email, login social, roles comerciales ni recuperación por correo en esta fase.
-- Pendiente antes de aceptar clientes reales (requiere un proveedor de email, ver Fase 3): sin verificación, alguien puede registrar el email de otra persona y bloquearle el alta; los emails de pedidos tampoco deben enviarse a direcciones sin verificar. El registro con un email ya existente responde con un error distinto, por lo que permite saber qué emails tienen cuenta; con verificación activada Better Auth lo oculta. Tampoco hay recuperación de contraseña.
+- El registro pide la contraseña dos veces y **no inicia sesión hasta verificar el email** con un código de 6 dígitos enviado por correo. El código vence a los 5 minutos, admite 5 intentos y se guarda cifrado con `BETTER_AUTH_SECRET`; se puede pedir uno nuevo (60 s entre reenvíos y 3 pedidos por minuto por IP). Al verificarlo se inicia sesión. Contraseñas de 8 a 128 caracteres. Sin login social ni roles comerciales en esta fase.
+- Ingresar con la contraseña correcta pero el email sin verificar envía un código nuevo y lleva a `/verificar-email`. Registrarse con un email que ya existe responde igual que con uno nuevo, así que no revela qué emails tienen cuenta.
+- Recuperar la contraseña: `/olvide-contrasena` envía un código (siempre con la misma respuesta, exista o no la cuenta) y `/restablecer-contrasena` pide el código y la contraseña nueva dos veces. Al cambiarla se cierran las demás sesiones de la cuenta. Las pantallas guardan el email en `sessionStorage`, no en la URL.
+- El registro no envía el código por sí mismo: Better Auth lo despacharía en segundo plano cuando la transacción del alta ya cerró y falla. El formulario lo pide con una llamada aparte apenas termina el registro (`sendOnSignUp: false`).
+- Los emails salen por SMTP (`src/lib/email/mailer.ts`) después de responder al cliente, para que el tiempo de respuesta no delate si una cuenta existe.
+- Pendiente: el límite de códigos es por IP; un atacante con muchas IPs podría enviar varios correos a una misma víctima. Conviene sumar un tope por email antes del lanzamiento. El código no se pide en cada inicio de sesión, solo para verificar la cuenta y recuperar la contraseña.
 - El perfil muestra nombre y email. No incluye cambios de email o contraseña.
 - Cada acción de direcciones valida la sesión y deriva `customerId` del servidor. Las consultas y mutaciones filtran por propietario; un ID ajeno no permite leer, modificar ni eliminar otra dirección.
 - Cambiar la predeterminada utiliza una transacción y un bloqueo por cliente para serializar escrituras concurrentes. Eliminar o desmarcar la predeterminada puede dejar al cliente sin predeterminada. Las operaciones manuales del equipo desde Payload no aplican esta normalización automática.
@@ -36,7 +41,7 @@ npx playwright install chromium
 npm run test:e2e -- tests/e2e/customer-auth.e2e.spec.ts --reporter=line
 ```
 
-El E2E crea dos clientes y un administrador temporales en la base de desarrollo y los elimina junto con sus direcciones al terminar. El comando npm incluye el loader TS necesario para importar la configuración de Payload. Usar una base de pruebas/desarrollo, nunca producción.
+Los E2E leen los códigos con `auth.api.getVerificationOTP` (API de servidor, ver `tests/helpers/customerAuth.ts`). El E2E crea varios clientes y un administrador temporales en la base de desarrollo y los elimina junto con sus direcciones al terminar. El comando npm incluye el loader TS necesario para importar la configuración de Payload. Usar una base de pruebas/desarrollo, nunca producción.
 
 Antes del despliegue: configurar los secretos y la URL HTTPS real, ejecutar la migración de Better Auth y preparar/aplicar las migraciones de Payload para la base de destino. La sincronización automática de desarrollo no reemplaza las migraciones de producción.
 
