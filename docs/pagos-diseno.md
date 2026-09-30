@@ -115,7 +115,7 @@ Restricción de base: **un solo intento `created` por pedido** (índice único p
 
 **`Orders`**: se agrega el estado `paid` y los campos `paidAt` y `paidAmount`. Sigue sin admitir cambios manuales.
 
-**Migración de producción** (`migrations/payments/003-payments.sql`, mismo estilo que `002-reservation-expiration.sql`): `ALTER TYPE enum_orders_status ADD VALUE IF NOT EXISTS 'paid'`, columnas nuevas y las tablas de pagos. `ADD VALUE` no puede usarse en la misma transacción en la que se agrega.
+**Migración de producción** (se genera con `npm run db:migrate:create -- payments` después de editar las colecciones y se revisa a mano, como la migración inicial en `migrations/`): `ALTER TYPE enum_orders_status ADD VALUE IF NOT EXISTS 'paid'`, columnas nuevas y las tablas de pagos. `ADD VALUE` no puede usarse en la misma transacción en la que se agrega.
 
 ## Flujos
 
