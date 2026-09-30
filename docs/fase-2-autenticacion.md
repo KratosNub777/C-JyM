@@ -20,7 +20,10 @@ Las tablas `user`, `session`, `account`, `verification` y `rate_limit` son propi
 - Cambiar la predeterminada utiliza una transacción y un bloqueo por cliente para serializar escrituras concurrentes. Eliminar o desmarcar la predeterminada puede dejar al cliente sin predeterminada. Las operaciones manuales del equipo desde Payload no aplican esta normalización automática.
 - REST y GraphQL de direcciones requieren una sesión interna de Payload. Una sesión de cliente no concede acceso al CMS.
 - El menú consulta la sesión en el navegador, conservando ISR en el catálogo. Las páginas privadas consultan en servidor. No se utiliza un proxy basado en presencia de cookies.
-- Better Auth guarda el rate limit en Postgres, compartido entre instancias. Las operaciones del cliente usan sus protecciones de origen; las Server Actions usan las de Next.js.
+- Better Auth guarda el rate limit en Postgres, compartido entre instancias. La consulta de sesión (`/get-session`, una por página vista) está exenta para no escribir en la base en cada visita; inicio de sesión, registro y demás endpoints conservan su límite. Las operaciones del cliente usan sus protecciones de origen; las Server Actions usan las de Next.js y no tienen rate limit propio.
+- Cada cliente puede guardar hasta 20 direcciones (`MAX_ADDRESSES`). El límite se verifica dentro de la transacción y del bloqueo por cliente, y la pantalla deshabilita el botón al alcanzarlo. Editar y eliminar siguen funcionando en el límite.
+- El formulario distingue datos rechazados (400/401/422), límite de intentos (429), origen no permitido (403) y fallos del servidor, para no mostrar "contraseña incorrecta" ante un error que no lo es.
+- En producción el pool de conexiones de Better Auth es de 3 (5 en desarrollo). Usar el endpoint con pooler de Neon en `DATABASE_URL` para que las instancias serverless no agoten las conexiones.
 
 ## Verificación
 
