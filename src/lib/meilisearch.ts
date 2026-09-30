@@ -32,6 +32,19 @@ export function getProductsIndex() {
   return getMeiliClient().index<ProductDocument>(PRODUCTS_INDEX)
 }
 
+export function toProductDocument(product: Product): ProductDocument {
+  return {
+    id: product.id,
+    name: product.name,
+    brand: product.brand ?? null,
+    sku: product.sku ?? null,
+    description: product.description ?? null,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice ?? null,
+    category: typeof product.category === 'object' ? product.category.id : product.category,
+  }
+}
+
 export async function syncProductToIndex(product: Product) {
   const index = getProductsIndex()
 
@@ -40,18 +53,7 @@ export async function syncProductToIndex(product: Product) {
     return
   }
 
-  await index.addDocuments([
-    {
-      id: product.id,
-      name: product.name,
-      brand: product.brand ?? null,
-      sku: product.sku ?? null,
-      description: product.description ?? null,
-      price: product.price,
-      compareAtPrice: product.compareAtPrice ?? null,
-      category: typeof product.category === 'object' ? product.category.id : product.category,
-    },
-  ])
+  await index.addDocuments([toProductDocument(product)])
 }
 
 export async function removeProductFromIndex(productId: number) {
