@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { Pool } from 'pg'
+import { trustedAuthOrigins } from './origins'
 
 // Reuse connections during Next.js development reloads.
 const globalAuth = globalThis as typeof globalThis & { customerAuthPool?: Pool }
@@ -18,6 +19,9 @@ export const auth = betterAuth({
   database: customerAuthPool,
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
+  // Sin esto solo se acepta el origen exacto de BETTER_AUTH_URL: en www/apex alternativos o en
+  // previews de Vercel el login respondería 403 (Invalid origin).
+  trustedOrigins: trustedAuthOrigins(),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
