@@ -11,3 +11,10 @@ export function securityHeaders(env: Env = process.env) {
   if (env.NODE_ENV !== 'production') return []
   return [{ key: 'Strict-Transport-Security', value: HSTS_VALUE }]
 }
+
+// Reglas listas para `headers()` de next.config. Next rechaza una regla con la lista de cabeceras
+// vacía ("Invalid header found"), así que fuera de producción no se devuelve ninguna regla.
+export function securityHeaderRules(env: Env = process.env) {
+  const headers = securityHeaders(env)
+  return headers.length ? [{ source: '/:path*', headers }] : []
+}
