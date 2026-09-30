@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { MAX_ADDRESSES } from '@/lib/customerAuth/addressFields'
 import type { Address } from '@/payload-types'
 import { AddressForm } from './AddressForm'
 import { deleteAddress } from './actions'
@@ -29,6 +30,7 @@ export function AddressList({ addresses }: { addresses: Address[] }) {
       }
     })
   }
+  const limitReached = addresses.length >= MAX_ADDRESSES
   const cardClass =
     'rounded-xl border border-neutral-200 bg-white p-5 sm:p-6 dark:border-neutral-800 dark:bg-neutral-900/40'
   return (
@@ -135,7 +137,7 @@ export function AddressList({ addresses }: { addresses: Address[] }) {
       <button
         ref={addButton}
         type="button"
-        disabled={editing !== null || pending}
+        disabled={editing !== null || pending || limitReached}
         onClick={() => {
           setEditing('new')
           setDeleting(null)
@@ -145,6 +147,11 @@ export function AddressList({ addresses }: { addresses: Address[] }) {
       >
         Agregar dirección
       </button>
+      {limitReached && (
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Llegaste al máximo de {MAX_ADDRESSES} direcciones. Eliminá una para agregar otra.
+        </p>
+      )}
     </div>
   )
 }
