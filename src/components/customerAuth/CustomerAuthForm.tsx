@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 import { authClient } from '@/lib/customerAuth/client'
+import { authFailureMessage } from '@/lib/customerAuth/errors'
 
 const inputClass =
   'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-base outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 dark:border-neutral-700 dark:bg-neutral-900'
@@ -37,13 +38,7 @@ export function CustomerAuthForm({
         ? await authClient.signUp.email({ email, password, name })
         : await authClient.signIn.email({ email, password })
       if (result.error) {
-        if (result.error.status === 429)
-          setMessage('Demasiados intentos. Esperá un minuto y volvé a intentar.')
-        else if (!register) setMessage('Email o contraseña incorrectos. Revisá tus datos.')
-        else
-          setMessage(
-            'No pudimos crear la cuenta. Revisá tus datos; si ya tenés una cuenta, ingresá.',
-          )
+        setMessage(authFailureMessage(register ? 'signUp' : 'signIn', result.error.status))
         return
       }
       router.replace(destination)
