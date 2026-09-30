@@ -15,6 +15,7 @@ Las tablas `user`, `session`, `account`, `verification` y `rate_limit` son propi
 ## Comportamiento y límites
 
 - El registro inicia sesión automáticamente. Contraseñas de 8 a 128 caracteres, sin verificación de email, login social, roles comerciales ni recuperación por correo en esta fase.
+- Pendiente antes de aceptar clientes reales (requiere un proveedor de email, ver Fase 3): sin verificación, alguien puede registrar el email de otra persona y bloquearle el alta; los emails de pedidos tampoco deben enviarse a direcciones sin verificar. El registro con un email ya existente responde con un error distinto, por lo que permite saber qué emails tienen cuenta; con verificación activada Better Auth lo oculta. Tampoco hay recuperación de contraseña.
 - El perfil muestra nombre y email. No incluye cambios de email o contraseña.
 - Cada acción de direcciones valida la sesión y deriva `customerId` del servidor. Las consultas y mutaciones filtran por propietario; un ID ajeno no permite leer, modificar ni eliminar otra dirección.
 - Cambiar la predeterminada utiliza una transacción y un bloqueo por cliente para serializar escrituras concurrentes. Eliminar o desmarcar la predeterminada puede dejar al cliente sin predeterminada. Las operaciones manuales del equipo desde Payload no aplican esta normalización automática.
