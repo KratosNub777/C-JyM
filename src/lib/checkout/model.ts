@@ -1,3 +1,4 @@
+import type { Order } from '@/payload-types'
 import { isProductId, MAX_CART_ITEMS, MAX_CART_QUANTITY } from '../cart/model'
 
 export type CheckoutInput = {
@@ -73,4 +74,16 @@ export function parseCheckout(input: unknown): CheckoutInput | null {
 
 export function orderReference(id: number) {
   return `JM-${String(id).padStart(6, '0')}`
+}
+
+// Record exhaustivo: al agregar un estado a Orders, TypeScript obliga a darle una etiqueta acá
+// en lugar de mostrarlo como "Pendiente de pago" en alguna pantalla.
+const ORDER_STATUS_LABELS: Record<Order['status'], string> = {
+  pending_payment: 'Pendiente de pago',
+  cancelled: 'Cancelado',
+  expired: 'Vencido',
+}
+
+export function orderStatusLabel(status: Order['status']) {
+  return ORDER_STATUS_LABELS[status]
 }

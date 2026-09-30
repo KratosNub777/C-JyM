@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { getPayloadClient } from '@/lib/payload'
-import { orderReference } from '@/lib/checkout/model'
+import { orderReference, orderStatusLabel } from '@/lib/checkout/model'
 import { formatGs } from '@/lib/format'
 
 export default async function OrdersPage({
@@ -49,12 +49,7 @@ export default async function OrdersPage({
                 <span>
                   <span className="font-semibold">{orderReference(order.id)}</span>
                   <span className="mt-2 block text-sm text-neutral-500">
-                    {order.status === 'expired'
-                      ? 'Vencido'
-                      : order.status === 'cancelled'
-                        ? 'Cancelado'
-                        : 'Pendiente de pago'}{' '}
-                    · Retiro en el local
+                    {orderStatusLabel(order.status)} · Retiro en el local
                   </span>
                 </span>
                 <span className="font-semibold">{formatGs(order.total)} →</span>

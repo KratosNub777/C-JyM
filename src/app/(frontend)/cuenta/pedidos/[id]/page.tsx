@@ -3,8 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { getPayloadClient } from '@/lib/payload'
-import { orderReference } from '@/lib/checkout/model'
-import { formatGs } from '@/lib/format'
+import { orderReference, orderStatusLabel } from '@/lib/checkout/model'
+import { formatDateTimePy, formatGs } from '@/lib/format'
 import { CancelOrderButton } from '@/components/checkout/CancelOrderButton'
 import { reservationDeadline } from '@/lib/checkout/reservationPolicy'
 
@@ -36,11 +36,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         role="status"
         className={`mt-4 inline-block rounded-full px-4 py-2 text-sm font-medium ${order.status !== 'pending_payment' ? 'bg-neutral-100 dark:bg-neutral-800' : 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200'}`}
       >
-        {order.status === 'expired'
-          ? 'Vencido'
-          : order.status === 'cancelled'
-            ? 'Cancelado'
-            : 'Pendiente de pago'}
+        {orderStatusLabel(order.status)}
       </p>
       <p className="mt-5 text-sm text-neutral-500 dark:text-neutral-400">
         {order.status === 'expired'
@@ -51,13 +47,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       </p>
       {order.status === 'pending_payment' && (
         <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-          Reserva hasta el{' '}
-          {new Intl.DateTimeFormat('es-PY', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-            timeZone: 'America/Asuncion',
-          }).format(new Date(reservationDeadline(order)))}{' '}
-          (hora de Paraguay). Si el pedido sigue impago, vencerá automáticamente.
+          Reserva hasta el {formatDateTimePy(reservationDeadline(order))} (hora de Paraguay). Si el
+          pedido sigue impago, vencerá automáticamente.
         </p>
       )}
       <section className="mt-7 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-7 dark:border-neutral-800 dark:bg-neutral-900/40">
@@ -88,14 +79,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           </p>
           <p>{order.customerEmail}</p>
           {order.notes && <p>Observaciones: {order.notes}</p>}
-          <p>
-            Creado el{' '}
-            {new Intl.DateTimeFormat('es-PY', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-              timeZone: 'America/Asuncion',
-            }).format(new Date(order.createdAt))}
-          </p>
+          <p>Creado el {formatDateTimePy(order.createdAt)}</p>
         </div>
         {order.status === 'pending_payment' && <CancelOrderButton orderId={order.id} />}
       </section>
