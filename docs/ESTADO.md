@@ -6,26 +6,30 @@
 ## Ahora
 
 - **Fase:** 3 en curso (carrito, checkout con retiro, reserva de stock y vencimiento listos; falta pasarela, confirmación verificada, emails transaccionales y `/security-review`). Detalle en `docs/checkout.md`.
+- **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Bloqueo: las imágenes de `Media` van a disco local; **decidido usar Cloudflare R2** (aún sin implementar).
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `main` (sincronizada con `origin/main`).
+- **Rama activa:** `feat/migraciones-y-despliegue` (pusheada, sin fusionar a `main`).
 
 ## Trabajo sin commitear
 
-Nada. Todo está mergeado y pusheado a `origin/main`.
-
-- Fix de registro ya en `main`: `auth.ts` tiene un hook `before` en `/sign-up/email` que borra una cuenta **sin verificar** con el mismo email (evita account squatting); las verificadas no se tocan. e2e de auth 6/6 OK (2026-09-29).
+Nada. `main` = `origin/main` (`91fc8f3`). La rama activa está pusheada.
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
-| 2026-09-29 | main | Push a origin. Merge de `docs/bitacora-de-sesion` y `fix/registro-cuenta-sin-verificar`. e2e de auth 6/6 OK. Fix registro: reemplaza cuenta sin verificar (auth.ts + e2e + doc). Se crea este archivo y se referencia desde `CLAUDE.md`. |
-| (previo) | main | `.claude/` deja de versionarse; diseño de pagos Bancard/Pagopar; docs de verificación de email por código y recuperación de contraseña; login con confirmar contraseña. |
+| 2026-10-01 | feat/migraciones-y-despliegue | Migración inicial de Payload (`migrations/*_initial.ts`), comandos `npm run db:*`, guía `docs/despliegue.md`; se quita el SQL `002`. Probada en Postgres 16 vacío (esquema = dev). |
+| 2026-09-30 | main | HTTPS forzado: `lib/security/{https,headers}.ts` (HSTS, `BETTER_AUTH_URL` https obligatoria en producción), cookie del admin Secure, orígenes solo https. |
+| 2026-09-30 | main | `npm run email:test` para probar SMTP (`scripts/email-test.ts`, `describeSmtpError` en `lib/email/mailer.ts`). |
+| 2026-09-30 | main | Registro: confirmar contraseña, verificación de email por código SMTP, recuperación de contraseña; reemplazo de cuentas sin verificar (`customerAuth/auth.ts`, `docs/fase-2-autenticacion.md`). |
+| 2026-09-29 | main | Meilisearch en producción (clave acotada, sync sin huérfanos, respaldo en Postgres), cron diario de reservas, fixes del code-review de la Fase 2; `.claude/` y `AGENTS.md` dejan de versionarse. |
 
 ## Próximos pasos sugeridos
 
-1. Hacer `git push` de `main` (sin pushear aún).
-2. Decidir pasarela (`docs/pagos-diseno.md`) y seguir con Fase 3.
+1. Fusionar `feat/migraciones-y-despliegue` a `main` cuando se revise.
+2. Almacenamiento de imágenes en Cloudflare R2 (plugin de Payload + `next.config.ts` + migración si cambia el esquema).
+3. Importación masiva de productos (~1.000) y despliegue de pruebas (Neon + Vercel + Railway).
+4. Decidir pasarela (`docs/pagos-diseno.md`) y seguir con Fase 3.
 
 ## Reglas de mantenimiento (para Claude)
 
