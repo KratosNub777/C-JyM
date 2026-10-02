@@ -11,7 +11,10 @@ export const Products: CollectionConfig = {
     defaultColumns: ['name', 'category', 'price', 'stock', 'status'],
   },
   access: {
-    read: () => true,
+    // La API REST y GraphQL son públicas: sin sesión de administrador solo se ven los productos
+    // activos. Los inactivos (borradores, ocultos del sitio) y su stock no deben poder consultarse.
+    // El frontend usa la Local API con overrideAccess, así que no se ve afectado.
+    read: ({ req }) => (req.user ? true : { status: { equals: 'active' } }),
   },
   hooks: {
     afterChange: [
