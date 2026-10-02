@@ -2,7 +2,7 @@
 
 Guía para publicar el catálogo con Vercel (app y panel), Neon (Postgres) y Railway (Meilisearch). Sirve igual para un entorno de pruebas (staging) y para producción: se repite con otra base y otras claves.
 
-> **Antes de empezar, hay un bloqueo:** las imágenes de `Media` se guardan en el disco local (`/media`). En Vercel el disco es efímero y de solo lectura, así que las subidas desde `/admin` fallarían o se perderían. Hace falta almacenamiento de objetos (por ejemplo Cloudflare R2 o Vercel Blob con el plugin de Payload) **antes de cargar productos reales**. Ver [Pendientes conocidos](#pendientes-conocidos).
+> **Imágenes:** en Vercel el disco es efímero, así que las fotos de `Media` se guardan en **Cloudflare R2** (sección 2.1). Hasta que `R2_BUCKET` y sus variables estén cargadas en Vercel, las subidas desde `/admin` no se conservan.
 
 ## Resumen del orden
 
@@ -42,6 +42,23 @@ Reglas:
 
 Seguir [meilisearch.md](meilisearch.md): servicio con la imagen oficial, volumen en `/meili_data`, `MEILI_ENV=production`, dominio HTTPS y una clave acotada al índice `products` (`npm run meilisearch:key`). Si Meilisearch no está disponible, `/buscar` busca en Postgres, así que no bloquea el lanzamiento.
 
+## 2.1 Imágenes (Cloudflare R2)
+
+Las fotos se suben desde `/admin` por el servidor y quedan en un bucket de R2; la web las muestra pidiéndolas directamente a la dirección pública del bucket.
+
+1. En Cloudflare, **R2**: activar el servicio (pide un método de pago; hay una capa gratuita mensual) y crear un bucket por entorno (`cjym-media-staging`, `cjym-media`).
+2. En el bucket, **Settings → Public Development URL → Enable**. Esa dirección (`https://pub-….r2.dev`) es `R2_PUBLIC_URL`. **`r2.dev` es solo para pruebas**: tiene límites de tasa y no usa caché de Cloudflare. Para producción conectar un **dominio propio** al bucket (Settings → Custom Domains) y usar esa dirección.
+3. **R2 → Manage R2 API Tokens → Create API token**, con permiso **Object Read & Write** y limitado a ese bucket. Cloudflare muestra el *Access Key ID* y el *Secret Access Key* una sola vez: guardarlos en el administrador de contraseñas.
+4. Cargar en Vercel `R2_BUCKET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_PUBLIC_URL` (ver la tabla). Sin `R2_BUCKET`, la app usa el disco local (solo desarrollo).
+5. Comprobar: subir una imagen en `/admin → Media` y abrir su URL en el navegador; debe empezar con `R2_PUBLIC_URL`.
+
+Detalles:
+
+- **El esquema no cambia entre entornos:** la migración `media_prefix` agrega las columnas del plugin aunque R2 esté apagado.
+- **No hace falta configurar CORS** en el bucket, porque las subidas pasan por el servidor.
+- **Límite de Vercel:** una función acepta cuerpos de hasta unos 4,5 MB, así que una foto más grande no se puede subir por `/admin`. Reducirla antes, o activar `clientUploads` en el plugin (las subidas van directo al bucket y exige permitir CORS `PUT` desde el sitio).
+- **Fotos ya subidas con otra dirección:** la URL se guarda en cada documento al subirlo; si se cambia `R2_PUBLIC_URL` (por ejemplo al pasar a un dominio propio) las imágenes existentes conservan la dirección vieja y hay que actualizarlas o volver a subirlas. Conviene decidir el dominio antes de cargar el catálogo.
+
 ## 3. Variables de entorno
 
 Generar cada secreto con un valor distinto por entorno:
@@ -61,6 +78,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `CRON_SECRET` | Sí | Al menos 32 caracteres. Vercel lo envía como `Bearer` al cron; sin él el vencimiento de reservas responde 401 |
 | `ORDER_RESERVATION_HOURS` | No | 1 a 168, por defecto 24 |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | Sí | Envío de códigos de verificación. **Sin SMTP en producción, registrarse falla.** Probar antes con `npm run email:test -- correo@destino.com` |
+| `R2_BUCKET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_URL` | Sí | Almacenamiento de imágenes en Cloudflare R2 (sección 2.1). `R2_PUBLIC_URL` con `https://` y sin barra final. Si falta alguna con `R2_BUCKET` definido, la app no arranca y el mensaje dice cuál |
 | `MEILISEARCH_HOST` | Sí* | URL HTTPS del servicio en Railway |
 | `MEILISEARCH_API_KEY` | Sí* | La clave acotada de `npm run meilisearch:key`, **no** la maestra |
 
@@ -115,7 +133,7 @@ Recorrerla con la URL pública:
 
 | Pendiente | Impacto |
 | --- | --- |
-| **Almacenamiento de imágenes** (`Media` usa disco local) | Bloquea cargar productos con fotos en Vercel. Hay que elegir R2 o Vercel Blob, instalar el plugin de Payload y actualizar `images` de `next.config.ts` |
+| Almacenamiento de imágenes | Resuelto en el código con R2; falta cargar las variables `R2_*` en Vercel y, para producción, un dominio propio en el bucket |
 | Importación masiva de productos | Cargar ~1.000 productos a mano no es viable |
 | Pasarela de pago | Los pedidos quedan pendientes y se pagan en el local. Ver [pagos-diseno.md](pagos-diseno.md) |
 | Tope de códigos por email | El límite actual es solo por IP |

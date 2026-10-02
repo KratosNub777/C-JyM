@@ -3,6 +3,7 @@ import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { securityHeaderRules } from './src/lib/security/headers'
+import { r2ImagePattern } from './src/lib/storage/r2'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
@@ -24,6 +25,8 @@ const nextConfig: NextConfig = {
       {
         hostname: 'picsum.photos',
       },
+      // Fotos de productos en el bucket público de R2.
+      ...(r2ImagePattern() ? [r2ImagePattern()!] : []),
     ],
   },
   async headers() {
