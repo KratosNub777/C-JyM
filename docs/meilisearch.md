@@ -8,7 +8,7 @@ Si Meilisearch no responde, `/buscar` registra el error y busca directo en Postg
 
 Payload corre dentro de Next.js (Vercel); Railway solo aloja Meilisearch.
 
-1. Crear un servicio desde la imagen Docker `getmeili/meilisearch:v1.12` (la misma versión del `docker-compose.yml`).
+1. Crear un servicio desde la imagen Docker `getmeili/meilisearch:v1.42.1` (la misma versión del `docker-compose.yml`). Usar siempre una versión exacta, la misma en desarrollo, staging y producción: Meilisearch no abre los datos de una versión anterior sin un volcado, y `latest` actualizaría el servicio sin avisar.
 2. Variables del servicio:
    - `MEILI_MASTER_KEY`: valor aleatorio y largo. Es la clave maestra; no se carga en Vercel.
    - `MEILI_ENV=production`. Sin esto Meilisearch no exige clave.
@@ -17,6 +17,8 @@ Payload corre dentro de Next.js (Vercel); Railway solo aloja Meilisearch.
 4. Generar un dominio público HTTPS para el puerto 7700. Vercel no alcanza la red privada de Railway, por eso la URL es pública y todo acceso queda protegido por las claves.
 5. Elegir la región más cercana a São Paulo (las funciones de Vercel corren en `gru1` y el cliente corta a los 5 segundos).
 6. Comprobar `GET https://<dominio>/health`, que debe responder `{"status":"available"}`.
+
+**Actualizar la versión:** se probó la v1.42.1 con el cliente `meilisearch` 0.62 (sincronizar, borrar huérfanos, crear la clave acotada y verificar sus permisos, y buscar con tolerancia a errores de tipeo). Para cambiar de versión basta con levantar una instancia nueva y correr `npm run meilisearch:sync`, porque el índice se reconstruye desde Postgres. En desarrollo, si el contenedor local venía de otra versión y no arranca, borrar su volumen con `docker compose down -v` y volver a levantarlo.
 
 El índice se reconstruye por completo desde Postgres, así que perder el volumen no pierde datos: solo hay que volver a sincronizar.
 
