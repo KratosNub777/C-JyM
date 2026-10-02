@@ -24,7 +24,8 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/', 'src/payload-types.ts', 'src/payload-generated-schema.ts'],
+    // migrations/ lo genera `payload migrate:create`; no se edita a mano ni se le aplica el lint.
+    ignores: ['.next/', 'src/payload-types.ts', 'src/payload-generated-schema.ts', 'migrations/'],
   },
 ]
 
