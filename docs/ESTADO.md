@@ -18,7 +18,7 @@ Nada. `main` = `origin/main` (`91fc8f3`). La rama activa está pusheada.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
-| 2026-10-02 | feat/almacenamiento-r2 | Imágenes en R2: `lib/storage/r2.ts` + `s3Storage` en `payload.config.ts`, patrón de `next/image`, migración `media_prefix`, variables `R2_*` en `.env.example` y sección 2.1 de `docs/despliegue.md`. Probado contra un S3 local (subida, URL pública, borrado, rechazo de no-imágenes). |
+| 2026-10-02 | feat/almacenamiento-r2 | Imágenes en R2: `lib/storage/r2.ts` + `s3Storage` en `payload.config.ts`, patrón de `next/image`, migración `media_prefix`, variables `R2_*` en `.env.example` y sección 2.1 de `docs/despliegue.md`. Probado contra un S3 local (subida, URL pública, borrado, rechazo de no-imágenes, nombres repetidos no se pisan). Tipos regenerados y `vitest.global-setup.ts` evita que la primera corrida tras cambiar columnas falle (42701). |
 | 2026-10-02 | fix/productos-api-solo-activos | La API REST/GraphQL de `products` solo muestra productos activos a visitantes (`collections/Products.ts` + test); staging `cjym-staging.vercel.app` desplegado y primer admin creado; faltan R2 (imágenes), SMTP y cargar productos. |
 | 2026-10-02 | feat/migraciones-y-despliegue | Meilisearch fijado en v1.42.1 (`docker-compose.yml`, `docs/meilisearch.md`); probado sync, huérfanos, clave acotada y búsqueda. Base de staging en Neon creada y migrada (`db:setup`); en la guía paso a paso falta Railway/Vercel. |
 | 2026-10-01 | feat/migraciones-y-despliegue | Migración inicial de Payload (`migrations/*_initial.ts`), comandos `npm run db:*`, guía `docs/despliegue.md`; se quita el SQL `002`. Probada en Postgres 16 vacío (esquema = dev). |
