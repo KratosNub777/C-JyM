@@ -3,6 +3,11 @@ import type { MetadataRoute } from 'next'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
 
+// Sin esto el sitemap se genera una sola vez al compilar (con el catálogo de ese momento) y los
+// productos y categorías cargados después no aparecen hasta el siguiente despliegue. Debe ser un
+// literal para que Next lo analice al compilar. Una hora alcanza para los buscadores.
+export const revalidate = 3600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl()
   const payload = await getPayloadClient()
