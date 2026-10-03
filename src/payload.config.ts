@@ -37,6 +37,11 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+    // Payload regenera los tipos en cada inicio fuera de producción: cada archivo de Vitest (en
+    // paralelo) reescribía payload-types.ts y cada corrida lo dejaba "modificado" en git solo por los
+    // finales de línea. En los tests no se regenera; los tipos se actualizan a mano con
+    // `npm run generate:types` tras editar una colección, como indica el flujo del proyecto.
+    autoGenerate: !process.env.VITEST,
   },
   db: postgresAdapter({
     // Better Auth owns these tables. Never include them in Payload schema pushes.
