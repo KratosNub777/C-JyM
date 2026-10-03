@@ -13,11 +13,9 @@ let categoryId: number
 describe('Products read access', () => {
   beforeAll(async () => {
     payload = await getPayload({ config, key: `products-access-${run}` })
-    const category = await payload.create({
-      collection: 'categories',
-      data: { name: `Acceso ${run}`, slug: `acceso-${run}` },
-    })
-    categoryId = category.id
+    // Como el resto de los tests: se usa la primera categoría existente y nunca se crea ni se borra
+    // una. Borrarla acá chocaba con productos de otros archivos que corren en paralelo y la usan.
+    categoryId = (await payload.find({ collection: 'categories', limit: 1, depth: 0 })).docs[0].id
     for (const status of ['active', 'inactive'] as const) {
       const product = await payload.create({
         collection: 'products',
@@ -36,7 +34,6 @@ describe('Products read access', () => {
 
   afterAll(async () => {
     for (const id of ids) await payload.delete({ collection: 'products', id })
-    if (categoryId) await payload.delete({ collection: 'categories', id: categoryId })
     await payload.destroy()
   })
 
