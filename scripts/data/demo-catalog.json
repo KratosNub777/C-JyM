@@ -1,0 +1,363 @@
+{
+  "_nota": "Catálogo de demostración (marcas y precios de ejemplo). Lo usa `npm run seed:demo`.",
+  "categories": [
+    {
+      "name": "Audio y TV",
+      "slug": "audio-tv",
+      "parent": null
+    },
+    {
+      "name": "Climatización",
+      "slug": "climatizacion-grupo",
+      "parent": null
+    },
+    {
+      "name": "Cocina",
+      "slug": "cocina",
+      "parent": null
+    },
+    {
+      "name": "Cuidado del Hogar",
+      "slug": "cuidado-del-hogar",
+      "parent": null
+    },
+    {
+      "name": "Línea Blanca",
+      "slug": "linea-blanca",
+      "parent": null
+    },
+    {
+      "name": "Audio y Parlantes",
+      "slug": "audio",
+      "parent": "audio-tv"
+    },
+    {
+      "name": "Calefacción",
+      "slug": "calefaccion",
+      "parent": "climatizacion-grupo"
+    },
+    {
+      "name": "Cocinas",
+      "slug": "cocinas",
+      "parent": "cocina"
+    },
+    {
+      "name": "Cuidado Personal",
+      "slug": "cuidado-personal",
+      "parent": "cuidado-del-hogar"
+    },
+    {
+      "name": "Freezers",
+      "slug": "freezers",
+      "parent": "linea-blanca"
+    },
+    {
+      "name": "Heladeras",
+      "slug": "heladeras",
+      "parent": "linea-blanca"
+    },
+    {
+      "name": "Lavado",
+      "slug": "lavado",
+      "parent": "linea-blanca"
+    },
+    {
+      "name": "Limpieza del Hogar",
+      "slug": "limpieza",
+      "parent": "cuidado-del-hogar"
+    },
+    {
+      "name": "Microondas y Hornos",
+      "slug": "microondas-hornos",
+      "parent": "cocina"
+    },
+    {
+      "name": "Televisores",
+      "slug": "television",
+      "parent": "audio-tv"
+    },
+    {
+      "name": "Ventilación y Climatización",
+      "slug": "climatizacion",
+      "parent": "climatizacion-grupo"
+    }
+  ],
+  "products": [
+    {
+      "name": "Heladera F/H Magna 207LTS",
+      "slug": "heladera-fh-magna-207lts",
+      "sku": "210123",
+      "description": "Frío húmedo, cajón para frutas y verduras, congelador con luz interior.",
+      "brand": "Tokyo",
+      "category": "heladeras",
+      "price": 2600000,
+      "compareAtPrice": null,
+      "stock": 6,
+      "status": "active"
+    },
+    {
+      "name": "Heladera No Frost 320LTS",
+      "slug": "heladera-no-frost-320lts",
+      "sku": "210122",
+      "description": "No frost, doble puerta, dispenser de agua externo.",
+      "brand": "Philco",
+      "category": "heladeras",
+      "price": 4100000,
+      "compareAtPrice": 4674000,
+      "stock": 4,
+      "status": "active"
+    },
+    {
+      "name": "Freezer Horizontal 250LTS",
+      "slug": "freezer-horizontal-250lts",
+      "sku": "210121",
+      "description": "Bajo consumo, ideal para comercios y familias numerosas.",
+      "brand": "Tokyo",
+      "category": "freezers",
+      "price": 3000000,
+      "compareAtPrice": 3360000,
+      "stock": 5,
+      "status": "active"
+    },
+    {
+      "name": "Freezer Vertical 150LTS",
+      "slug": "freezer-vertical-150lts",
+      "sku": "210120",
+      "description": "Ahorra espacio, 4 bandejas removibles.",
+      "brand": "Philco",
+      "category": "freezers",
+      "price": 2400000,
+      "compareAtPrice": null,
+      "stock": 6,
+      "status": "active"
+    },
+    {
+      "name": "Cocina 5 Hornallas c/Horno",
+      "slug": "cocina-5-hornallas-horno",
+      "sku": "210119",
+      "description": "Encendido eléctrico, grill y horno con visor de vidrio.",
+      "brand": "Philco",
+      "category": "cocinas",
+      "price": 2150000,
+      "compareAtPrice": 2537000,
+      "stock": 8,
+      "status": "active"
+    },
+    {
+      "name": "Anafe Eléctrico Doble",
+      "slug": "anafe-electrico-doble",
+      "sku": "210118",
+      "description": "Dos hornallas, control de temperatura independiente.",
+      "brand": "Jam",
+      "category": "cocinas",
+      "price": 370000,
+      "compareAtPrice": 429000,
+      "stock": 20,
+      "status": "active"
+    },
+    {
+      "name": "Horno Eléctrico 45LTS",
+      "slug": "horno-electrico-45lts",
+      "sku": "210117",
+      "description": "Con grill, temporizador y luz interior.",
+      "brand": "Jam",
+      "category": "microondas-hornos",
+      "price": 670000,
+      "compareAtPrice": null,
+      "stock": 12,
+      "status": "active"
+    },
+    {
+      "name": "Microondas 20L Digital",
+      "slug": "microondas-20l-digital",
+      "sku": "210116",
+      "description": "Panel digital, 6 niveles de potencia.",
+      "brand": "Philco",
+      "category": "microondas-hornos",
+      "price": 740000,
+      "compareAtPrice": 829000,
+      "stock": 14,
+      "status": "active"
+    },
+    {
+      "name": "Lavarropas Automático 8KG",
+      "slug": "lavarropas-automatico-8kg",
+      "sku": "210115",
+      "description": "Carga superior, 10 programas de lavado.",
+      "brand": "Tokyo",
+      "category": "lavado",
+      "price": 3200000,
+      "compareAtPrice": 3520000,
+      "stock": 7,
+      "status": "active"
+    },
+    {
+      "name": "Lavarropas Semiautomático 12KG",
+      "slug": "lavarropas-semiautomatico-12kg",
+      "sku": "210114",
+      "description": "Doble tina, ideal para grandes cargas de ropa.",
+      "brand": "Philco",
+      "category": "lavado",
+      "price": 1950000,
+      "compareAtPrice": null,
+      "stock": 9,
+      "status": "active"
+    },
+    {
+      "name": "Smart TV 50\" 4K UHD",
+      "slug": "smart-tv-50-4k-uhd",
+      "sku": "210113",
+      "description": "Android TV, HDR10, control por voz.",
+      "brand": "Philco",
+      "category": "television",
+      "price": 3000000,
+      "compareAtPrice": 3480000,
+      "stock": 6,
+      "status": "active"
+    },
+    {
+      "name": "Smart TV 43\" Full HD",
+      "slug": "smart-tv-43-full-hd",
+      "sku": "210112",
+      "description": "Wi-Fi integrado, apps de streaming preinstaladas.",
+      "brand": "Jam",
+      "category": "television",
+      "price": 2100000,
+      "compareAtPrice": 2394000,
+      "stock": 10,
+      "status": "active"
+    },
+    {
+      "name": "Parlante Bluetooth Portátil",
+      "slug": "parlante-bluetooth-portatil",
+      "sku": "210111",
+      "description": "Resistente al agua, 12 horas de batería.",
+      "brand": "Jam",
+      "category": "audio",
+      "price": 250000,
+      "compareAtPrice": null,
+      "stock": 22,
+      "status": "active"
+    },
+    {
+      "name": "Equipo de Sonido Bluetooth",
+      "slug": "equipo-de-sonido-bluetooth",
+      "sku": "210110",
+      "description": "Torre de sonido, USB, radio FM, luces LED.",
+      "brand": "Tokyo",
+      "category": "audio",
+      "price": 890000,
+      "compareAtPrice": 979000,
+      "stock": 8,
+      "status": "active"
+    },
+    {
+      "name": "Aire Acondicionado Split 12000 BTU",
+      "slug": "aire-acondicionado-split-12000btu",
+      "sku": "210109",
+      "description": "Frío/calor, control remoto, bajo consumo.",
+      "brand": "Tokyo",
+      "category": "climatizacion",
+      "price": 3750000,
+      "compareAtPrice": 4425000,
+      "stock": 5,
+      "status": "active"
+    },
+    {
+      "name": "Ventilador de Pie 20\"",
+      "slug": "ventilador-de-pie-20",
+      "sku": "210108",
+      "description": "3 velocidades, oscilación automática.",
+      "brand": "Jam",
+      "category": "climatizacion",
+      "price": 340000,
+      "compareAtPrice": null,
+      "stock": 18,
+      "status": "active"
+    },
+    {
+      "name": "Ventilador de Techo con Luz",
+      "slug": "ventilador-de-techo-con-luz",
+      "sku": "210107",
+      "description": "Control remoto, 3 aspas, lámpara LED incluida.",
+      "brand": "Philco",
+      "category": "climatizacion",
+      "price": 590000,
+      "compareAtPrice": 673000,
+      "stock": 11,
+      "status": "active"
+    },
+    {
+      "name": "Estufa Eléctrica Infrarroja",
+      "slug": "estufa-electrica-infrarroja",
+      "sku": "210106",
+      "description": "Dos niveles de calor, apagado de seguridad.",
+      "brand": "Jam",
+      "category": "calefaccion",
+      "price": 320000,
+      "compareAtPrice": 358000,
+      "stock": 15,
+      "status": "active"
+    },
+    {
+      "name": "Caloventor 2000W",
+      "slug": "caloventor-2000w",
+      "sku": "210105",
+      "description": "Termostato ajustable, función solo ventilación.",
+      "brand": "Tokyo",
+      "category": "calefaccion",
+      "price": 210000,
+      "compareAtPrice": null,
+      "stock": 20,
+      "status": "active"
+    },
+    {
+      "name": "Aspiradora de Mano 800W",
+      "slug": "aspiradora-de-mano-800w",
+      "sku": "210104",
+      "description": "Liviana, filtro lavable, ideal para autos y muebles.",
+      "brand": "Tokyo",
+      "category": "limpieza",
+      "price": 340000,
+      "compareAtPrice": 401000,
+      "stock": 16,
+      "status": "active"
+    },
+    {
+      "name": "Aspiradora Vertical 1400W",
+      "slug": "aspiradora-vertical-1400w",
+      "sku": "210103",
+      "description": "Bolsa reutilizable, cable retráctil.",
+      "brand": "Philco",
+      "category": "limpieza",
+      "price": 590000,
+      "compareAtPrice": 684000,
+      "stock": 9,
+      "status": "active"
+    },
+    {
+      "name": "Plancha a Vapor 1200W",
+      "slug": "plancha-a-vapor-1200w",
+      "sku": "210102",
+      "description": "Suela antiadherente, sistema antigoteo.",
+      "brand": "Jam",
+      "category": "cuidado-personal",
+      "price": 190000,
+      "compareAtPrice": null,
+      "stock": 30,
+      "status": "active"
+    },
+    {
+      "name": "Secador de Pelo 1875W",
+      "slug": "secador-de-pelo-1875w",
+      "sku": "210101",
+      "description": "2 velocidades, 3 temperaturas, boquilla concentradora.",
+      "brand": "Jam",
+      "category": "cuidado-personal",
+      "price": 170000,
+      "compareAtPrice": null,
+      "stock": 25,
+      "status": "active"
+    }
+  ]
+}

@@ -17,6 +17,7 @@
     "db:migrate:down": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:down",
     "db:setup": "npm run db:migrate && npm run auth:migrate",
     "email:test": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/email-test.ts",
+    "seed:demo": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-demo.ts",
     "meilisearch:key": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/meilisearch-key.ts",
     "meilisearch:sync": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/meilisearch-setup.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

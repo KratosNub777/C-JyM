@@ -100,7 +100,16 @@ No cargar en Vercel: `MEILISEARCH_MASTER_KEY` (es solo para los scripts locales)
 ## 5. Primer arranque
 
 1. **Crear el primer administrador enseguida.** Mientras no exista ningún usuario, `POST /api/users/first-register` y la pantalla de `/admin` permiten crear el primero a cualquiera que llegue antes. Hacerlo inmediatamente después del primer despliegue y **antes de difundir la URL**. Desde entonces esa ruta responde 403.
-2. Cargar categorías y productos desde `/admin` (la importación masiva de ~1.000 productos todavía no existe, ver pendientes).
+2. Cargar categorías y productos. Para **ver el sitio con datos de demostración** (16 categorías y 23 productos de ejemplo, los mismos del desarrollo) hay un script que no necesita iniciar sesión en el panel, porque escribe directo en la base:
+
+   ```powershell
+   # En una PowerShell nueva, con las variables del entorno de destino (como en el paso de db:setup).
+   # DATABASE_URL debe ser la base de staging; el script imprime el servidor al que apunta.
+   npm.cmd run seed:demo                  # solo muestra qué haría
+   npm.cmd run seed:demo -- --yes         # lo carga; se niega si el catálogo ya tiene datos
+   ```
+
+   Opciones: `--force` agrega solo lo que falte en un catálogo con datos (nunca duplica por slug) y `--with-media` pone la primera imagen de Media en todos los productos. **No usarlo en la base de producción real.** Después correr `npm run meilisearch:sync` y esperar hasta 5 minutos a que la portada refresque su caché. El catálogo real se carga desde `/admin` o con la importación masiva (ver pendientes).
 3. Sincronizar la búsqueda desde tu máquina, con las variables del entorno de destino:
 
    ```bash
