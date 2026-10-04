@@ -2,6 +2,7 @@
 
 > Leer **esto primero** en una sesión nueva; alcanza para retomar sin explorar el repo.
 > Se actualiza con cada cambio (ver reglas al final). Máx. ~80 líneas: al pasar, borrar lo más viejo.
+> Para retomar con todo el contexto (estado, pendientes, comandos y cuidados): `docs/NUEVA-SESION.md`.
 
 ## Ahora
 
