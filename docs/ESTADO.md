@@ -19,6 +19,7 @@ Nada.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-04 | chore/pendientes-calidad | Menores: se borra la ruta de ejemplo `/my-route` del template (pública, iniciaba Payload sin usarlo) y el arg sin usar del e2e de admin (lint 0 warnings); `package.json` sin `engines.pnpm`/bloque `pnpm` y `npm test` usa npm; `sslmode=verify-full` en `.env.example`, `.env` local y `docs/despliegue.md` (quita el aviso de `pg`, misma validación). |
 | 2026-10-04 | chore/pendientes-calidad | `Products` exige `compareAtPrice > price` (validación de campo en `collections/Products.ts`, cubre ediciones parciales; misma regla en `/catalogar` vía `lib/validateProductFields.ts`; test `product-price-validation`). Corregido el secador de pelo en la base de desarrollo (precio de lista → vacío); staging no tenía casos. |
 | 2026-10-04 | chore/pendientes-calidad | `next` y `eslint-config-next` 16.3.3 → 16.3.8, `vitest` 4.0.18 → 4.1.11 y `overrides.undici` 7.29.1 (Payload fija 7.29.0): `npm audit` pasa de 2 críticas/13 altas a 0 críticas/12 altas, todas en herramientas de build sin arreglo publicado (`braces` vía `sass`/`chokidar`, `esbuild` viejo de `drizzle-kit`). tsc, lint, 111 Vitest, 16 e2e y build OK. |
 | 2026-10-03 | fix/sitemap-revalidate | `sitemap.xml` se generaba una sola vez al compilar y no mostraba productos nuevos hasta redesplegar; ahora `revalidate = 3600` (`app/sitemap.ts` + test). Staging con datos demo verificado (portada, ofertas, búsqueda). Tests: `products-access` ya no crea/borra categorías (chocaba en paralelo con otros archivos, falla ~1 de 5 corridas) y los tests ya no reescriben `payload-types.ts`. |
@@ -56,7 +57,7 @@ Nada.
 13. Subidas por `/admin` en Vercel limitadas a ~4,5 MB (evaluar `clientUploads` + CORS en R2).
 14. Variables de entorno de **Preview** sin configurar en Vercel (solo Production): los previews no arrancan.
 15. `/code-review` de la Fase 3 y `/security-review` obligatorio antes de cerrarla.
-16. Menores: 3 warnings de lint previos, aviso SSL de `pg` (usar `sslmode=verify-full`), `engines.pnpm` en `package.json` aunque el proyecto usa npm.
+16. Menores: hechos (ver tabla). Falta en Vercel cambiar `sslmode=require` → `verify-full` en `DATABASE_URL` (acción del usuario) y revisar respaldo/restauración de Neon según el plan.
 
 **Cuidados para la sesión nueva**
 - Una sola sesión por carpeta o un `git worktree` por sesión. Nunca enlazar `node_modules` dentro de un worktree: `git worktree remove` lo siguió y borró el real (se reinstaló con `npm ci`).

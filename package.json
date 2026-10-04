@@ -22,7 +22,7 @@
     "meilisearch:sync": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/meilisearch-setup.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "pnpm run test:int && pnpm run test:e2e",
+    "test": "npm run test:int && npm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "auth:generate": "tsx scripts/customer-auth-migrate.ts --generate",
@@ -74,15 +74,7 @@
     "vitest": "4.1.11"
   },
   "engines": {
-    "node": "^18.20.2 || >=20.9.0",
-    "pnpm": "^9 || ^10 || ^11"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
+    "node": "^18.20.2 || >=20.9.0"
   },
   "overrides": {
     "undici": "7.29.1"

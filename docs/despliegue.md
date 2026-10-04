@@ -16,7 +16,7 @@ Guía para publicar el catálogo con Vercel (app y panel), Neon (Postgres) y Rai
 
 - Crear un proyecto (o una rama) **distinto para staging y para producción**. Los tests de desarrollo crean y borran datos: nunca apuntarlos a estas bases.
 - Usar la cadena de conexión **con pooler** (el host lleva `-pooler`). Cada instancia serverless abre conexiones y sin pooler se agotan.
-- La cadena termina en `?sslmode=require`. `pg` avisa que ese modo pasará a significar otra cosa; para conservar la validación completa del certificado usar `?sslmode=verify-full`.
+- Neon entrega la cadena con `?sslmode=require`: **cambiarlo por `?sslmode=verify-full`** (dejando el resto igual, por ejemplo `&channel_binding=require`). Hoy `pg` trata `require` como `verify-full` y lo avisa en cada arranque; en su próxima versión mayor `require` dejará de validar el certificado. `verify-full` conserva la validación completa y quita el aviso.
 
 ### Migraciones
 
