@@ -71,7 +71,7 @@ export function ResetPasswordForm() {
       setCode('')
       setCooldown(RESEND_SECONDS)
       setInfo(
-        'Si el email tiene una cuenta, te enviamos un código nuevo. Revisá el correo no deseado.',
+        'Si el email tiene una cuenta, te enviamos el código otra vez. Revisá el correo no deseado.',
       )
     } catch {
       setMessage('No pudimos conectarnos. Intentá nuevamente.')

@@ -5,6 +5,7 @@ import { after } from 'next/server'
 import { Pool } from 'pg'
 import { sendEmail } from '@/lib/email/mailer'
 import { assertHttpsInProduction } from '@/lib/security/https'
+import { consumeCodeEmailQuota } from './codeQuota'
 import { codeEmail, isCodeEmailKind } from './emails'
 import { trustedAuthOrigins } from './origins'
 
@@ -42,6 +43,19 @@ export const customerAuthPool =
   })
 if (process.env.NODE_ENV !== 'production') globalAuth.customerAuthPool = customerAuthPool
 
+// Pasado el tope no se envía y la respuesta no cambia: así tampoco revela si la cuenta existe. Si el
+// conteo falla se envía igual (el límite por IP sigue activo) para no dejar a nadie sin registrarse.
+async function withinCodeEmailQuota(email: string) {
+  try {
+    if (await consumeCodeEmailQuota(customerAuthPool, email)) return true
+    console.warn('Tope de emails con código alcanzado para un destinatario: no se envía otro.')
+    return false
+  } catch (error) {
+    console.error('No se pudo contar el email con código; se envía igual:', error)
+    return true
+  }
+}
+
 export const auth = betterAuth({
   appName: 'Comercial José María',
   database: customerAuthPool,
@@ -65,7 +79,7 @@ export const auth = betterAuth({
     // del alta ya cerró y el envío falla ("Transaction is already committed"). El formulario pide
     // el código con una llamada aparte apenas termina el registro (ver CustomerAuthForm).
     sendOnSignUp: false,
-    // Un cliente con la contraseña correcta pero sin verificar recibe un código nuevo al ingresar.
+    // Un cliente con la contraseña correcta pero sin verificar recibe un código al ingresar.
     sendOnSignIn: true,
     autoSignInAfterVerification: true,
   },
@@ -93,8 +107,15 @@ export const auth = betterAuth({
       // Cifrado con el secreto: un volcado de la base no expone códigos vigentes y el servidor
       // (por ejemplo los E2E) aún puede leerlos con auth.api.getVerificationOTP.
       storeOTP: 'encrypted',
+      // Reenviar manda el mismo código mientras siga vigente (y le renueva el plazo) en vez de
+      // invalidar el que la persona ya recibió. Sin esto, pedir códigos a nombre de otro le anulaba
+      // el suyo, y pasado el tope por email se quedaría sin ninguno válido. Los intentos fallidos
+      // se conservan: un código reutilizado no da intentos nuevos.
+      resendStrategy: 'reuse',
       async sendVerificationOTP({ email, otp, type }) {
         if (!isCodeEmailKind(type)) return
+        // Todos los emails con código pasan por acá (registro, ingreso sin verificar y recuperación).
+        if (!(await withinCodeEmailQuota(email))) return
         await sendEmail(codeEmail(type, email, otp, CODE_MINUTES))
       },
     }),

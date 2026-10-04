@@ -17,8 +17,13 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
+  limit: vi.fn(),
 }))
 vi.mock('next/headers', () => ({ headers: async () => new Headers() }))
+vi.mock('@/lib/customerAuth/actionLimit', () => ({
+  ACTION_LIMIT_MESSAGE: 'Hiciste muchos intentos seguidos.',
+  withinActionLimit: mocks.limit,
+}))
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidate }))
 vi.mock('@/lib/customerAuth/session', () => ({ getCustomerSession: mocks.session }))
 vi.mock('@/lib/payload', () => ({ getPayloadClient: mocks.payload }))
@@ -49,6 +54,7 @@ describe('Customer address authorization and transactions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.session.mockResolvedValue({ user: { id: 'customer-a' } })
+    mocks.limit.mockResolvedValue(true)
     mocks.payload.mockResolvedValue(mocks)
     mocks.db.beginTransaction.mockResolvedValue('tx')
     mocks.find.mockResolvedValue({ docs: [{ id: 7 }] })
@@ -66,6 +72,18 @@ describe('Customer address authorization and transactions', () => {
       await deleteAddress(7),
     ])
       expect(result.success).toBe(false)
+    expect(mocks.payload).not.toHaveBeenCalled()
+  })
+
+  it('stops a customer past the action limit before touching Payload', async () => {
+    mocks.limit.mockResolvedValue(false)
+    for (const result of [
+      await createAddress(form()),
+      await updateAddress(7, form()),
+      await deleteAddress(7),
+    ])
+      expect(result).toEqual({ success: false, error: 'Hiciste muchos intentos seguidos.' })
+    expect(mocks.limit).toHaveBeenCalledWith('addresses', 'customer-a')
     expect(mocks.payload).not.toHaveBeenCalled()
   })
 

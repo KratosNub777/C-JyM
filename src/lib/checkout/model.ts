@@ -13,7 +13,7 @@ export type CheckoutResult =
   | { ok: true; orderId: number }
   | {
       ok: false
-      code: 'INVALID' | 'AUTH' | 'PRICES_CHANGED' | 'STOCK' | 'CONFLICT' | 'FAILED'
+      code: 'INVALID' | 'AUTH' | 'PRICES_CHANGED' | 'STOCK' | 'CONFLICT' | 'LIMIT' | 'FAILED'
       message: string
     }
 

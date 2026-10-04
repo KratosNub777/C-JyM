@@ -16,7 +16,7 @@ Guía para publicar el catálogo con Vercel (app y panel), Neon (Postgres) y Rai
 
 - Crear un proyecto (o una rama) **distinto para staging y para producción**. Los tests de desarrollo crean y borran datos: nunca apuntarlos a estas bases.
 - Usar la cadena de conexión **con pooler** (el host lleva `-pooler`). Cada instancia serverless abre conexiones y sin pooler se agotan.
-- La cadena termina en `?sslmode=require`. `pg` avisa que ese modo pasará a significar otra cosa; para conservar la validación completa del certificado usar `?sslmode=verify-full`.
+- Neon entrega la cadena con `?sslmode=require`: **cambiarlo por `?sslmode=verify-full`** (dejando el resto igual, por ejemplo `&channel_binding=require`). Hoy `pg` trata `require` como `verify-full` y lo avisa en cada arranque; en su próxima versión mayor `require` dejará de validar el certificado. `verify-full` conserva la validación completa y quita el aviso.
 
 ### Migraciones
 
@@ -93,7 +93,8 @@ No cargar en Vercel: `MEILISEARCH_MASTER_KEY` (es solo para los scripts locales)
    - Si se prefiere no migrar durante el build, correr `npm run db:setup` a mano contra la base antes de cada despliegue y dejar `npm run build`.
 3. Cargar las variables del cuadro anterior en **Production** y, con otra base y otras claves, en **Preview**. Un preview con las variables de producción escribiría en la base real.
 4. La región de las funciones (`gru1`, São Paulo) y el cron ya están en `vercel.json`.
-   - El cron llama a `/api/cron/expire-orders` una vez por día: es el máximo del plan gratuito. Con reservas de 24 h puede liberar el stock hasta un día tarde. En un plan Pro cambiar `schedule` a `0 * * * *` (cada hora) o menos.
+   - Hay dos crons diarios: `/api/cron/expire-orders` (vencimiento de reservas) y `/api/cron/cleanup-accounts` (borra cuentas de clientes sin verificar con más de 7 días). Ambos usan `CRON_SECRET`.
+   - El de reservas corre una vez por día: es el máximo del plan gratuito. Con reservas de 24 h puede liberar el stock hasta un día tarde. En un plan Pro cambiar `schedule` a `0 * * * *` (cada hora) o menos.
    - El plan Hobby de Vercel está pensado para uso personal y no comercial (verificar los términos vigentes): para publicar la tienda real conviene el plan Pro.
 5. Agregar el dominio `.com.py` (registrado a nombre de la empresa en NIC Paraguay). Vercel redirige HTTP a HTTPS y emite el certificado; la app además envía `Strict-Transport-Security`.
 
@@ -128,7 +129,7 @@ Recorrerla con la URL pública:
 - [ ] Salir, entrar de nuevo y recuperar la contraseña con el código.
 - [ ] Agregar al carrito, confirmar un pedido de prueba y ver el plazo de reserva en la cuenta.
 - [ ] Cancelar ese pedido y comprobar que el stock vuelve.
-- [ ] `curl -H "Authorization: Bearer $CRON_SECRET" https://…/api/cron/expire-orders` responde 200, y sin la cabecera responde 401.
+- [ ] `curl -H "Authorization: Bearer $CRON_SECRET" https://…/api/cron/expire-orders` responde 200, y sin la cabecera responde 401. Lo mismo con `/api/cron/cleanup-accounts`.
 - [ ] `sitemap.xml` y `robots.txt` apuntan al dominio `https` correcto.
 
 ## 7. Operación

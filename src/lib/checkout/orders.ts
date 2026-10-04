@@ -10,7 +10,15 @@ import {
   withOrderTransaction as transaction,
   type OrderResult as Result,
 } from './orderTransactions'
-import { reservationDeadline, reservationHours } from './reservationPolicy'
+import {
+  DEFAULT_RESERVATION_HOURS,
+  reservationDeadline,
+  reservationHours,
+} from './reservationPolicy'
+
+// Cada pedido impago reserva stock hasta su vencimiento. Sin tope, una sola cuenta podía dejar sin
+// stock un producto creando pedidos que nunca retira. Tres alcanzan para un cliente real.
+export const MAX_PENDING_ORDERS = 3
 
 type Customer = { id: string; email: string }
 export async function createCheckoutOrder(
@@ -48,6 +56,19 @@ export async function createCheckoutOrder(
         )
       return { ok: true, orderId: existing.docs[0].id }
     }
+    // Contado bajo el bloqueo del cliente, así dos pedidos simultáneos no pasan el tope. Las reservas
+    // ya vencidas no cuentan aunque el cron todavía no las haya procesado.
+    const pending = await payload.db.execute({
+      db,
+      sql: sql`SELECT count(*)::int AS count FROM orders
+        WHERE customer_id = ${customer.id} AND status = 'pending_payment'
+          AND COALESCE(expires_at, created_at + make_interval(hours => ${DEFAULT_RESERVATION_HOURS})) > clock_timestamp()`,
+    })
+    if (Number(pending.rows[0].count) >= MAX_PENDING_ORDERS)
+      throw new CheckoutError(
+        'LIMIT',
+        `Ya tenés ${MAX_PENDING_ORDERS} pedidos pendientes de pago. Para hacer otro, cancelá alguno desde Mis pedidos o esperá a que venza su reserva.`,
+      )
     const ids = input.items.map((item) => item.productId)
     await payload.db.execute({
       db,

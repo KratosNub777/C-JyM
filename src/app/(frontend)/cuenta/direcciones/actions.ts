@@ -3,6 +3,7 @@
 import { sql } from '@payloadcms/db-postgres'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
+import { ACTION_LIMIT_MESSAGE, withinActionLimit } from '@/lib/customerAuth/actionLimit'
 import { getCustomerSession } from '@/lib/customerAuth/session'
 import { MAX_ADDRESSES, parseAddress, type AddressResult } from '@/lib/customerAuth/addressFields'
 import { getPayloadClient } from '@/lib/payload'
@@ -18,6 +19,8 @@ async function mutateAddress(
 ): Promise<AddressResult> {
   const session = await getCustomerSession(await headers())
   if (!session) return { success: false, error: 'Tu sesión venció. Volvé a ingresar.' }
+  if (!(await withinActionLimit('addresses', session.user.id)))
+    return { success: false, error: ACTION_LIMIT_MESSAGE }
   if (operation !== 'create' && (!Number.isSafeInteger(id) || id! <= 0)) {
     return { success: false, error: 'La dirección no existe.' }
   }
