@@ -1,10 +1,11 @@
 // @vitest-environment node
 import { randomUUID } from 'node:crypto'
+import { sql } from '@payloadcms/db-postgres'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { getPayload, type Payload } from 'payload'
 import config from '@/payload.config'
 import { parseCheckout } from '@/lib/checkout/model'
-import { cancelCheckoutOrder, createCheckoutOrder } from '@/lib/checkout/orders'
+import { cancelCheckoutOrder, createCheckoutOrder, MAX_PENDING_ORDERS } from '@/lib/checkout/orders'
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }))
 vi.mock('@/lib/meilisearch', () => ({
@@ -15,6 +16,7 @@ vi.mock('@/lib/meilisearch', () => ({
 const run = randomUUID()
 const customer = { id: `checkout-test-${run}`, email: `checkout-${run}@example.com` }
 const other = { id: `checkout-other-${run}`, email: `other-${run}@example.com` }
+const limited = { id: `checkout-limited-${run}`, email: `limited-${run}@example.com` }
 let payload: Payload
 let categoryId: number
 const productIds: number[] = []
@@ -52,7 +54,7 @@ afterAll(async () => {
   if (!payload) return
   await payload.delete({
     collection: 'orders',
-    where: { customerId: { in: [customer.id, other.id] } },
+    where: { customerId: { in: [customer.id, other.id, limited.id] } },
     overrideAccess: true,
   })
   for (const id of productIds) await payload.delete({ collection: 'products', id })
@@ -173,4 +175,39 @@ describe('Postgres checkout transactions', () => {
     expect((await createCheckoutOrder(payload, customer, request)).ok).toBe(true)
     expect(await stock(id)).toBe(3)
   }, 30000)
+
+  it('caps unexpired pending orders per customer without blocking retries', async () => {
+    const id = await product(10)
+    const placed: { orderId: number; request: ReturnType<typeof input> }[] = []
+    for (let i = 0; i < MAX_PENDING_ORDERS; i++) {
+      const request = input(id)
+      const result = await createCheckoutOrder(payload, limited, request)
+      if (!result.ok) throw new Error('Order failed')
+      placed.push({ orderId: result.orderId, request })
+    }
+    expect(await stock(id)).toBe(10 - MAX_PENDING_ORDERS)
+
+    // Otro pedido pasa el tope y no toca el stock; reintentar uno existente sigue funcionando.
+    expect(await createCheckoutOrder(payload, limited, input(id))).toMatchObject({ code: 'LIMIT' })
+    expect(await stock(id)).toBe(10 - MAX_PENDING_ORDERS)
+    expect(await createCheckoutOrder(payload, limited, placed[0].request)).toEqual({
+      ok: true,
+      orderId: placed[0].orderId,
+    })
+    // Otro cliente no se ve afectado.
+    expect((await createCheckoutOrder(payload, other, input(id))).ok).toBe(true)
+
+    // Cancelar uno libera el cupo.
+    expect((await cancelCheckoutOrder(payload, limited.id, placed[0].orderId)).ok).toBe(true)
+    const afterCancel = await createCheckoutOrder(payload, limited, input(id))
+    expect(afterCancel.ok).toBe(true)
+
+    // Una reserva vencida no cuenta aunque el proceso automático todavía no la haya marcado.
+    expect(await createCheckoutOrder(payload, limited, input(id))).toMatchObject({ code: 'LIMIT' })
+    await payload.db.execute({
+      drizzle: payload.db.drizzle,
+      sql: sql`UPDATE orders SET expires_at = clock_timestamp() - INTERVAL '1 minute' WHERE id = ${placed[1].orderId}`,
+    })
+    expect((await createCheckoutOrder(payload, limited, input(id))).ok).toBe(true)
+  }, 60000)
 })

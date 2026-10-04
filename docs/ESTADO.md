@@ -19,6 +19,7 @@ Nada.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-04 | chore/pendientes-calidad | Server actions: máximo 3 pedidos pendientes con reserva vigente por cliente (`MAX_PENDING_ORDERS`, código `LIMIT`; evita acaparar stock) y límite por cliente de 10/min en checkout y 20/min en direcciones (`customerAuth/actionLimit.ts`). El contador por ventana se extrae a `customerAuth/windowQuota.ts` (lo usa también el tope de códigos). Tests de tope, reintento, vencidas y límites. |
 | 2026-10-04 | chore/pendientes-calidad | Auth: tope de 5 emails con código por hora por destinatario (`customerAuth/codeQuota.ts`, contador en `verification`, sin migración), reenvío con `resendStrategy: 'reuse'` (no anula el código ya recibido) y cron diario `/api/cron/cleanup-accounts` que borra cuentas sin verificar de más de 7 días (`customerAuth/cleanup.ts`, `vercel.json`). Tests de tope, concurrencia, envío real con Better Auth, limpieza y ruta; e2e de auth OK. |
 | 2026-10-04 | chore/pendientes-calidad | Menores: se borra la ruta de ejemplo `/my-route` del template (pública, iniciaba Payload sin usarlo) y el arg sin usar del e2e de admin (lint 0 warnings); `package.json` sin `engines.pnpm`/bloque `pnpm` y `npm test` usa npm; `sslmode=verify-full` en `.env.example`, `.env` local y `docs/despliegue.md` (quita el aviso de `pg`, misma validación). |
 | 2026-10-04 | chore/pendientes-calidad | `Products` exige `compareAtPrice > price` (validación de campo en `collections/Products.ts`, cubre ediciones parciales; misma regla en `/catalogar` vía `lib/validateProductFields.ts`; test `product-price-validation`). Corregido el secador de pelo en la base de desarrollo (precio de lista → vacío); staging no tenía casos. |
@@ -53,7 +54,7 @@ Nada.
 **Seguridad y calidad**
 9. ~~Actualizar `next`~~ hecho (ver tabla). Volver a mirar `npm audit` cuando salga un Payload nuevo (las 12 altas restantes vienen de dependencias de Payload y de `eslint-config-next`).
 10. ~~Tope de códigos por email y limpieza de cuentas sin verificar~~ hecho (ver tabla).
-11. Server actions (direcciones, checkout) sin rate limit propio.
+11. ~~Server actions sin rate limit~~ hecho (ver tabla). El tope de 3 pedidos pendientes es un valor por defecto: confirmarlo con la empresa.
 12. ~~Validar `compareAtPrice > price`~~ hecho (ver tabla).
 13. Subidas por `/admin` en Vercel limitadas a ~4,5 MB (evaluar `clientUploads` + CORS en R2).
 14. Variables de entorno de **Preview** sin configurar en Vercel (solo Production): los previews no arrancan.
