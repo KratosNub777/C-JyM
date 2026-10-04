@@ -7,7 +7,8 @@
 ## Ahora
 
 - **Fase:** 3 en curso (carrito, checkout con retiro, reserva de stock y vencimiento listos; falta pasarela, confirmación verificada, emails transaccionales y `/security-review`). Detalle en `docs/checkout.md`.
-- **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos); falta SMTP, correr `meilisearch:sync` y la importación masiva.
+- **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos) y el sitemap nuevo verificado (42 URLs); falta SMTP, correr `meilisearch:sync` y la importación masiva.
+- **Calidad (2026-10-04):** tsc OK, lint 0 errores/0 warnings, 128 Vitest en 27 archivos, 16 e2e y build OK. `npm audit`: 0 críticas.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
 - **Rama activa:** `chore/pendientes-calidad` (sin pushear), sale de `main` = `f9e575c` (incluye `fix/sitemap-revalidate`, PR #3).
 

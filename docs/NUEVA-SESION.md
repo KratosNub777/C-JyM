@@ -16,8 +16,8 @@ Antes de tocar nada: `git branch --show-current`, `git status --short` y `git fe
 - **Stack:** Next.js 16.3.8, Payload CMS 3.90.2 (integrado, `/admin`), Better Auth 1.7 para clientes, Postgres, Meilisearch v1.42.1, Cloudflare R2 para imágenes, Node 22.18, npm 10.9.
 - **Staging publicado:** `https://cjym-staging.vercel.app` (Vercel, región `gru1`), con base propia en Neon, Meilisearch en Railway y bucket R2 `cjym-media-staging` (público en `https://pub-8efd880a2684425a83a434897505c0fd.r2.dev`). Ya tiene el catálogo de demostración cargado (16 categorías y 23 productos) y un administrador creado.
 - **Producción:** todavía no existe.
-- **Ramas:** `main` en `b9f05ff`. La rama `fix/sitemap-revalidate` (7 commits: sitemap que se regenera cada hora, tests más estables y bitácora) **no está pusheada ni fusionada**. Es lo primero que hay que publicar.
-- **Calidad al último chequeo:** `tsc` sin errores, lint con 0 errores y 3 advertencias viejas, 111 tests de Vitest en 22 archivos, 16 e2e de Playwright y build de producción correcto.
+- **Ramas:** `main` en `f9e575c` (ya incluye `fix/sitemap-revalidate`, PR #3, desplegado y verificado en staging). La rama `chore/pendientes-calidad` (dependencias, validación de precios, tope de códigos por email, limpieza de cuentas, límites en server actions y menores; ver la tabla de `docs/ESTADO.md`) **no está pusheada ni fusionada**. Es lo primero que hay que publicar.
+- **Calidad al último chequeo (2026-10-04):** `tsc` sin errores, lint con 0 errores y 0 advertencias, 128 tests de Vitest en 27 archivos, 16 e2e de Playwright y build de producción correcto. `npm audit`: 0 críticas; las 12 altas que quedan son de herramientas de build sin arreglo publicado.
 - **Dos bases de Neon distintas.** La de **desarrollo** (`.env`, servidor `ep-holy-poetry-…`) la usan los tests y el desarrollo local. La de **staging** (servidor `ep-little-queen-…`) es la del sitio publicado. Confundirlas es el error más fácil de cometer: comprobar siempre el nombre del servidor antes de ejecutar nada que escriba.
 
 ## 3. Mapa de documentos
@@ -35,7 +35,7 @@ Antes de tocar nada: `git branch --show-current`, `git status --short` y `git fe
 ## 4. Pendientes por prioridad
 
 ### A. Publicar lo que ya está hecho
-1. **Pushear y fusionar `fix/sitemap-revalidate` a `main`.** Vercel redespliega solo y el sitemap de staging pasa a incluir los productos.
+1. **Pushear y fusionar `chore/pendientes-calidad` a `main`.** Vercel redespliega solo y agrega el segundo cron (`/api/cron/cleanup-accounts`). No necesita migraciones: los contadores nuevos usan la tabla `verification` de Better Auth. Después, en Vercel, cambiar `sslmode=require` por `sslmode=verify-full` en `DATABASE_URL` (misma seguridad, quita el aviso de `pg`).
 
 ### B. Staging (requieren acciones del usuario)
 2. **Correo (SMTP).** Sin él, **registrarse falla en producción**. El usuario carga `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y `SMTP_FROM` en Vercel y se prueba con `npm run email:test -- correo@destino.com`. Gmail sirve con una contraseña de aplicación. Falta verificar en vivo que el envío en segundo plano (`after()`) funciona en Vercel; solo se probó en local.
@@ -49,14 +49,14 @@ Antes de tocar nada: `git branch --show-current`, `git status --short` y `git fe
 8. **Producción real.** Base de Neon aparte, proyecto de Vercel aparte, bucket `cjym-media`, cuenta de Cloudflare y dominio `.com.py` **a nombre de la empresa**. Plan Vercel Pro (el Hobby es para uso no comercial; el cron diario libera reservas con hasta un día de atraso, y en Pro puede ser cada hora con `0 * * * *`). Al desplegar, **crear el primer administrador de inmediato**: hasta que exista uno, cualquiera puede crearlo.
 
 ### D. Seguridad y calidad
-9. **Actualizar `next` de 16.3.3 a 16.3.8.** `npm audit` reporta 17 vulnerabilidades (1 crítica, 10 altas, 6 moderadas). La crítica es una ejecución remota de código en `next/og`, que el proyecto no usa. La mayoría de las altas son transitivas de herramientas de compilación sin arreglo disponible. Actualizar, correr toda la suite y revisar el resto con `npm audit`.
-10. **Tope de códigos de verificación por email** (hoy el límite es solo por IP y se podría saturar de correos a una persona) y **limpieza de cuentas sin verificar** antiguas.
-11. **Server actions sin límite de uso propio** (direcciones, checkout). El límite de Better Auth solo cubre `/api/auth`.
-12. **`Products` no valida que `compareAtPrice` sea mayor que `price`.** El demo tenía un caso al revés; la base de desarrollo conserva el "Secador de pelo 1875W" con precio de lista menor al de venta.
+9. ~~Actualizar `next`~~ hecho (16.3.8, más `vitest` 4.1.11 y `undici` 7.29.1 por `overrides`). Revisar `npm audit` cuando salga una versión nueva de Payload.
+10. ~~Tope de códigos por email y limpieza de cuentas sin verificar~~ hecho: 5 emails con código por hora por dirección, reenvío que reutiliza el código vigente y cron diario que borra cuentas sin verificar de más de 7 días.
+11. ~~Server actions sin límite~~ hecho: máximo 3 pedidos pendientes por cliente y límites por minuto en checkout y direcciones. **Confirmar con la empresa** si 3 pedidos pendientes simultáneos está bien.
+12. ~~`compareAtPrice > price`~~ hecho (validación en `Products` y en `/catalogar`; corregido el secador en la base de desarrollo).
 13. **Subidas por `/admin` en Vercel limitadas a ~4,5 MB.** Si hace falta, activar `clientUploads` en el plugin de R2 y permitir CORS `PUT` desde el sitio.
 14. **Variables de entorno de Preview sin configurar en Vercel** (solo están las de Production): los previews fallarían. Usar una base y claves distintas para Preview.
 15. **`/code-review` de la Fase 3 y `/security-review` obligatorio** antes de cerrarla.
-16. **Menores:** 3 advertencias de lint preexistentes, aviso SSL de `pg` (usar `sslmode=verify-full`), `engines.pnpm` en `package.json` aunque el proyecto usa npm, y respaldo o restauración a un punto en el tiempo de Neon según el plan.
+16. **Menores:** hechos (lint sin advertencias, `/my-route` del template borrada, `sslmode=verify-full` en `.env` y `.env.example`, sin `pnpm` en `package.json`). Falta: `sslmode` en Vercel (punto 1) y revisar respaldo o restauración a un punto en el tiempo de Neon según el plan.
 
 ## 5. Comandos útiles
 
@@ -91,11 +91,13 @@ $env:BETTER_AUTH_URL = 'https://cjym-staging.vercel.app'
 - **Todo cambio de esquema necesita su migración** (`db:migrate:create`) y regenerar los tipos (`generate:types`).
 - **Los tests no deben crear ni borrar categorías** (todos usan "la primera existente"): hacerlo chocaba con otros archivos en paralelo y fallaba 1 de cada 5 corridas.
 - **El mensaje de cada commit termina con la línea `Co-Authored-By`** indicada en las instrucciones del entorno, y la bitácora `docs/ESTADO.md` se actualiza en el mismo commit que el cambio.
+- **`npx prettier --write` sobre una carpeta reescribe finales de línea** de archivos que no se tocaron: pasarle solo los archivos cambiados y, si aparecen de más, restaurar los que tengan `git diff --ignore-space-at-eol` vacío. Si `src/payload-types.ts` cambia de verdad (por ejemplo la descripción de un campo), es por un cambio de colección y se commitea.
 - **Después de correr tests, `src/payload-types.ts` puede aparecer modificado** solo por finales de línea de Windows. Si `git diff --ignore-space-at-eol` está vacío, restaurarlo con `git checkout -- src/payload-types.ts`.
 
 ## 7. Qué no se probó
 
-- El envío real de correos (no hay SMTP configurado).
+- El envío real de correos (no hay SMTP configurado). El tope de 5 códigos por hora se probó con el envío simulado.
+- El cron `/api/cron/cleanup-accounts` en Vercel (se probó la ruta y la consulta contra la base de desarrollo; corre por primera vez después de fusionar).
 - Un pago online (no existe).
 - El panel de administración visualmente al subir fotos en staging (se verificó por API: la imagen quedó en R2 y `next/image` la sirve).
 - Cargas altas, rendimiento con ~1.000 productos y el comportamiento del caché de la portada con ese volumen.
