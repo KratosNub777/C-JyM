@@ -1,8 +1,25 @@
 import { revalidateTag } from 'next/cache'
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, NumberFieldSingleValidation } from 'payload'
+import { number } from 'payload/shared'
 
 import { PRODUCTS_TAG, REVALIDATE_IMMEDIATELY } from '@/lib/cacheTags'
 import { removeProductFromIndex, syncProductToIndex } from '@/lib/meilisearch'
+import { COMPARE_AT_PRICE_ERROR, isCompareAtPriceValid } from '@/lib/validateProductFields'
+
+// Payload valida con `siblingData` ya combinado con el documento guardado, así que también cubre
+// ediciones parciales (por ejemplo, subir solo el precio por encima del precio de lista existente).
+// `value` llega undefined cuando el campo no viene en el cambio: ahí se usa el valor guardado.
+const validateCompareAtPrice: NumberFieldSingleValidation = (value, args) => {
+  const baseResult = number(value, args)
+  if (baseResult !== true) return baseResult
+
+  const siblingData = args.siblingData as { price?: unknown; compareAtPrice?: unknown }
+  const compareAtPrice = value !== undefined ? value : siblingData.compareAtPrice
+  const price = siblingData.price
+  if (typeof compareAtPrice !== 'number' || typeof price !== 'number') return true
+
+  return isCompareAtPriceValid(price, compareAtPrice) ? true : COMPARE_AT_PRICE_ERROR
+}
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -101,8 +118,10 @@ export const Products: CollectionConfig = {
       label: 'Precio de lista (Gs.), opcional',
       type: 'number',
       min: 0,
+      validate: validateCompareAtPrice,
       admin: {
-        description: 'Precio tachado antes del descuento. Dejar vacío si no hay descuento.',
+        description:
+          'Precio tachado antes del descuento; debe ser mayor al precio contado. Dejar vacío si no hay descuento.',
       },
     },
     {

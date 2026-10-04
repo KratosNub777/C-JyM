@@ -1,3 +1,14 @@
+export const COMPARE_AT_PRICE_ERROR =
+  'El precio de lista debe ser mayor al precio contado (es el precio tachado antes del descuento).'
+
+/**
+ * El precio de lista es el que se muestra tachado: solo tiene sentido si es mayor al precio
+ * contado. Si es igual o menor, la tarjeta mostraría un "descuento" que en realidad sube el precio.
+ */
+export function isCompareAtPriceValid(price: number, compareAtPrice: number): boolean {
+  return compareAtPrice > price
+}
+
 export function validateProductFields(input: {
   name: string
   hasCategory: boolean
@@ -17,6 +28,7 @@ export function validateProductFields(input: {
   if (input.compareAtPrice) {
     const compareAtPrice = Number(input.compareAtPrice)
     if (Number.isNaN(compareAtPrice) || compareAtPrice < 0) return 'Precio de lista inválido.'
+    if (!isCompareAtPriceValid(price, compareAtPrice)) return COMPARE_AT_PRICE_ERROR
   }
 
   return null

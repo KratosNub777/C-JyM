@@ -19,6 +19,7 @@ Nada.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-04 | chore/pendientes-calidad | `Products` exige `compareAtPrice > price` (validación de campo en `collections/Products.ts`, cubre ediciones parciales; misma regla en `/catalogar` vía `lib/validateProductFields.ts`; test `product-price-validation`). Corregido el secador de pelo en la base de desarrollo (precio de lista → vacío); staging no tenía casos. |
 | 2026-10-04 | chore/pendientes-calidad | `next` y `eslint-config-next` 16.3.3 → 16.3.8, `vitest` 4.0.18 → 4.1.11 y `overrides.undici` 7.29.1 (Payload fija 7.29.0): `npm audit` pasa de 2 críticas/13 altas a 0 críticas/12 altas, todas en herramientas de build sin arreglo publicado (`braces` vía `sass`/`chokidar`, `esbuild` viejo de `drizzle-kit`). tsc, lint, 111 Vitest, 16 e2e y build OK. |
 | 2026-10-03 | fix/sitemap-revalidate | `sitemap.xml` se generaba una sola vez al compilar y no mostraba productos nuevos hasta redesplegar; ahora `revalidate = 3600` (`app/sitemap.ts` + test). Staging con datos demo verificado (portada, ofertas, búsqueda). Tests: `products-access` ya no crea/borra categorías (chocaba en paralelo con otros archivos, falla ~1 de 5 corridas) y los tests ya no reescriben `payload-types.ts`. |
 | 2026-10-02 | feat/datos-demo | `npm run seed:demo` (`scripts/seed-demo.ts`, `lib/demoCatalog.ts`, `scripts/data/demo-catalog.json`): carga 16 categorías y 23 productos de ejemplo; exige `--yes`, se niega si el catálogo no está vacío. Probado en una base local vacía + build y portada. Se corrige un dato del demo (descuento al revés del secador de pelo). |
@@ -51,7 +52,7 @@ Nada.
 9. ~~Actualizar `next`~~ hecho (ver tabla). Volver a mirar `npm audit` cuando salga un Payload nuevo (las 12 altas restantes vienen de dependencias de Payload y de `eslint-config-next`).
 10. Tope de códigos de verificación por email (hoy solo por IP) y limpieza de cuentas sin verificar viejas.
 11. Server actions (direcciones, checkout) sin rate limit propio.
-12. `Products` no valida `compareAtPrice > price` (el demo tenía un caso invertido; la base de desarrollo conserva el secador de pelo).
+12. ~~Validar `compareAtPrice > price`~~ hecho (ver tabla).
 13. Subidas por `/admin` en Vercel limitadas a ~4,5 MB (evaluar `clientUploads` + CORS en R2).
 14. Variables de entorno de **Preview** sin configurar en Vercel (solo Production): los previews no arrancan.
 15. `/code-review` de la Fase 3 y `/security-review` obligatorio antes de cerrarla.
