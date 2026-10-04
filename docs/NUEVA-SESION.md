@@ -13,7 +13,7 @@ Antes de tocar nada: `git branch --show-current`, `git status --short` y `git fe
 ## 2. Estado en pocas líneas
 
 - **Producto:** catálogo y tienda de **Comercial José María** (electrodomésticos, Paraguay). Fase 1 (catálogo) y Fase 2 (cuentas) terminadas. Fase 3 (compra) en curso: hay carrito, pedidos con **retiro en el local**, reserva de stock y vencimiento automático. **No hay cobro online todavía.**
-- **Stack:** Next.js 16.3.3, Payload CMS 3.90.2 (integrado, `/admin`), Better Auth 1.7 para clientes, Postgres, Meilisearch v1.42.1, Cloudflare R2 para imágenes, Node 22.18, npm 10.9.
+- **Stack:** Next.js 16.3.8, Payload CMS 3.90.2 (integrado, `/admin`), Better Auth 1.7 para clientes, Postgres, Meilisearch v1.42.1, Cloudflare R2 para imágenes, Node 22.18, npm 10.9.
 - **Staging publicado:** `https://cjym-staging.vercel.app` (Vercel, región `gru1`), con base propia en Neon, Meilisearch en Railway y bucket R2 `cjym-media-staging` (público en `https://pub-8efd880a2684425a83a434897505c0fd.r2.dev`). Ya tiene el catálogo de demostración cargado (16 categorías y 23 productos) y un administrador creado.
 - **Producción:** todavía no existe.
 - **Ramas:** `main` en `b9f05ff`. La rama `fix/sitemap-revalidate` (7 commits: sitemap que se regenera cada hora, tests más estables y bitácora) **no está pusheada ni fusionada**. Es lo primero que hay que publicar.

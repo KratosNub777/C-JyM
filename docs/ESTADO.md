@@ -9,16 +9,17 @@
 - **Fase:** 3 en curso (carrito, checkout con retiro, reserva de stock y vencimiento listos; falta pasarela, confirmación verificada, emails transaccionales y `/security-review`). Detalle en `docs/checkout.md`.
 - **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos); falta SMTP, correr `meilisearch:sync` y la importación masiva.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `fix/sitemap-revalidate` (sin pushear). `main` = `b9f05ff`.
+- **Rama activa:** `chore/pendientes-calidad` (sin pushear), sale de `main` = `f9e575c` (incluye `fix/sitemap-revalidate`, PR #3).
 
 ## Trabajo sin commitear
 
-Nada. `main` = `origin/main` (`91fc8f3`). La rama activa está pusheada.
+Nada.
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-04 | chore/pendientes-calidad | `next` y `eslint-config-next` 16.3.3 → 16.3.8, `vitest` 4.0.18 → 4.1.11 y `overrides.undici` 7.29.1 (Payload fija 7.29.0): `npm audit` pasa de 2 críticas/13 altas a 0 críticas/12 altas, todas en herramientas de build sin arreglo publicado (`braces` vía `sass`/`chokidar`, `esbuild` viejo de `drizzle-kit`). tsc, lint, 111 Vitest, 16 e2e y build OK. |
 | 2026-10-03 | fix/sitemap-revalidate | `sitemap.xml` se generaba una sola vez al compilar y no mostraba productos nuevos hasta redesplegar; ahora `revalidate = 3600` (`app/sitemap.ts` + test). Staging con datos demo verificado (portada, ofertas, búsqueda). Tests: `products-access` ya no crea/borra categorías (chocaba en paralelo con otros archivos, falla ~1 de 5 corridas) y los tests ya no reescriben `payload-types.ts`. |
 | 2026-10-02 | feat/datos-demo | `npm run seed:demo` (`scripts/seed-demo.ts`, `lib/demoCatalog.ts`, `scripts/data/demo-catalog.json`): carga 16 categorías y 23 productos de ejemplo; exige `--yes`, se niega si el catálogo no está vacío. Probado en una base local vacía + build y portada. Se corrige un dato del demo (descuento al revés del secador de pelo). |
 | 2026-10-02 | feat/almacenamiento-r2 | Imágenes en R2: `lib/storage/r2.ts` + `s3Storage` en `payload.config.ts`, patrón de `next/image`, migración `media_prefix`, variables `R2_*` en `.env.example` y sección 2.1 de `docs/despliegue.md`. Probado contra un S3 local (subida, URL pública, borrado, rechazo de no-imágenes, nombres repetidos no se pisan). Tipos regenerados y `vitest.global-setup.ts` evita que la primera corrida tras cambiar columnas falle (42701). |
@@ -33,7 +34,7 @@ Nada. `main` = `origin/main` (`91fc8f3`). La rama activa está pusheada.
 ## Pendientes (por prioridad)
 
 **Ya hecho, falta publicar**
-1. Pushear y fusionar `fix/sitemap-revalidate` (sitemap cada hora + tests más estables). Vercel redespliega solo.
+1. Pushear y fusionar `chore/pendientes-calidad`. (`fix/sitemap-revalidate` ya está en `main`.)
 
 **Staging (`cjym-staging.vercel.app`) — acciones del usuario**
 2. **SMTP:** sin él registrarse falla en producción. Cargar `SMTP_*` en Vercel y probar con `npm run email:test`. Verificar en vivo que el envío con `after()` funciona en Vercel (solo probado en local).
@@ -47,7 +48,7 @@ Nada. `main` = `origin/main` (`91fc8f3`). La rama activa está pusheada.
 8. Producción real: Neon aparte, proyecto Vercel aparte, bucket `cjym-media`, cuenta Cloudflare y dominio `.com.py` a nombre de la empresa. Plan Vercel Pro (Hobby es no comercial; el cron diario libera reservas hasta un día tarde).
 
 **Seguridad y calidad**
-9. Actualizar `next` 16.3.3 → 16.3.8: `npm audit` marca 1 crítica (RCE en `next/og`; el código no usa `next/og`, riesgo bajo) y 10 altas, casi todas transitivas de herramientas de build sin arreglo. Revisar el resto con `npm audit`.
+9. ~~Actualizar `next`~~ hecho (ver tabla). Volver a mirar `npm audit` cuando salga un Payload nuevo (las 12 altas restantes vienen de dependencias de Payload y de `eslint-config-next`).
 10. Tope de códigos de verificación por email (hoy solo por IP) y limpieza de cuentas sin verificar viejas.
 11. Server actions (direcciones, checkout) sin rate limit propio.
 12. `Products` no valida `compareAtPrice > price` (el demo tenía un caso invertido; la base de desarrollo conserva el secador de pelo).
