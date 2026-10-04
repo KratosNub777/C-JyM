@@ -219,7 +219,7 @@ export interface Product {
   images?: (number | Media)[] | null;
   price: number;
   /**
-   * Precio tachado antes del descuento. Dejar vacío si no hay descuento.
+   * Precio tachado antes del descuento; debe ser mayor al precio contado. Dejar vacío si no hay descuento.
    */
   compareAtPrice?: number | null;
   stock: number;
