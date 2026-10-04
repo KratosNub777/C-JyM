@@ -19,6 +19,7 @@ Nada.
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-04 | chore/pendientes-calidad | Auth: tope de 5 emails con código por hora por destinatario (`customerAuth/codeQuota.ts`, contador en `verification`, sin migración), reenvío con `resendStrategy: 'reuse'` (no anula el código ya recibido) y cron diario `/api/cron/cleanup-accounts` que borra cuentas sin verificar de más de 7 días (`customerAuth/cleanup.ts`, `vercel.json`). Tests de tope, concurrencia, envío real con Better Auth, limpieza y ruta; e2e de auth OK. |
 | 2026-10-04 | chore/pendientes-calidad | Menores: se borra la ruta de ejemplo `/my-route` del template (pública, iniciaba Payload sin usarlo) y el arg sin usar del e2e de admin (lint 0 warnings); `package.json` sin `engines.pnpm`/bloque `pnpm` y `npm test` usa npm; `sslmode=verify-full` en `.env.example`, `.env` local y `docs/despliegue.md` (quita el aviso de `pg`, misma validación). |
 | 2026-10-04 | chore/pendientes-calidad | `Products` exige `compareAtPrice > price` (validación de campo en `collections/Products.ts`, cubre ediciones parciales; misma regla en `/catalogar` vía `lib/validateProductFields.ts`; test `product-price-validation`). Corregido el secador de pelo en la base de desarrollo (precio de lista → vacío); staging no tenía casos. |
 | 2026-10-04 | chore/pendientes-calidad | `next` y `eslint-config-next` 16.3.3 → 16.3.8, `vitest` 4.0.18 → 4.1.11 y `overrides.undici` 7.29.1 (Payload fija 7.29.0): `npm audit` pasa de 2 críticas/13 altas a 0 críticas/12 altas, todas en herramientas de build sin arreglo publicado (`braces` vía `sass`/`chokidar`, `esbuild` viejo de `drizzle-kit`). tsc, lint, 111 Vitest, 16 e2e y build OK. |
@@ -51,7 +52,7 @@ Nada.
 
 **Seguridad y calidad**
 9. ~~Actualizar `next`~~ hecho (ver tabla). Volver a mirar `npm audit` cuando salga un Payload nuevo (las 12 altas restantes vienen de dependencias de Payload y de `eslint-config-next`).
-10. Tope de códigos de verificación por email (hoy solo por IP) y limpieza de cuentas sin verificar viejas.
+10. ~~Tope de códigos por email y limpieza de cuentas sin verificar~~ hecho (ver tabla).
 11. Server actions (direcciones, checkout) sin rate limit propio.
 12. ~~Validar `compareAtPrice > price`~~ hecho (ver tabla).
 13. Subidas por `/admin` en Vercel limitadas a ~4,5 MB (evaluar `clientUploads` + CORS en R2).

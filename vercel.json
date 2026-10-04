@@ -1,4 +1,7 @@
 {
   "regions": ["gru1"],
-  "crons": [{ "path": "/api/cron/expire-orders", "schedule": "0 9 * * *" }]
+  "crons": [
+    { "path": "/api/cron/expire-orders", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/cleanup-accounts", "schedule": "30 9 * * *" }
+  ]
 }

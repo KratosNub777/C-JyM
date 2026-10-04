@@ -65,7 +65,7 @@ export function VerifyEmailForm({ destination }: { destination: '/cuenta' | '/ch
       setCode('')
       setCooldown(RESEND_SECONDS)
       setInfo(
-        'Si el email es correcto, te enviamos un código nuevo. Revisá también el correo no deseado.',
+        'Si el email es correcto, te enviamos el código otra vez. Revisá también el correo no deseado.',
       )
     } catch {
       setMessage('No pudimos conectarnos. Intentá nuevamente.')
