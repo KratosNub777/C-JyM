@@ -14,12 +14,13 @@
 
 ## Trabajo sin commitear
 
-Nada.
+Fotos reales de portada y categorías (`public/images/`, `Hero.tsx`, `CategoryBentoGrid.tsx`, `next.config.ts`).
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-14 | main | Portada y tarjetas de categoría dejan de usar fotos al azar de picsum.photos: 12 fotos de Unsplash (licencia libre) en `public/images/` (`hero.jpg`, `categorias/<slug>.jpg`); categoría sin foto usa la de portada; `next.config.ts` permite `/images/**` y quita picsum. Los productos siguen sin foto (demo). La de climatización es provisoria (unidad exterior vieja). |
 | 2026-10-04 | chore/pendientes-calidad | Server actions: máximo 3 pedidos pendientes con reserva vigente por cliente (`MAX_PENDING_ORDERS`, código `LIMIT`; evita acaparar stock) y límite por cliente de 10/min en checkout y 20/min en direcciones (`customerAuth/actionLimit.ts`). El contador por ventana se extrae a `customerAuth/windowQuota.ts` (lo usa también el tope de códigos). Tests de tope, reintento, vencidas y límites. |
 | 2026-10-04 | chore/pendientes-calidad | Auth: tope de 5 emails con código por hora por destinatario (`customerAuth/codeQuota.ts`, contador en `verification`, sin migración), reenvío con `resendStrategy: 'reuse'` (no anula el código ya recibido) y cron diario `/api/cron/cleanup-accounts` que borra cuentas sin verificar de más de 7 días (`customerAuth/cleanup.ts`, `vercel.json`). Tests de tope, concurrencia, envío real con Better Auth, limpieza y ruta; e2e de auth OK. |
 | 2026-10-04 | chore/pendientes-calidad | Menores: se borra la ruta de ejemplo `/my-route` del template (pública, iniciaba Payload sin usarlo) y el arg sin usar del e2e de admin (lint 0 warnings); `package.json` sin `engines.pnpm`/bloque `pnpm` y `npm test` usa npm; `sslmode=verify-full` en `.env.example`, `.env` local y `docs/despliegue.md` (quita el aviso de `pg`, misma validación). |
