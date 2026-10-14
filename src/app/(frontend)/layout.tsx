@@ -87,7 +87,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="mx-auto flex h-24 max-w-7xl items-center gap-6 px-4 sm:px-6">
+          <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-24 sm:px-6">
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.png"
@@ -95,7 +95,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 width={280}
                 height={140}
                 priority
-                className="h-20 w-auto dark:hidden"
+                className="h-12 w-auto sm:h-20 dark:hidden"
               />
               <Image
                 src="/logo-dark.png"
@@ -103,7 +103,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 width={280}
                 height={140}
                 priority
-                className="hidden h-20 w-auto dark:block"
+                className="hidden h-12 w-auto sm:h-20 dark:block"
               />
             </Link>
 
@@ -113,7 +113,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                   type="search"
                   name="q"
                   placeholder="Estoy buscando..."
-                  className="w-full bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  className="w-full bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
                 />
                 <button
                   type="submit"
@@ -131,6 +131,25 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <CartLink />
             </div>
           </div>
+
+          <form action="/buscar" method="get" role="search" className="px-4 pb-3 sm:hidden">
+            <div className="flex w-full overflow-hidden rounded-full border border-neutral-300 focus-within:border-brand-600 dark:border-neutral-700">
+              <input
+                type="search"
+                name="q"
+                placeholder="Estoy buscando..."
+                aria-label="Buscar productos"
+                className="w-full bg-white px-4 py-2.5 text-base text-neutral-900 placeholder:text-neutral-500 focus:outline-none dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
+              />
+              <button
+                type="submit"
+                aria-label="Buscar"
+                className="flex items-center justify-center bg-brand-600 px-5 text-white transition-colors hover:bg-brand-700"
+              >
+                <MagnifyingGlass size={18} weight="bold" />
+              </button>
+            </div>
+          </form>
 
           <div className="relative bg-ink-600">
             <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-2 sm:px-6">
@@ -191,26 +210,26 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 lg:flex-1 lg:px-10">
                 <div>
                   <h3 className="text-sm font-semibold text-white">Información</h3>
-                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/80">
                     <Link
                       href="/terminos"
                       className="flex items-center gap-2 transition-colors hover:text-white"
                     >
-                      <FileText size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <FileText size={16} weight="regular" className="shrink-0 text-white/70" />
                       Términos y condiciones
                     </Link>
                     <Link
                       href="/garantia"
                       className="flex items-center gap-2 transition-colors hover:text-white"
                     >
-                      <ArrowsClockwise size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <ArrowsClockwise size={16} weight="regular" className="shrink-0 text-white/70" />
                       Garantía y devoluciones
                     </Link>
                     <Link
                       href="/privacidad"
                       className="flex items-center gap-2 transition-colors hover:text-white"
                     >
-                      <ShieldCheck size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <ShieldCheck size={16} weight="regular" className="shrink-0 text-white/70" />
                       Políticas de privacidad
                     </Link>
                   </nav>
@@ -218,19 +237,19 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
                 <div>
                   <h3 className="text-sm font-semibold text-white">Institucional</h3>
-                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                  <nav className="mt-4 flex flex-col gap-2.5 text-sm text-white/80">
                     <Link
                       href="/quienes-somos"
                       className="flex items-center gap-2 transition-colors hover:text-white"
                     >
-                      <UsersThree size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <UsersThree size={16} weight="regular" className="shrink-0 text-white/70" />
                       Nosotros
                     </Link>
                     <Link
                       href="/contacto"
                       className="flex items-center gap-2 transition-colors hover:text-white"
                     >
-                      <EnvelopeSimple size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <EnvelopeSimple size={16} weight="regular" className="shrink-0 text-white/70" />
                       Contacto
                     </Link>
                   </nav>
@@ -238,18 +257,18 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
                 <div>
                   <h3 className="text-sm font-semibold text-white">Horario y ubicación</h3>
-                  <div className="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
+                  <div className="mt-4 flex flex-col gap-2.5 text-sm text-white/80">
                     <div className="flex items-center gap-2">
-                      <Clock size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <Clock size={16} weight="regular" className="shrink-0 text-white/70" />
                       Lun a Vie 7:30 a 18:30 h · Sáb 7:30 a 16:00 h
                     </div>
                     <div className="flex items-center gap-2">
-                      <Truck size={16} weight="regular" className="shrink-0 text-white/50" />
+                      <Truck size={16} weight="regular" className="shrink-0 text-white/70" />
                       {/* TODO(owner): confirmar política real de entregas */}
                       Entregas próximamente
                     </div>
                     <div className="flex items-start gap-2">
-                      <MapPin size={16} weight="regular" className="mt-0.5 shrink-0 text-white/50" />
+                      <MapPin size={16} weight="regular" className="mt-0.5 shrink-0 text-white/70" />
                       {/* TODO(owner): reemplazar con la dirección real del local */}
                       Dirección próximamente
                     </div>
@@ -258,8 +277,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               </div>
 
               <div className="shrink-0">
-                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-xs text-white/70">
-                  <ShieldCheck size={20} weight="regular" className="shrink-0 text-white/50" />
+                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-[13px] text-white/80">
+                  <ShieldCheck size={20} weight="regular" className="shrink-0 text-white/70" />
                   {/* TODO(owner): reemplazar por el badge real de la pasarela de pago (Fase 3) */}
                   <span>
                     Compra segura
@@ -271,11 +290,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </div>
 
             <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs text-white/70 w-fit">
-                <MapPin size={14} weight="regular" className="shrink-0 text-white/50" />
+              <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] text-white/80 w-fit">
+                <MapPin size={14} weight="regular" className="shrink-0 text-white/70" />
                 Dirección próximamente, Paraguay
               </div>
-              <p className="text-xs text-white/50">
+              <p className="text-[13px] text-white/80">
                 © {new Date().getFullYear()} Comercial José María. Catálogo de productos.
               </p>
             </div>
