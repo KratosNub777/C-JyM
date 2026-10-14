@@ -1,11 +1,12 @@
 'use client'
 
-import { Check, CaretDown, Tag, X } from '@phosphor-icons/react'
+import { Check, CaretDown, SlidersHorizontal, Tag, X } from '@phosphor-icons/react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 
 import { formatGs } from '@/lib/format'
 import {
+  countActiveFilters,
   hasActiveFilters,
   parseProductFilters,
   SORT_OPTIONS,
@@ -16,7 +17,7 @@ import { useClickOutside } from '@/lib/useClickOutside'
 const CONTROL =
   'flex h-10 items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 transition-colors hover:border-neutral-400 focus-within:border-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100'
 const LABEL =
-  'mb-1.5 block text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400'
+  'mb-1.5 block text-[13px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300'
 const PANEL =
   'absolute left-0 top-full z-20 mt-1.5 max-h-64 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-800 dark:bg-neutral-900'
 
@@ -34,7 +35,7 @@ function SortDropdown({
   const current = SORT_OPTIONS.find((option) => option.value === value) ?? SORT_OPTIONS[0]
 
   return (
-    <div className="relative shrink-0" ref={ref}>
+    <div className="relative w-full shrink-0 sm:w-auto" ref={ref}>
       <span className={LABEL}>Ordenar por</span>
       <button
         type="button"
@@ -45,7 +46,7 @@ function SortDropdown({
         <CaretDown
           size={14}
           weight="bold"
-          className={`shrink-0 text-neutral-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 text-neutral-500 transition-transform dark:text-neutral-400 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -108,7 +109,7 @@ function BrandCombobox({
         {active.map((brand) => (
           <span
             key={brand}
-            className="flex items-center gap-1 rounded-full bg-brand-600 px-2 py-0.5 text-xs font-medium text-white"
+            className="flex items-center gap-1 rounded-full bg-brand-600 px-2 py-0.5 text-[13px] font-medium text-white"
           >
             {brand}
             <button
@@ -132,14 +133,14 @@ function BrandCombobox({
           }}
           onFocus={() => setOpen(true)}
           placeholder={active.length === 0 ? 'Buscar marca...' : ''}
-          className="min-w-[80px] flex-1 border-none bg-transparent py-1 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 dark:text-neutral-100"
+          className="min-w-[80px] flex-1 border-none bg-transparent py-1 text-sm text-neutral-900 outline-none placeholder:text-neutral-500 dark:text-neutral-100 dark:placeholder:text-neutral-400"
         />
       </div>
 
       {open && (
         <div className={PANEL}>
           {filtered.length === 0 ? (
-            <p className="px-3.5 py-2 text-sm text-neutral-400 dark:text-neutral-500">
+            <p className="px-3.5 py-2 text-sm text-neutral-600 dark:text-neutral-400">
               Sin resultados
             </p>
           ) : (
@@ -193,6 +194,9 @@ export function FilterBar({
 
   const [minInput, setMinInput] = useState(searchParams.get('min') ?? '')
   const [maxInput, setMaxInput] = useState(searchParams.get('max') ?? '')
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const panelId = useId()
+  const activeCount = countActiveFilters(filters)
 
   function navigate(mutate: (params: URLSearchParams) => void) {
     const params = new URLSearchParams(searchParams.toString())
@@ -242,75 +246,106 @@ export function FilterBar({
   }
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="flex flex-wrap items-end gap-4">
-        <SortDropdown value={filters.sort} onChange={handleSortChange} />
+    <div className="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <button
+        type="button"
+        onClick={() => setMobileOpen((value) => !value)}
+        aria-expanded={mobileOpen}
+        aria-controls={panelId}
+        className="flex h-14 w-full items-center justify-between gap-3 px-4 text-left md:hidden"
+      >
+        <span className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100">
+          <SlidersHorizontal size={20} weight="bold" />
+          Filtros
+          {activeCount > 0 && (
+            <span
+              className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-600 px-1.5 text-[13px] font-semibold text-white"
+              aria-label={`${activeCount} ${activeCount === 1 ? 'filtro activo' : 'filtros activos'}`}
+            >
+              {activeCount}
+            </span>
+          )}
+        </span>
+        <CaretDown
+          size={18}
+          weight="bold"
+          className={`shrink-0 text-neutral-600 transition-transform dark:text-neutral-300 ${mobileOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
 
-        {brands.length > 0 && (
-          <BrandCombobox brands={brands} active={activeBrands} onToggle={toggleBrand} />
-        )}
+      <div
+        id={panelId}
+        className={`${mobileOpen ? 'flex' : 'hidden'} flex-col gap-5 border-t border-neutral-200 p-4 md:flex md:border-t-0 md:p-5 dark:border-neutral-800`}
+      >
+        <div className="flex flex-wrap items-end gap-4">
+          <SortDropdown value={filters.sort} onChange={handleSortChange} />
 
-        {priceBounds && (
-          <div className="min-w-[220px] flex-1 sm:max-w-md">
-            <span className={LABEL}>Precio</span>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex min-w-[180px] flex-1 items-center gap-2">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  placeholder={formatGs(priceBounds.min)}
-                  value={minInput}
-                  onChange={(event) => setMinInput(event.target.value)}
-                  className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
-                />
-                <span className="shrink-0 text-neutral-400">—</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  placeholder={formatGs(priceBounds.max)}
-                  value={maxInput}
-                  onChange={(event) => setMaxInput(event.target.value)}
-                  className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
-                />
+          {brands.length > 0 && (
+            <BrandCombobox brands={brands} active={activeBrands} onToggle={toggleBrand} />
+          )}
+
+          {priceBounds && (
+            <div className="min-w-[220px] flex-1 sm:max-w-md">
+              <span className={LABEL}>Precio</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex min-w-[180px] flex-1 items-center gap-2">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    placeholder={formatGs(priceBounds.min)}
+                    value={minInput}
+                    onChange={(event) => setMinInput(event.target.value)}
+                    className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
+                  />
+                  <span className="shrink-0 text-neutral-500 dark:text-neutral-400">—</span>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    placeholder={formatGs(priceBounds.max)}
+                    value={maxInput}
+                    onChange={(event) => setMaxInput(event.target.value)}
+                    className={`${CONTROL} w-0 min-w-0 flex-1 text-[13px] sm:text-sm`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={applyPriceRange}
+                  className="h-10 w-full shrink-0 rounded-xl bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700 sm:w-auto"
+                >
+                  Aplicar
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={applyPriceRange}
-                className="h-10 w-full shrink-0 rounded-xl bg-brand-600 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-700 sm:w-auto"
-              >
-                Aplicar
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {hasActiveFilters(filters) && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="flex h-10 items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
-          >
-            <X size={14} weight="bold" />
-            Limpiar filtros
-          </button>
-        )}
+          {hasActiveFilters(filters) && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="flex h-10 items-center gap-1 text-sm text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
+            >
+              <X size={14} weight="bold" />
+              Limpiar filtros
+            </button>
+          )}
 
-        {!!onSaleCount && onSaleCount > 0 && (
-          <button
-            type="button"
-            onClick={toggleOnSale}
-            className={
-              filters.onSale
-                ? 'ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600 bg-accent-oferta-600 px-4 text-sm font-semibold text-white transition-colors'
-                : 'animate-pulse-glow ml-auto flex h-10 items-center gap-2 rounded-xl border border-accent-oferta-600/40 bg-accent-oferta-50 px-4 text-sm font-semibold text-accent-oferta-600 transition-colors hover:bg-accent-oferta-100 dark:border-accent-oferta-600/50 dark:bg-accent-oferta-600/10 dark:text-accent-oferta-100 dark:hover:bg-accent-oferta-600/20'
-            }
-          >
-            <Tag size={16} weight="fill" />
-            Ofertas
-          </button>
-        )}
+          {!!onSaleCount && onSaleCount > 0 && (
+            <button
+              type="button"
+              onClick={toggleOnSale}
+              className={
+                filters.onSale
+                  ? 'flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-accent-oferta-600 bg-accent-oferta-600 px-4 text-sm font-semibold text-white transition-colors sm:ml-auto sm:w-auto'
+                  : 'animate-pulse-glow flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-accent-oferta-600/40 bg-accent-oferta-50 px-4 text-sm font-semibold text-accent-oferta-600 transition-colors hover:bg-accent-oferta-100 dark:border-accent-oferta-600/50 dark:bg-accent-oferta-600/10 dark:text-accent-oferta-100 dark:hover:bg-accent-oferta-600/20 sm:ml-auto sm:w-auto'
+              }
+            >
+              <Tag size={16} weight="fill" />
+              Ofertas
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
