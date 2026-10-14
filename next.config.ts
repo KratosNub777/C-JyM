@@ -20,11 +20,11 @@ const nextConfig: NextConfig = {
       {
         pathname: '/logo-dark.png',
       },
+      {
+        pathname: '/images/**',
+      },
     ],
     remotePatterns: [
-      {
-        hostname: 'picsum.photos',
-      },
       // Fotos de productos en el bucket público de R2.
       ...(r2ImagePattern() ? [r2ImagePattern()!] : []),
     ],

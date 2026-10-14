@@ -1,6 +1,26 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+// Fotos de public/images/categorias/<slug>.jpg (Unsplash, licencia libre).
+// Las categorías sin foto propia usan la de la portada.
+const CATEGORY_IMAGE_SLUGS = new Set([
+  'audio',
+  'calefaccion',
+  'climatizacion',
+  'cocinas',
+  'cuidado-personal',
+  'freezers',
+  'heladeras',
+  'lavado',
+  'limpieza',
+  'microondas-hornos',
+  'television',
+])
+
+function categoryImageSrc(slug: string) {
+  return CATEGORY_IMAGE_SLUGS.has(slug) ? `/images/categorias/${slug}.jpg` : '/images/hero.jpg'
+}
+
 type CategoryTileData = {
   id: number
   name: string
@@ -20,7 +40,7 @@ export function CategoryBentoGrid({ categories }: { categories: CategoryTileData
           }`}
         >
           <Image
-            src={`https://picsum.photos/seed/cjym-${category.slug}/800/800`}
+            src={categoryImageSrc(category.slug)}
             alt=""
             fill
             className="object-cover transition duration-300 group-hover:scale-105"
