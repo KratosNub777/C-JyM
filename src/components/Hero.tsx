@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section className="relative h-[420px] overflow-hidden rounded-2xl sm:h-[480px] md:h-[560px]">
       <Image
-        src="https://picsum.photos/seed/cjm-hogar/1600/1000"
+        src="/images/hero.jpg"
         alt=""
         fill
         priority
