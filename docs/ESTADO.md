@@ -10,16 +10,17 @@
 - **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos) y el sitemap nuevo verificado (42 URLs); falta SMTP, correr `meilisearch:sync` y la importación masiva.
 - **Calidad (2026-10-04):** tsc OK, lint 0 errores/0 warnings, 128 Vitest en 27 archivos, 16 e2e y build OK. `npm audit`: 0 críticas.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `chore/pendientes-calidad` (sin pushear), sale de `main` = `f9e575c` (incluye `fix/sitemap-revalidate`, PR #3).
+- **Rama activa:** `feat/movil-ux` (sin pushear), sale de `origin/main` = `d82f789` (incluye las fotos reales, PR #5).
 
 ## Trabajo sin commitear
 
-Fotos reales de portada y categorías (`public/images/`, `Hero.tsx`, `CategoryBentoGrid.tsx`, `next.config.ts`).
+Ninguno (todo en `feat/movil-ux`, sin pushear).
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-14 | feat/movil-ux | Móvil: el buscador queda visible en el header (fila propia bajo `sm`, sale del menú de categorías; logo y fila más bajos) y los filtros de `FilterBar` se pliegan tras un botón «Filtros» con contador de activos (`countActiveFilters` en `lib/productFilters.ts`; en `md+` se ven como siempre). Textos secundarios más legibles (cuotas, marca, stock, precio tachado, enlaces y footer: `neutral-600/300`, mínimo 13 px) en `ProductCard`, ficha, `InstallmentBreakdown`, `CategoryShelf`, `ValuePropStrip`, `Pagination`. La tarjeta pone las cuotas debajo del precio. Tests: unit del contador y 2 e2e (móvil/escritorio) en `frontend.e2e.spec.ts`. |
 | 2026-10-14 | main | Portada y tarjetas de categoría dejan de usar fotos al azar de picsum.photos: 12 fotos de Unsplash (licencia libre) en `public/images/` (`hero.jpg`, `categorias/<slug>.jpg`); categoría sin foto usa la de portada; `next.config.ts` permite `/images/**` y quita picsum. Los productos siguen sin foto (demo). La de climatización es provisoria (unidad exterior vieja). |
 | 2026-10-04 | chore/pendientes-calidad | Server actions: máximo 3 pedidos pendientes con reserva vigente por cliente (`MAX_PENDING_ORDERS`, código `LIMIT`; evita acaparar stock) y límite por cliente de 10/min en checkout y 20/min en direcciones (`customerAuth/actionLimit.ts`). El contador por ventana se extrae a `customerAuth/windowQuota.ts` (lo usa también el tope de códigos). Tests de tope, reintento, vencidas y límites. |
 | 2026-10-04 | chore/pendientes-calidad | Auth: tope de 5 emails con código por hora por destinatario (`customerAuth/codeQuota.ts`, contador en `verification`, sin migración), reenvío con `resendStrategy: 'reuse'` (no anula el código ya recibido) y cron diario `/api/cron/cleanup-accounts` que borra cuentas sin verificar de más de 7 días (`customerAuth/cleanup.ts`, `vercel.json`). Tests de tope, concurrencia, envío real con Better Auth, limpieza y ruta; e2e de auth OK. |
@@ -33,9 +34,7 @@ Fotos reales de portada y categorías (`public/images/`, `Hero.tsx`, `CategoryBe
 | 2026-10-02 | feat/migraciones-y-despliegue | Meilisearch fijado en v1.42.1 (`docker-compose.yml`, `docs/meilisearch.md`); probado sync, huérfanos, clave acotada y búsqueda. Base de staging en Neon creada y migrada (`db:setup`); en la guía paso a paso falta Railway/Vercel. |
 | 2026-10-01 | feat/migraciones-y-despliegue | Migración inicial de Payload (`migrations/*_initial.ts`), comandos `npm run db:*`, guía `docs/despliegue.md`; se quita el SQL `002`. Probada en Postgres 16 vacío (esquema = dev). |
 | 2026-09-30 | main | HTTPS forzado: `lib/security/{https,headers}.ts` (HSTS, `BETTER_AUTH_URL` https obligatoria en producción), cookie del admin Secure, orígenes solo https. |
-| 2026-09-30 | main | `npm run email:test` para probar SMTP (`scripts/email-test.ts`, `describeSmtpError` en `lib/email/mailer.ts`). |
 | 2026-09-30 | main | Registro: confirmar contraseña, verificación de email por código SMTP, recuperación de contraseña; reemplazo de cuentas sin verificar (`customerAuth/auth.ts`, `docs/fase-2-autenticacion.md`). |
-| 2026-09-29 | main | Meilisearch en producción (clave acotada, sync sin huérfanos, respaldo en Postgres), cron diario de reservas, fixes del code-review de la Fase 2; `.claude/` y `AGENTS.md` dejan de versionarse. |
 
 ## Pendientes (por prioridad)
 
