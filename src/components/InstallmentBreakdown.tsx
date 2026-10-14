@@ -26,7 +26,7 @@ export function InstallmentBreakdown({
         aria-expanded={open}
       >
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+          <p className="text-[13px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
             Pedí en cuotas sin interés
           </p>
           <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
@@ -36,7 +36,7 @@ export function InstallmentBreakdown({
         <CaretDown
           size={18}
           weight="bold"
-          className={`shrink-0 text-neutral-500 transition-transform dark:text-neutral-400 ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 text-neutral-600 transition-transform dark:text-neutral-300 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -47,10 +47,10 @@ export function InstallmentBreakdown({
               key={option.count}
               className="flex items-center justify-between gap-3 py-2 text-sm"
             >
-              <span className="text-neutral-600 dark:text-neutral-300">{option.count} cuotas</span>
+              <span className="text-neutral-700 dark:text-neutral-200">{option.count} cuotas</span>
               <span className="flex items-center gap-2">
                 {option.perInstallmentListPrice && (
-                  <span className="text-neutral-400 line-through dark:text-neutral-500">
+                  <span className="text-neutral-500 line-through dark:text-neutral-400">
                     {formatGs(option.perInstallmentListPrice)}
                   </span>
                 )}

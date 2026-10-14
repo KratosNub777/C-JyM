@@ -72,7 +72,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-300 dark:text-neutral-600">
               <ImageSquare size={36} weight="light" />
-              <span className="text-xs text-neutral-400 dark:text-neutral-500">Sin imagen</span>
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">Sin imagen</span>
             </div>
           )}
         </div>
@@ -102,7 +102,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {category && (
               <Link
                 href={`/categorias/${category.slug}`}
-                className="text-sm font-medium text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
               >
                 {category.name}
               </Link>
@@ -111,7 +111,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               className={
                 inStock
                   ? 'text-sm font-medium text-accent-ahorro-600 dark:text-accent-ahorro-100'
-                  : 'text-sm font-medium text-neutral-400 dark:text-neutral-500'
+                  : 'text-sm font-medium text-neutral-600 dark:text-neutral-400'
               }
             >
               {inStock ? 'En stock' : 'Sin stock'}
@@ -122,7 +122,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {product.name}
           </h1>
 
-          <div className="mt-1 flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+          <div className="mt-1 flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
             {product.brand && <span>{product.brand}</span>}
             {product.sku && <span>COD: {product.sku}</span>}
           </div>
@@ -130,11 +130,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         <div>
           {hasDiscount && (
-            <p className="text-base text-neutral-400 line-through dark:text-neutral-500">
+            <p className="text-base text-neutral-500 line-through dark:text-neutral-400">
               {formatGs(product.compareAtPrice!)}
             </p>
           )}
-          <p className="text-sm font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
             Precio contado
           </p>
           <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">

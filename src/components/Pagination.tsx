@@ -38,12 +38,12 @@ export function Pagination({
         className={
           hasPrevPage
             ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
-            : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
+            : 'pointer-events-none text-neutral-400 dark:text-neutral-600'
         }
       >
         ← Anterior
       </Link>
-      <span className="text-neutral-500 dark:text-neutral-400">
+      <span className="text-neutral-600 dark:text-neutral-300">
         Página {page} de {totalPages}
       </span>
       <Link
@@ -52,7 +52,7 @@ export function Pagination({
         className={
           hasNextPage
             ? 'font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white'
-            : 'pointer-events-none text-neutral-300 dark:text-neutral-700'
+            : 'pointer-events-none text-neutral-400 dark:text-neutral-600'
         }
       >
         Siguiente →
