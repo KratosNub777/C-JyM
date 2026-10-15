@@ -14,12 +14,13 @@
 
 ## Trabajo sin commitear
 
-Fotos reales de portada y categorías (`public/images/`, `Hero.tsx`, `CategoryBentoGrid.tsx`, `next.config.ts`).
+Header que se compacta al scrollear (`components/StickyHeader.tsx`, `app/(frontend)/layout.tsx`). `payload-types.ts` aparece modificado desde antes de este cambio (sin revisar).
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-15 | feat/fotos-reales-categorias | Header compacto al bajar: `StickyHeader` (cliente, `position: fixed` + espaciador de la altura expandida, así el contenido no salta) activa `data-compact` con histéresis (>64 px compacta, <24 px expande); la franja de horario se oculta, la fila del logo pasa de 96 a 56 px (logo 80 → 40 px) y la de categorías de 48 a 40 px. Alturas en variables `--header-*`. Verificado con Playwright en escritorio claro/oscuro y móvil (173/145 → 97 px). |
 | 2026-10-14 | main | Portada y tarjetas de categoría dejan de usar fotos al azar de picsum.photos: 12 fotos de Unsplash (licencia libre) en `public/images/` (`hero.jpg`, `categorias/<slug>.jpg`); categoría sin foto usa la de portada; `next.config.ts` permite `/images/**` y quita picsum. Los productos siguen sin foto (demo). La de climatización es provisoria (unidad exterior vieja). |
 | 2026-10-04 | chore/pendientes-calidad | Server actions: máximo 3 pedidos pendientes con reserva vigente por cliente (`MAX_PENDING_ORDERS`, código `LIMIT`; evita acaparar stock) y límite por cliente de 10/min en checkout y 20/min en direcciones (`customerAuth/actionLimit.ts`). El contador por ventana se extrae a `customerAuth/windowQuota.ts` (lo usa también el tope de códigos). Tests de tope, reintento, vencidas y límites. |
 | 2026-10-04 | chore/pendientes-calidad | Auth: tope de 5 emails con código por hora por destinatario (`customerAuth/codeQuota.ts`, contador en `verification`, sin migración), reenvío con `resendStrategy: 'reuse'` (no anula el código ya recibido) y cron diario `/api/cron/cleanup-accounts` que borra cuentas sin verificar de más de 7 días (`customerAuth/cleanup.ts`, `vercel.json`). Tests de tope, concurrencia, envío real con Better Auth, limpieza y ruta; e2e de auth OK. |
@@ -35,7 +36,6 @@ Fotos reales de portada y categorías (`public/images/`, `Hero.tsx`, `CategoryBe
 | 2026-09-30 | main | HTTPS forzado: `lib/security/{https,headers}.ts` (HSTS, `BETTER_AUTH_URL` https obligatoria en producción), cookie del admin Secure, orígenes solo https. |
 | 2026-09-30 | main | `npm run email:test` para probar SMTP (`scripts/email-test.ts`, `describeSmtpError` en `lib/email/mailer.ts`). |
 | 2026-09-30 | main | Registro: confirmar contraseña, verificación de email por código SMTP, recuperación de contraseña; reemplazo de cuentas sin verificar (`customerAuth/auth.ts`, `docs/fase-2-autenticacion.md`). |
-| 2026-09-29 | main | Meilisearch en producción (clave acotada, sync sin huérfanos, respaldo en Postgres), cron diario de reservas, fixes del code-review de la Fase 2; `.claude/` y `AGENTS.md` dejan de versionarse. |
 
 ## Pendientes (por prioridad)
 
