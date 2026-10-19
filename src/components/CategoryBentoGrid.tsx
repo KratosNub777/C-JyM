@@ -36,7 +36,9 @@ export function CategoryBentoGrid({ categories }: { categories: CategoryTileData
           key={category.id}
           href={`/categorias/${category.slug}`}
           className={`group relative overflow-hidden rounded-2xl bg-neutral-200 dark:bg-neutral-800 ${
-            index === 0 ? 'aspect-square md:aspect-auto md:col-span-2 md:row-span-2' : 'aspect-square md:aspect-auto'
+            index === 0
+              ? 'aspect-square md:aspect-auto md:col-span-2 md:row-span-2'
+              : 'aspect-square md:aspect-auto'
           }`}
         >
           <Image
@@ -49,7 +51,9 @@ export function CategoryBentoGrid({ categories }: { categories: CategoryTileData
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-4">
             <p className="font-semibold text-white">{category.name}</p>
-            <p className="text-sm text-white/75">{category.productCount} productos</p>
+            <p className="text-sm text-white/75">
+              {category.productCount} {category.productCount === 1 ? 'producto' : 'productos'}
+            </p>
           </div>
         </Link>
       ))}
