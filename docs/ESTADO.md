@@ -20,6 +20,7 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-19 | docs/una-rama-por-sesion | Vercel: `ignoreCommand` en `vercel.json` salta los builds de Preview (exit 0 si `VERCEL_ENV` no es `production`); solo `main` despliega a producción. |
 | 2026-10-19 | docs/una-rama-por-sesion | La portada (`Hero.tsx`, ahora cliente) es un carrusel con flechas laterales y puntos; 3 slides fijos en código con fotos de ejemplo (sin autoplay) — reemplazar por los flyers reales (idealmente una colección de Payload). Verificado en escritorio y móvil. |
 | 2026-10-19 | docs/una-rama-por-sesion | Regla «una rama nueva por cada sesión nueva» en `CLAUDE.md` y en las reglas de este archivo; 16 ramas locales ya fusionadas borradas. |
 | 2026-10-15 | feat/fotos-reales-categorias | Header compacto al bajar: `StickyHeader` (cliente, `position: fixed` + espaciador de la altura expandida, así el contenido no salta) activa `data-compact` con histéresis (>64 px compacta, <24 px expande); la franja de horario se oculta, la fila del logo pasa de 96 a 56 px (logo 80 → 40 px) y la de categorías de 48 a 40 px. Alturas en variables `--header-*`. Verificado con Playwright en escritorio claro/oscuro y móvil (173/145 → 97 px). |
@@ -61,7 +62,7 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la
 11. ~~Server actions sin rate limit~~ hecho (ver tabla). El tope de 3 pedidos pendientes es un valor por defecto: confirmarlo con la empresa.
 12. ~~Validar `compareAtPrice > price`~~ hecho (ver tabla).
 13. Subidas por `/admin` en Vercel limitadas a ~4,5 MB (evaluar `clientUploads` + CORS en R2).
-14. Variables de entorno de **Preview** sin configurar en Vercel (solo Production): los previews no arrancan.
+14. ~~Previews de Vercel sin variables~~ ya no se construyen: `ignoreCommand` en `vercel.json` salta todo build que no sea Production, así que solo se despliega al fusionar a `main`. Si algún día se quieren previews, quitarlo y cargar las variables de **Preview** (con otra base).
 15. `/code-review` de la Fase 3 y `/security-review` obligatorio antes de cerrarla.
 16. Menores: hechos (ver tabla). Falta en Vercel cambiar `sslmode=require` → `verify-full` en `DATABASE_URL` (acción del usuario) y revisar respaldo/restauración de Neon según el plan.
 
