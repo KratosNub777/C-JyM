@@ -19,6 +19,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
+import { StickyHeader } from '@/components/StickyHeader'
 import { UserMenu } from '@/components/UserMenu'
 import { CartLink } from '@/components/cart/CartLink'
 import { CartFeedback } from '@/components/cart/CartFeedback'
@@ -79,15 +80,15 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="es" className={GeistSans.className}>
       <body className="min-h-screen bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
-        <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-          <div className="hidden bg-ink-700 text-white sm:block">
-            <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-xs sm:px-6">
+        <StickyHeader>
+          <div className="hidden h-[var(--header-strip)] overflow-hidden bg-ink-700 text-white transition-[height,opacity] duration-200 ease-out group-data-[compact=true]/header:h-0 group-data-[compact=true]/header:opacity-0 motion-reduce:transition-none sm:block">
+            <div className="mx-auto flex h-full max-w-7xl items-center justify-center gap-2 px-4 text-xs sm:px-6">
               <Clock size={14} weight="bold" />
               <span>Lun a Vie 7:30 a 18:30 h · Sáb 7:30 a 16:00 h</span>
             </div>
           </div>
 
-          <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-24 sm:px-6">
+          <div className="mx-auto flex h-[var(--header-main)] max-w-7xl items-center gap-6 px-4 transition-[height] duration-200 ease-out group-data-[compact=true]/header:h-14 motion-reduce:transition-none sm:px-6">
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.png"
@@ -95,7 +96,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 width={280}
                 height={140}
                 priority
-                className="h-12 w-auto sm:h-20 dark:hidden"
+                className="h-[var(--header-logo)] w-auto transition-[height] duration-200 ease-out group-data-[compact=true]/header:h-10 motion-reduce:transition-none dark:hidden"
               />
               <Image
                 src="/logo-dark.png"
@@ -103,7 +104,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 width={280}
                 height={140}
                 priority
-                className="hidden h-12 w-auto sm:h-20 dark:block"
+                className="hidden h-[var(--header-logo)] w-auto transition-[height] duration-200 ease-out group-data-[compact=true]/header:h-10 motion-reduce:transition-none dark:block"
               />
             </Link>
 
@@ -132,7 +133,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <form action="/buscar" method="get" role="search" className="px-4 pb-3 sm:hidden">
+          <form action="/buscar" method="get" role="search" className="h-[var(--header-search)] px-4 pb-3 sm:hidden">
             <div className="flex w-full overflow-hidden rounded-full border border-neutral-300 focus-within:border-brand-600 dark:border-neutral-700">
               <input
                 type="search"
@@ -152,7 +153,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </form>
 
           <div className="relative bg-ink-600">
-            <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-2 sm:px-6">
+            <div className="mx-auto flex h-[var(--header-nav)] max-w-7xl items-center gap-6 px-4 transition-[height] duration-200 ease-out group-data-[compact=true]/header:h-10 motion-reduce:transition-none sm:px-6">
               <HeaderNav topLevelCategories={topLevelCategories} childrenByParent={childrenByParent} />
 
               <Link
@@ -171,7 +172,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               </Link>
             </div>
           </div>
-        </header>
+        </StickyHeader>
         <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
         <CartFeedback />
         <footer className="mt-16 bg-ink-700 text-white">
