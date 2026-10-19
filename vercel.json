@@ -1,5 +1,6 @@
 {
   "regions": ["gru1"],
+  "ignoreCommand": "[ \"$VERCEL_ENV\" != \"production\" ]",
   "crons": [
     { "path": "/api/cron/expire-orders", "schedule": "0 9 * * *" },
     { "path": "/api/cron/cleanup-accounts", "schedule": "30 9 * * *" }
