@@ -27,7 +27,7 @@ export function InstallmentBreakdown({
       >
         <div>
           <p className="text-[13px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
-            Pedí en cuotas sin interés
+            Opciones de cuotas
           </p>
           <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
             {featured.count}x {formatGs(featured.perInstallment)}
@@ -60,6 +60,9 @@ export function InstallmentBreakdown({
               </span>
             </div>
           ))}
+          <p className="py-2 text-[13px] text-neutral-600 dark:text-neutral-300">
+            Montos de referencia. Consultá las condiciones de financiación en el local.
+          </p>
         </div>
       )}
     </div>

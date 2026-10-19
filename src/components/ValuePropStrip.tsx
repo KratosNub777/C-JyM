@@ -1,10 +1,10 @@
-import { CreditCard, Headset, ShieldCheck, Truck } from '@phosphor-icons/react/dist/ssr'
+import { CreditCard, Headset, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
 
 const items = [
   {
-    icon: Truck,
-    title: 'Envío a domicilio',
-    body: 'Te lo llevamos hasta tu casa.',
+    icon: Storefront,
+    title: 'Retiro en el local',
+    body: 'Reservá online y retirá tu compra.',
   },
   {
     icon: ShieldCheck,
