@@ -10,16 +10,18 @@
 - **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos) y el sitemap nuevo verificado (42 URLs); falta SMTP, correr `meilisearch:sync` y la importación masiva.
 - **Calidad (2026-10-04):** tsc OK, lint 0 errores/0 warnings, 128 Vitest en 27 archivos, 16 e2e y build OK. `npm audit`: 0 críticas.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `feat/movil-ux` (sin pushear), sale de `origin/main` = `d82f789` (incluye las fotos reales, PR #5).
+- **Rama activa:** `docs/una-rama-por-sesion` (sale de `origin/main`). Ramas viejas ya fusionadas borradas; queda solo `codex/reservation-expiration-backup` (3 commits sin fusionar, respaldo del vencimiento de reservas).
 
 ## Trabajo sin commitear
 
-Ninguno (PR #7 `feat/movil-ux` fusionada con `main`, conflictos resueltos).
+Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la carpeta `C-JyM-movil/` sin rastrear, ajenos a este cambio).
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-19 | docs/una-rama-por-sesion | La portada (`Hero.tsx`, ahora cliente) es un carrusel con flechas laterales y puntos; 3 slides fijos en código con fotos de ejemplo (sin autoplay) — reemplazar por los flyers reales (idealmente una colección de Payload). Verificado en escritorio y móvil. |
+| 2026-10-19 | docs/una-rama-por-sesion | Regla «una rama nueva por cada sesión nueva» en `CLAUDE.md` y en las reglas de este archivo; 16 ramas locales ya fusionadas borradas. |
 | 2026-10-15 | feat/fotos-reales-categorias | Header compacto al bajar: `StickyHeader` (cliente, `position: fixed` + espaciador de la altura expandida, así el contenido no salta) activa `data-compact` con histéresis (>64 px compacta, <24 px expande); la franja de horario se oculta, la fila del logo pasa de 96 a 56 px (logo 80 → 40 px) y la de categorías de 48 a 40 px. Alturas en variables `--header-*`. Verificado con Playwright en escritorio claro/oscuro y móvil (173/145 → 97 px). |
 | 2026-10-14 | feat/movil-ux | Móvil: el buscador queda visible en el header (fila propia bajo `sm`, sale del menú de categorías; logo y fila más bajos; las alturas móviles van en las variables `--header-main/logo/search` de `StickyHeader` para que el espaciador coincida con el header compacto) y los filtros de `FilterBar` se pliegan tras un botón «Filtros» con contador de activos (`countActiveFilters` en `lib/productFilters.ts`; en `md+` se ven como siempre). Textos secundarios más legibles (cuotas, marca, stock, precio tachado, enlaces y footer: `neutral-600/300`, mínimo 13 px) en `ProductCard`, ficha, `InstallmentBreakdown`, `CategoryShelf`, `ValuePropStrip`, `Pagination`. La tarjeta pone las cuotas debajo del precio. Tests: unit del contador y 2 e2e (móvil/escritorio) en `frontend.e2e.spec.ts`. |
 | 2026-10-14 | main | Portada y tarjetas de categoría dejan de usar fotos al azar de picsum.photos: 12 fotos de Unsplash (licencia libre) en `public/images/` (`hero.jpg`, `categorias/<slug>.jpg`); categoría sin foto usa la de portada; `next.config.ts` permite `/images/**` y quita picsum. Los productos siguen sin foto (demo). La de climatización es provisoria (unidad exterior vieja). |
@@ -74,3 +76,4 @@ Ninguno (PR #7 `feat/movil-ux` fusionada con `main`, conflictos resueltos).
 - Mantener ≤ ~15 filas en la tabla y ≤ ~80 líneas en total; el historial fino vive en `git log`.
 - No duplicar lo que ya está en `CLAUDE.md` ni en `docs/*.md`: solo enlazar.
 - Incluirlo en el mismo commit que el cambio que describe.
+- **Una rama nueva por cada sesión nueva**, creada desde `origin/main` actualizado (`git checkout -b tipo/nombre origin/main`); nunca seguir trabajando en la rama de una sesión anterior. Al fusionarse el PR, borrar la rama (local y remota).
