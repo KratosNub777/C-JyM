@@ -1,8 +1,8 @@
-import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Media, Product } from '@/payload-types'
+import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder'
 import { formatGs } from '@/lib/format'
 import { getInstallmentOptions } from '@/lib/pricing'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
@@ -34,10 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-300 dark:text-neutral-600">
-            <ImageSquare size={28} weight="light" />
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">Sin imagen</span>
-          </div>
+          <ProductImagePlaceholder />
         )}
         {discountPercent && (
           <span className="absolute left-2 top-2 rounded-full bg-accent-oferta-600 px-2 py-0.5 text-xs font-semibold text-white">

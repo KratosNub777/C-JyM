@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { CategoryBentoGrid } from '@/components/CategoryBentoGrid'
 import { CategoryShelf } from '@/components/CategoryShelf'
 import { Hero } from '@/components/Hero'
@@ -11,23 +10,22 @@ import type { Product } from '@/payload-types'
 // importar CATALOG_REVALIDATE_SECONDS acá; mantener en sync manualmente.
 export const revalidate = 300
 
+const SHELF_PRODUCT_LIMIT = 12
+
 export default async function HomePage() {
-  const { subcategories, allCategories, activeProducts } = await getCachedHomeData()
+  const { subcategories, allCategories, activeProducts, productCounts } = await getCachedHomeData()
 
-  const countsByCategory = activeProducts.reduce<Record<number, number>>((counts, product) => {
-    const categoryId = typeof product.category === 'object' ? product.category.id : product.category
-    counts[categoryId] = (counts[categoryId] ?? 0) + 1
-    return counts
-  }, {})
-
+  // 9 tarjetas llenan la grilla de 3 columnas sin huecos (la primera ocupa 2x2).
   const categoriesWithCount = subcategories
     .map((category) => ({
       id: category.id,
       name: category.name,
       slug: category.slug,
-      productCount: countsByCategory[category.id] ?? 0,
+      productCount: productCounts[category.id] ?? 0,
     }))
-    .sort((a, b) => b.productCount - a.productCount)
+    .filter((category) => category.productCount > 0)
+    .sort((a, b) => b.productCount - a.productCount || a.name.localeCompare(b.name, 'es'))
+    .slice(0, 9)
 
   const { topLevel, childrenByParent } = buildCategoryTree(allCategories)
 
@@ -38,7 +36,8 @@ export default async function HomePage() {
 
   const productsByTopLevelId = activeProducts.reduce<Record<number, Product[]>>(
     (groups, product) => {
-      const categoryId = typeof product.category === 'object' ? product.category.id : product.category
+      const categoryId =
+        typeof product.category === 'object' ? product.category.id : product.category
       const topLevelId = categoryIdToTopLevelId[categoryId]
       if (!topLevelId) return groups
       groups[topLevelId] = groups[topLevelId] ?? []
@@ -56,7 +55,7 @@ export default async function HomePage() {
         name: sub.name,
         slug: sub.slug,
       })),
-      products: productsByTopLevelId[category.id] ?? [],
+      products: (productsByTopLevelId[category.id] ?? []).slice(0, SHELF_PRODUCT_LIMIT),
     }))
     .filter((shelf) => shelf.products.length > 0)
 
@@ -77,11 +76,7 @@ export default async function HomePage() {
 
       {shelves.length === 0 ? (
         <p className="text-neutral-500 dark:text-neutral-400">
-          Todavía no hay productos cargados. Agregalos desde el{' '}
-          <Link href="/admin" className="underline">
-            panel de administración
-          </Link>
-          .
+          Estamos actualizando el catálogo. Volvé en unos minutos o escribinos por WhatsApp.
         </p>
       ) : (
         shelves.map((shelf) => (

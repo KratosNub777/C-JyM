@@ -1,10 +1,10 @@
-import { ImageSquare } from '@phosphor-icons/react/dist/ssr'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { InstallmentBreakdown } from '@/components/InstallmentBreakdown'
+import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
@@ -70,10 +70,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               priority
             />
           ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-300 dark:text-neutral-600">
-              <ImageSquare size={36} weight="light" />
-              <span className="text-sm text-neutral-500 dark:text-neutral-400">Sin imagen</span>
-            </div>
+            <ProductImagePlaceholder />
           )}
         </div>
         {images.length > 1 && (
