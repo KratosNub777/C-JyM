@@ -20,7 +20,7 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la
 
 | Fecha | Rama | Cambio |
 |---|---|---|
-| 2026-10-19 | docs/una-rama-por-sesion | Vercel: `ignoreCommand` en `vercel.json` salta los builds de Preview (exit 0 si `VERCEL_ENV` no es `production`); solo `main` despliega a producción. |
+| 2026-10-19 | fix/vercel-ignore-command | Vercel: `ignoreCommand` en `vercel.json` salta los builds de cualquier rama que no sea `main` (exit 0 si `VERCEL_GIT_COMMIT_REF` no es `main`); solo `main` despliega a producción. La primera versión usaba `VERCEL_ENV`, que en ese paso no vale `production`: canceló el build del merge de la PR #9 en `main`. |
 | 2026-10-19 | docs/una-rama-por-sesion | La portada (`Hero.tsx`, ahora cliente) es un carrusel con flechas laterales y puntos; 3 slides fijos en código con fotos de ejemplo (sin autoplay) — reemplazar por los flyers reales (idealmente una colección de Payload). Verificado en escritorio y móvil. |
 | 2026-10-19 | docs/una-rama-por-sesion | Regla «una rama nueva por cada sesión nueva» en `CLAUDE.md` y en las reglas de este archivo; 16 ramas locales ya fusionadas borradas. |
 | 2026-10-15 | feat/fotos-reales-categorias | Header compacto al bajar: `StickyHeader` (cliente, `position: fixed` + espaciador de la altura expandida, así el contenido no salta) activa `data-compact` con histéresis (>64 px compacta, <24 px expande); la franja de horario se oculta, la fila del logo pasa de 96 a 56 px (logo 80 → 40 px) y la de categorías de 48 a 40 px. Alturas en variables `--header-*`. Verificado con Playwright en escritorio claro/oscuro y móvil (173/145 → 97 px). |
