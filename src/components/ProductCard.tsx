@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-300 dark:text-neutral-600">
             <ImageSquare size={28} weight="light" />
-            <span className="text-xs text-neutral-400 dark:text-neutral-500">Sin imagen</span>
+            <span className="text-sm text-neutral-500 dark:text-neutral-400">Sin imagen</span>
           </div>
         )}
         {discountPercent && (
@@ -49,15 +49,15 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-1.5 p-3">
         <div className="flex items-center justify-between gap-2">
           {product.brand && (
-            <span className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+            <span className="text-[13px] font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">
               {product.brand}
             </span>
           )}
           <span
             className={
               inStock
-                ? 'text-xs font-medium text-accent-ahorro-600 dark:text-accent-ahorro-100'
-                : 'text-xs font-medium text-neutral-400 dark:text-neutral-500'
+                ? 'text-[13px] font-medium text-accent-ahorro-600 dark:text-accent-ahorro-100'
+                : 'text-[13px] font-medium text-neutral-600 dark:text-neutral-400'
             }
           >
             {inStock ? 'En stock' : 'Sin stock'}
@@ -73,30 +73,30 @@ export function ProductCard({ product }: { product: Product }) {
           </Link>
         </h3>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-1">
-          <div>
-            {hasDiscount && (
-              <p className="text-xs text-neutral-400 line-through dark:text-neutral-500">
-                {formatGs(product.compareAtPrice!)}
-              </p>
-            )}
+        <div className="mt-auto pt-1">
+          {hasDiscount && (
+            <p className="text-sm text-neutral-500 line-through dark:text-neutral-400">
+              {formatGs(product.compareAtPrice!)}
+            </p>
+          )}
+          <div className="flex items-center justify-between gap-2">
             <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
               {formatGs(product.price)}
             </p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              o {featuredInstallment.count}x {formatGs(featuredInstallment.perInstallment)}
-            </p>
-          </div>
 
-          <div className="relative z-10">
-            <AddToCartButton
-              productId={product.id}
-              name={product.name}
-              stock={product.stock}
-              active={product.status === 'active'}
-              compact
-            />
+            <div className="relative z-10">
+              <AddToCartButton
+                productId={product.id}
+                name={product.name}
+                stock={product.stock}
+                active={product.status === 'active'}
+                compact
+              />
+            </div>
           </div>
+          <p className="text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
+            o {featuredInstallment.count}x {formatGs(featuredInstallment.perInstallment)}
+          </p>
         </div>
       </div>
     </article>

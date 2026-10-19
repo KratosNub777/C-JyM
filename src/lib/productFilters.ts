@@ -80,6 +80,16 @@ export function hasActiveFilters(filters: ParsedProductFilters): boolean {
   )
 }
 
+/** Cuántos filtros hay activos (cada marca cuenta; el rango de precio cuenta como uno). */
+export function countActiveFilters(filters: ParsedProductFilters): number {
+  return (
+    (filters.sort !== DEFAULT_SORT ? 1 : 0) +
+    filters.brands.length +
+    (filters.minPrice !== undefined || filters.maxPrice !== undefined ? 1 : 0) +
+    (filters.onSale ? 1 : 0)
+  )
+}
+
 export function applyFiltersInMemory<
   T extends { brand?: string | null; price: number; name: string; compareAtPrice?: number | null },
 >(docs: T[], filters: ParsedProductFilters): T[] {

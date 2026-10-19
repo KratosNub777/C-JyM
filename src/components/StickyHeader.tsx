@@ -39,10 +39,10 @@ export function StickyHeader({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="[--header-strip:0rem] [--header-main:6rem] [--header-nav:3rem] sm:[--header-strip:1.75rem]">
+    <div className="[--header-strip:0rem] [--header-main:4rem] [--header-logo:3rem] [--header-search:3.625rem] [--header-nav:3rem] sm:[--header-strip:1.75rem] sm:[--header-main:6rem] sm:[--header-logo:5rem] sm:[--header-search:0rem]">
       <div
         aria-hidden="true"
-        className="h-[calc(var(--header-strip)+var(--header-main)+var(--header-nav)+1px)]"
+        className="h-[calc(var(--header-strip)+var(--header-main)+var(--header-search)+var(--header-nav)+1px)]"
       />
       <header
         data-compact={compact}

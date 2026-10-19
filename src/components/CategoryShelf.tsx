@@ -39,7 +39,7 @@ export function CategoryShelf({
             <Link
               key={sub.id}
               href={`/categorias/${sub.slug}`}
-              className="text-sm text-neutral-500 transition-colors hover:text-brand-600 dark:text-neutral-400"
+              className="text-sm text-neutral-600 transition-colors hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400"
             >
               {sub.name}
             </Link>

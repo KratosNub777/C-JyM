@@ -1,6 +1,6 @@
 'use client'
 
-import { CaretDown, CaretRight, GridFour, List, MagnifyingGlass, X } from '@phosphor-icons/react'
+import { CaretDown, CaretRight, GridFour, List, X } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
@@ -121,7 +121,7 @@ export function HeaderNav({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-neutral-400 dark:text-neutral-500">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     Sin subcategorías todavía.
                   </p>
                 )}
@@ -143,23 +143,6 @@ export function HeaderNav({
 
       {mobileOpen && (
         <div className="absolute inset-x-0 top-full z-50 max-h-[70vh] overflow-y-auto border-b border-neutral-200 bg-white px-4 py-4 shadow-lg md:hidden dark:border-neutral-800 dark:bg-neutral-900">
-          <form action="/buscar" method="get" className="mb-4 sm:hidden">
-            <div className="relative w-full">
-              <input
-                type="search"
-                name="q"
-                placeholder="Buscar productos..."
-                className="w-full rounded-full border border-neutral-300 bg-white py-2 pl-4 pr-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-brand-600 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-              <button
-                type="submit"
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 dark:text-neutral-400"
-                aria-label="Buscar"
-              >
-                <MagnifyingGlass size={18} weight="bold" />
-              </button>
-            </div>
-          </form>
           <div className="flex flex-col gap-1">
             {topLevelCategories.map((category) => {
               const Icon = ICONS_BY_SLUG[category.slug]
@@ -180,7 +163,7 @@ export function HeaderNav({
                       <button
                         type="button"
                         onClick={() => setExpandedMobileId(isExpanded ? null : category.id)}
-                        className="p-2 text-neutral-500 dark:text-neutral-400"
+                        className="p-2 text-neutral-600 dark:text-neutral-300"
                         aria-label={`Ver subcategorías de ${category.name}`}
                         aria-expanded={isExpanded}
                       >
@@ -195,7 +178,7 @@ export function HeaderNav({
                           key={child.id}
                           href={`/categorias/${child.slug}`}
                           onClick={() => setMobileOpen(false)}
-                          className="rounded-md px-2 py-1.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                          className="rounded-md px-2 py-1.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                         >
                           {child.name}
                         </Link>

@@ -31,7 +31,7 @@ export function ValuePropStrip() {
           <Icon size={22} weight="regular" className="mt-0.5 shrink-0 text-brand-600" />
           <div>
             <p className="font-medium text-neutral-900 dark:text-neutral-100">{title}</p>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">{body}</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">{body}</p>
           </div>
         </div>
       ))}
