@@ -10,16 +10,18 @@
 - **Camino a publicar:** migraciones de producción y guía listas (`docs/despliegue.md`). Imágenes en **Cloudflare R2** funcionando en staging (foto subida y servida; `next/image` OK). Staging (`cjym-staging.vercel.app`) ya tiene el catálogo demo cargado (16 categorías, 23 productos) y el sitemap nuevo verificado (42 URLs); falta SMTP, correr `meilisearch:sync` y la importación masiva.
 - **Calidad (2026-10-04):** tsc OK, lint 0 errores/0 warnings, 128 Vitest en 27 archivos, 16 e2e y build OK. `npm audit`: 0 críticas.
 - **Diseño de pagos:** propuesta en `docs/pagos-diseno.md` (Bancard vs Pagopar), aún sin decidir.
-- **Rama activa:** `docs/una-rama-por-sesion` (sale de `origin/main`). Ramas viejas ya fusionadas borradas; queda solo `codex/reservation-expiration-backup` (3 commits sin fusionar, respaldo del vencimiento de reservas).
+- **Rama activa:** `feat/demo-cliente` (sale de `origin/main`): deja el frontend listo para la demo al cliente; plan en `~/.claude/plans/quiero-que-analices-en-wild-rain.md`. Queda solo `codex/reservation-expiration-backup` (3 commits del 28/09 sin fusionar, respaldo del vencimiento de reservas, ya hecho en `main`).
+- **Demo al cliente, falta:** WhatsApp y dirección reales (hoy `wa.me/595000000000` y «Dirección próximamente» en el footer), las 5 páginas del footer (`/contacto`, `/quienes-somos`, `/garantia`, `/terminos`, `/privacidad` dan 404), botón flotante de WhatsApp, ficha con breadcrumb/relacionados/consulta por WhatsApp, fotos reales de productos. Rutas inexistentes de categoría/producto responden 200 (soft 404 por `loading.tsx`).
 
 ## Trabajo sin commitear
 
-Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la carpeta `C-JyM-movil/` sin rastrear, ajenos a este cambio).
+Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` con solo cambios de fin de línea y la carpeta `C-JyM-movil/`, un worktree huérfano sin rastrear, ajenos a este cambio).
 
 ## Últimos cambios (más nuevo arriba)
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-10-19 | feat/demo-cliente | Demo: la ficha solo muestra productos activos (`lib/products.ts` + test `product-by-slug`; antes un borrador era visible por URL); portada con subcategorías ordenadas por cantidad real (9 tarjetas) y contadores sin tope de 200 (`getCachedHomeData` suma `productCounts`), estantes de máx. 12 productos; copy alineado con el checkout («Retiro en el local», «Opciones de cuotas» en vez de «sin interés»); `ProductImagePlaceholder` (logo atenuado) en vez de «Sin imagen»; `icon.png`/`apple-icon.png` desde el emblema del logo; `(frontend)/error.tsx` (en este Next el prop es `retry`, no `reset`). |
 | 2026-10-19 | fix/vercel-ignore-command | Vercel: `ignoreCommand` en `vercel.json` salta los builds de cualquier rama que no sea `main` (exit 0 si `VERCEL_GIT_COMMIT_REF` no es `main`); solo `main` despliega a producción. La primera versión usaba `VERCEL_ENV`, que en ese paso no vale `production`: canceló el build del merge de la PR #9 en `main`. |
 | 2026-10-19 | docs/una-rama-por-sesion | La portada (`Hero.tsx`, ahora cliente) es un carrusel con flechas laterales y puntos; 3 slides fijos en código con fotos de ejemplo (sin autoplay) — reemplazar por los flyers reales (idealmente una colección de Payload). Verificado en escritorio y móvil. |
 | 2026-10-19 | docs/una-rama-por-sesion | Regla «una rama nueva por cada sesión nueva» en `CLAUDE.md` y en las reglas de este archivo; 16 ramas locales ya fusionadas borradas. |
@@ -37,8 +39,6 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` modificado y la
 | 2026-10-02 | fix/productos-api-solo-activos | La API REST/GraphQL de `products` solo muestra productos activos a visitantes (`collections/Products.ts` + test); staging `cjym-staging.vercel.app` desplegado y primer admin creado; faltan R2 (imágenes), SMTP y cargar productos. |
 | 2026-10-02 | feat/migraciones-y-despliegue | Meilisearch fijado en v1.42.1 (`docker-compose.yml`, `docs/meilisearch.md`); probado sync, huérfanos, clave acotada y búsqueda. Base de staging en Neon creada y migrada (`db:setup`); en la guía paso a paso falta Railway/Vercel. |
 | 2026-10-01 | feat/migraciones-y-despliegue | Migración inicial de Payload (`migrations/*_initial.ts`), comandos `npm run db:*`, guía `docs/despliegue.md`; se quita el SQL `002`. Probada en Postgres 16 vacío (esquema = dev). |
-| 2026-09-30 | main | HTTPS forzado: `lib/security/{https,headers}.ts` (HSTS, `BETTER_AUTH_URL` https obligatoria en producción), cookie del admin Secure, orígenes solo https. |
-| 2026-09-30 | main | Registro: confirmar contraseña, verificación de email por código SMTP, recuperación de contraseña; reemplazo de cuentas sin verificar (`customerAuth/auth.ts`, `docs/fase-2-autenticacion.md`). |
 
 ## Pendientes (por prioridad)
 

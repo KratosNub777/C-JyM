@@ -10,7 +10,8 @@ const getCachedProductBySlug = unstable_cache(
 
     const { docs } = await payload.find({
       collection: 'products',
-      where: { slug: { equals: slug } },
+      // La Local API salta el control de acceso: sin este filtro un borrador sería visible por su URL.
+      where: { and: [{ slug: { equals: slug } }, { status: { equals: 'active' } }] },
       limit: 1,
     })
 
