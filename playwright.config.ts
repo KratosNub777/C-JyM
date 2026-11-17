@@ -11,6 +11,8 @@ import 'dotenv/config'
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  // shortcut: /checkout redirige al carrito (venta por WhatsApp); reactivar junto con la ruta en next.config.ts.
+  testIgnore: ['**/checkout.e2e.spec.ts'],
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
