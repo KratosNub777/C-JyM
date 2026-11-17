@@ -20,12 +20,12 @@ import React from 'react'
 
 import { HeaderNav } from '@/components/HeaderNav'
 import { StickyHeader } from '@/components/StickyHeader'
-import { UserMenu } from '@/components/UserMenu'
 import { CartLink } from '@/components/cart/CartLink'
 import { CartFeedback } from '@/components/cart/CartFeedback'
 import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
+import { whatsappUrl } from '@/lib/whatsapp'
 import './styles.css'
 
 const siteDescription = 'Catálogo de electrodomésticos para tu hogar.'
@@ -127,8 +127,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             </form>
 
             <div className="ml-auto flex items-center gap-1 sm:ml-0">
-              <UserMenu />
-
               <CartLink />
             </div>
           </div>
@@ -175,6 +173,16 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         </StickyHeader>
         <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
         <CartFeedback />
+        <a
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Escribinos por WhatsApp"
+          title="Escribinos por WhatsApp"
+          className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-colors hover:bg-brand-700 sm:right-6"
+        >
+          <WhatsappLogo size={30} weight="fill" />
+        </a>
         <footer className="mt-16 bg-ink-700 text-white">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
@@ -188,7 +196,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 />
                 <div className="mt-4 flex items-center gap-3">
                   <a
-                    href="https://wa.me/595000000000"
+                    href={whatsappUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp de Comercial José María"
@@ -278,15 +286,19 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               </div>
 
               <div className="shrink-0">
-                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-[13px] text-white/80">
-                  <ShieldCheck size={20} weight="regular" className="shrink-0 text-white/70" />
-                  {/* TODO(owner): reemplazar por el badge real de la pasarela de pago (Fase 3) */}
+                <a
+                  href={whatsappUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-[13px] text-white/80 transition-colors hover:bg-white/15"
+                >
+                  <WhatsappLogo size={20} weight="regular" className="shrink-0 text-white/70" />
                   <span>
-                    Compra segura
+                    Pedidos y consultas
                     <br />
-                    Próximamente pago online
+                    +595 981 339654
                   </span>
-                </div>
+                </a>
               </div>
             </div>
 
