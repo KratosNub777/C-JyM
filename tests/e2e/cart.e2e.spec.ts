@@ -45,6 +45,13 @@ test('cart works from cards and product pages, persists and synchronizes tabs', 
     CART_STORAGE_KEY,
   )
   expect(saved).toEqual({ version: 1, items: [{ productId: product.id, quantity: 2 }] })
+  const whatsapp = new URL(
+    (await page
+      .getByRole('link', { name: 'Enviar pedido por WhatsApp', exact: true })
+      .getAttribute('href'))!,
+  )
+  expect(`${whatsapp.origin}${whatsapp.pathname}`).toBe('https://wa.me/595981339654')
+  expect(whatsapp.searchParams.get('text')).toContain(`- 2 × ${product.name}:`)
 
   const second = await context.newPage()
   await second.goto(`${base}/carrito`)

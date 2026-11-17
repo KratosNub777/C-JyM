@@ -1,12 +1,20 @@
 'use client'
 
-import { ImageSquare, Minus, Plus, ShoppingCart, Trash } from '@phosphor-icons/react'
+import {
+  ImageSquare,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Trash,
+  WhatsappLogo,
+} from '@phosphor-icons/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { fetchCartProducts, quantityLimit, type CartProduct } from '@/lib/cart/model'
 import { clearCart, removeFromCart, setCartQuantity, useCart } from '@/lib/cart/store'
 import { formatGs } from '@/lib/format'
+import { cartOrderText, whatsappUrl } from '@/lib/whatsapp'
 
 export function CartContents() {
   const { items, ready, persistent } = useCart()
@@ -280,15 +288,27 @@ export function CartContents() {
                 </p>
               )}
               <p className="mt-5 border-t border-neutral-200 pt-5 text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-                Confirmá tu pedido con retiro en el local. Quedará pendiente de pago.
+                Enviá tu pedido por WhatsApp y te confirmamos stock, forma de pago y retiro.
               </p>
               {!hasUnavailable && (
-                <Link
-                  href="/checkout"
-                  className="mt-5 flex justify-center rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+                <a
+                  href={whatsappUrl(
+                    cartOrderText(
+                      items.flatMap((item) => {
+                        const product = products.get(item.productId)
+                        return product
+                          ? [{ name: product.name, quantity: item.quantity, price: product.price }]
+                          : []
+                      }),
+                    ),
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 flex items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
                 >
-                  Continuar al checkout
-                </Link>
+                  <WhatsappLogo size={20} weight="fill" />
+                  Enviar pedido por WhatsApp
+                </a>
               )}
               <p className="mt-4 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
                 Guardar productos en el carrito no reserva el stock. Los precios y la disponibilidad
