@@ -1,5 +1,7 @@
 # Checkout con retiro en el local
 
+> **Desactivado (2026-11):** sin venta en línea (la empresa no puede emitir factura electrónica). `/checkout` redirige a `/carrito` (`next.config.ts`) y el carrito envía el pedido por WhatsApp (`src/lib/whatsapp.ts`). El código y sus tests de integración siguen; el E2E `checkout.e2e.spec.ts` está excluido en `playwright.config.ts`. Para reactivarlo, quitar ambos.
+
 Segunda parte de la Fase 3. Desde `/carrito`, el cliente inicia sesión y confirma un pedido en `/checkout`. El carrito se conserva al ingresar o registrarse. Se admite únicamente retiro en el local, sin costo de entrega ni cobro online; el pedido queda `pending_payment`.
 
 ## Pedido y stock

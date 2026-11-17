@@ -3,8 +3,8 @@ import { CreditCard, Headset, ShieldCheck, Storefront } from '@phosphor-icons/re
 const items = [
   {
     icon: Storefront,
-    title: 'Retiro en el local',
-    body: 'Reservá online y retirá tu compra.',
+    title: 'Pedí por WhatsApp',
+    body: 'Armá tu carrito y coordinamos el pago y el retiro.',
   },
   {
     icon: ShieldCheck,

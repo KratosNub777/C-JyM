@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return securityHeaderRules()
   },
+  // Sin venta en línea (la empresa no puede emitir factura electrónica): los pedidos se cierran
+  // por WhatsApp desde el carrito, así que nadie debe crear pedidos que reserven stock.
+  async redirects() {
+    return [{ source: '/checkout', destination: '/carrito', permanent: false }]
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

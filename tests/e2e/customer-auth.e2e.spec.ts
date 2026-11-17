@@ -40,7 +40,6 @@ async function register(page: Page, userEmail: string, name: string) {
   await fillRegistration(page, { name, email: userEmail, password })
   await submitVerificationCode(page, userEmail)
   await expect(page).toHaveURL(`${base}/cuenta`)
-  await expect(page.getByRole('button', { name: 'Menú de mi cuenta' })).toBeVisible()
 }
 
 async function addAddress(page: Page, name: string) {
@@ -272,7 +271,8 @@ test('customer lifecycle, address isolation, default switch and protected routes
   await expect(home).toHaveCount(0)
   await page.reload()
   await expect(page.getByRole('region', { name: 'Dirección de Oficina E2E' })).toBeVisible()
-  await page.getByRole('button', { name: 'Menú de mi cuenta' }).click()
+  // El header ya no tiene menú de cuenta (cuentas ocultas): se cierra sesión desde /cuenta.
+  await page.goto(`${base}/cuenta`)
   await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click()
   await expect(page).toHaveURL(`${base}/ingresar`)
   await page.goto(`${base}/cuenta`)

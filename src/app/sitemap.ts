@@ -8,6 +8,9 @@ import { getSiteUrl } from '@/lib/site'
 // literal para que Next lo analice al compilar. Una hora alcanza para los buscadores.
 export const revalidate = 3600
 
+// Páginas institucionales y legales enlazadas desde el footer.
+const INFO_PAGES = ['/quienes-somos', '/contacto', '/garantia', '/terminos', '/privacidad']
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl()
   const payload = await getPayloadClient()
@@ -30,6 +33,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: siteUrl, changeFrequency: 'daily', priority: 1 },
     { url: `${siteUrl}/productos`, changeFrequency: 'daily', priority: 0.8 },
     { url: `${siteUrl}/ofertas`, changeFrequency: 'daily', priority: 0.8 },
+    ...INFO_PAGES.map((path) => ({
+      url: `${siteUrl}${path}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.3,
+    })),
     ...categories.map((category) => ({
       url: `${siteUrl}/categorias/${category.slug}`,
       lastModified: category.updatedAt,
