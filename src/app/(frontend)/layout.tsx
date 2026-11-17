@@ -25,6 +25,7 @@ import { CartFeedback } from '@/components/cart/CartFeedback'
 import { buildCategoryTree } from '@/lib/categories'
 import { getPayloadClient } from '@/lib/payload'
 import { getSiteUrl } from '@/lib/site'
+import { BUSINESS_ADDRESS, BUSINESS_EMAIL, BUSINESS_PHONE, MAPS_URL } from '@/lib/contact'
 import { whatsappUrl } from '@/lib/whatsapp'
 import './styles.css'
 
@@ -276,11 +277,22 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                       {/* TODO(owner): confirmar política real de entregas */}
                       Entregas próximamente
                     </div>
-                    <div className="flex items-start gap-2">
+                    <a
+                      href={MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-2 transition-colors hover:text-white"
+                    >
                       <MapPin size={16} weight="regular" className="mt-0.5 shrink-0 text-white/70" />
-                      {/* TODO(owner): reemplazar con la dirección real del local */}
-                      Dirección próximamente
-                    </div>
+                      {BUSINESS_ADDRESS}
+                    </a>
+                    <a
+                      href={`mailto:${BUSINESS_EMAIL}`}
+                      className="flex items-center gap-2 break-all transition-colors hover:text-white"
+                    >
+                      <EnvelopeSimple size={16} weight="regular" className="shrink-0 text-white/70" />
+                      {BUSINESS_EMAIL}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -296,17 +308,22 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                   <span>
                     Pedidos y consultas
                     <br />
-                    +595 981 339654
+                    {BUSINESS_PHONE}
                   </span>
                 </a>
               </div>
             </div>
 
             <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] text-white/80 w-fit">
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] text-white/80 transition-colors hover:bg-white/15"
+              >
                 <MapPin size={14} weight="regular" className="shrink-0 text-white/70" />
-                Dirección próximamente, Paraguay
-              </div>
+                {BUSINESS_ADDRESS}
+              </a>
               <p className="text-[13px] text-white/80">
                 © {new Date().getFullYear()} Comercial José María. Catálogo de productos.
               </p>
