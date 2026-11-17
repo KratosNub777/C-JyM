@@ -29,6 +29,24 @@ test.describe('Frontend', () => {
     await expect(page.getByRole('button', { name: /Filtros/ })).toContainText('2')
   })
 
+  test('every footer link opens a real page', async ({ page }) => {
+    const pages = [
+      ['Nosotros', 'Quiénes somos'],
+      ['Contacto', 'Contacto'],
+      ['Garantía y devoluciones', 'Garantía y devoluciones'],
+      ['Términos y condiciones', 'Términos y condiciones'],
+      ['Políticas de privacidad', 'Políticas de privacidad'],
+    ]
+    for (const [link, heading] of pages) {
+      await page.goto('http://localhost:3000')
+      await page.getByRole('contentinfo').getByRole('link', { name: link, exact: true }).click()
+      await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible()
+    }
+    await expect(
+      page.getByRole('contentinfo').getByRole('link', { name: 'comercialjosemaria08@gmail.com' }),
+    ).toHaveAttribute('href', 'mailto:comercialjosemaria08@gmail.com')
+  })
+
   test('desktop: filters stay visible without the toggle', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('http://localhost:3000/productos')
