@@ -11,7 +11,7 @@
 - **Calidad (2026-10-04):** tsc OK, lint 0 errores/0 warnings, 128 Vitest en 27 archivos, 16 e2e y build OK. `npm audit`: 0 críticas.
 - **Diseño de pagos:** en pausa (`docs/pagos-diseno.md`).
 - **Rama activa:** `feat/pedidos-whatsapp` (sale de `origin/main`). Queda `codex/reservation-expiration-backup` (respaldo viejo, ya hecho en `main`).
-- **Demo al cliente, falta:** dirección real (hoy «Dirección próximamente» en el footer), las 5 páginas del footer (`/contacto`, `/quienes-somos`, `/garantia`, `/terminos`, `/privacidad` dan 404), ficha con breadcrumb/relacionados, fotos reales de productos. Rutas inexistentes de categoría/producto responden 200 (soft 404 por `loading.tsx`).
+- **Demo al cliente, falta:** fotos reales e importación de productos (las carga el usuario), ficha con breadcrumb/relacionados, política real de entregas (footer: «Entregas próximamente») y confirmar con la empresa los textos de `/garantia` y `/quienes-somos` (marcados con `TODO(owner)`). Rutas inexistentes de categoría/producto responden 200 (soft 404 por `loading.tsx`).
 
 ## Trabajo sin commitear
 
@@ -21,6 +21,7 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` con solo cambio
 
 | Fecha | Rama | Cambio |
 |---|---|---|
+| 2026-11-17 | feat/pedidos-whatsapp | Páginas del footer: `/quienes-somos`, `/contacto`, `/garantia`, `/terminos`, `/privacidad` (contenedor `components/InfoPage.tsx`), en el sitemap (+ test) y un e2e que recorre los links del footer. Dirección real (JFV5+W98, San Lorenzo, con link a Google Maps) y email en el footer, desde `lib/contact.ts`. |
 | 2026-11-17 | feat/pedidos-whatsapp | Venta por WhatsApp: `lib/whatsapp.ts` (número real, `whatsappUrl`, `cartOrderText`, `productInquiryText` + test `whatsapp.int`); el carrito cambia «Continuar al checkout» por «Enviar pedido por WhatsApp» con productos y total; ficha con «Consultar por WhatsApp»; botón flotante y footer con el número real; sin `UserMenu` en el header; `/checkout` → `/carrito` en `next.config.ts`; `checkout.e2e` excluido en `playwright.config.ts`; copy de `ValuePropStrip`. |
 | 2026-10-19 | feat/demo-cliente | Demo: la ficha solo muestra productos activos (`lib/products.ts` + test `product-by-slug`; antes un borrador era visible por URL); portada con subcategorías ordenadas por cantidad real (9 tarjetas) y contadores sin tope de 200 (`getCachedHomeData` suma `productCounts`), estantes de máx. 12 productos; copy alineado con el checkout («Retiro en el local», «Opciones de cuotas» en vez de «sin interés»); `ProductImagePlaceholder` (logo atenuado) en vez de «Sin imagen»; `icon.png`/`apple-icon.png` desde el emblema del logo; `(frontend)/error.tsx` (en este Next el prop es `retry`, no `reset`). |
 | 2026-10-19 | fix/vercel-ignore-command | Vercel: `ignoreCommand` en `vercel.json` salta los builds de cualquier rama que no sea `main` (exit 0 si `VERCEL_GIT_COMMIT_REF` no es `main`); solo `main` despliega a producción. La primera versión usaba `VERCEL_ENV`, que en ese paso no vale `production`: canceló el build del merge de la PR #9 en `main`. |
@@ -38,7 +39,6 @@ Ninguno de esta rama (en el árbol hay un `src/payload-types.ts` con solo cambio
 | 2026-10-02 | feat/datos-demo | `npm run seed:demo` (`scripts/seed-demo.ts`, `lib/demoCatalog.ts`, `scripts/data/demo-catalog.json`): carga 16 categorías y 23 productos de ejemplo; exige `--yes`, se niega si el catálogo no está vacío. Probado en una base local vacía + build y portada. Se corrige un dato del demo (descuento al revés del secador de pelo). |
 | 2026-10-02 | feat/almacenamiento-r2 | Imágenes en R2: `lib/storage/r2.ts` + `s3Storage` en `payload.config.ts`, patrón de `next/image`, migración `media_prefix`, variables `R2_*` en `.env.example` y sección 2.1 de `docs/despliegue.md`. Probado contra un S3 local (subida, URL pública, borrado, rechazo de no-imágenes, nombres repetidos no se pisan). Tipos regenerados y `vitest.global-setup.ts` evita que la primera corrida tras cambiar columnas falle (42701). |
 | 2026-10-02 | fix/productos-api-solo-activos | La API REST/GraphQL de `products` solo muestra productos activos a visitantes (`collections/Products.ts` + test); staging `cjym-staging.vercel.app` desplegado y primer admin creado; faltan R2 (imágenes), SMTP y cargar productos. |
-| 2026-10-02 | feat/migraciones-y-despliegue | Meilisearch fijado en v1.42.1 (`docker-compose.yml`, `docs/meilisearch.md`); probado sync, huérfanos, clave acotada y búsqueda. Base de staging en Neon creada y migrada (`db:setup`); en la guía paso a paso falta Railway/Vercel. |
 
 ## Pendientes (por prioridad)
 

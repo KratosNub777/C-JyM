@@ -30,6 +30,11 @@ describe('sitemap', () => {
       'https://tienda.example',
       'https://tienda.example/productos',
       'https://tienda.example/ofertas',
+      'https://tienda.example/quienes-somos',
+      'https://tienda.example/contacto',
+      'https://tienda.example/garantia',
+      'https://tienda.example/terminos',
+      'https://tienda.example/privacidad',
       'https://tienda.example/categorias/heladeras',
       'https://tienda.example/productos/heladera-a',
     ])
