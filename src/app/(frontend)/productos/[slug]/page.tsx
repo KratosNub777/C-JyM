@@ -9,6 +9,9 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getProductBySlug } from '@/lib/products'
+import { getSiteUrl } from '@/lib/site'
+import { productInquiryText, whatsappUrl } from '@/lib/whatsapp'
+import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr'
 
 // Debe ser un literal estático (analizable en build time) — no se puede
 // importar CATALOG_REVALIDATE_SECONDS acá; mantener en sync manualmente.
@@ -147,6 +150,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           stock={product.stock}
           active={product.status === 'active'}
         />
+
+        <a
+          href={whatsappUrl(
+            productInquiryText(product.name, product.sku, `${getSiteUrl()}/productos/${product.slug}`),
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 rounded-full border border-brand-600 px-5 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-white/5"
+        >
+          <WhatsappLogo size={20} weight="fill" />
+          Consultar por WhatsApp
+        </a>
 
         {product.description && (
           <div className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">
