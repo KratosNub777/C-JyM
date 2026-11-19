@@ -10,6 +10,7 @@ import type { Category, Media } from '@/payload-types'
 import { formatGs } from '@/lib/format'
 import { getProductBySlug } from '@/lib/products'
 import { getSiteUrl } from '@/lib/site'
+import { productJsonLd, serializeJsonLd } from '@/lib/structuredData'
 import { productInquiryText, whatsappUrl } from '@/lib/whatsapp'
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr'
 
@@ -36,6 +37,7 @@ export async function generateMetadata({
   return {
     title: product.name,
     description,
+    alternates: { canonical: `/productos/${product.slug}` },
     openGraph: {
       title: product.name,
       description,
@@ -61,6 +63,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(productJsonLd(product, getSiteUrl())) }}
+      />
       <div className="flex flex-col gap-3">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
           {images[0]?.url ? (
