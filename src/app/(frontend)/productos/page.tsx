@@ -4,12 +4,21 @@ import type { Where } from 'payload'
 import { FilterBar } from '@/components/FilterBar'
 import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
+import { canonicalPath } from '@/lib/structuredData'
 import { mergeWhere, parseProductFilters, sortToPayload, type RawSearchParams } from '@/lib/productFilters'
 import { getCachedProducts, getDistinctBrands, getOnSaleCount, getPriceBounds } from '@/lib/productQueries'
 
-export const metadata: Metadata = {
-  title: 'Productos',
-  description: 'Todo el catálogo de electrodomésticos de Comercial José María.',
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}): Promise<Metadata> {
+  const page = Number((await searchParams).page) || 1
+  return {
+    title: 'Productos',
+    description: 'Todo el catálogo de electrodomésticos de Comercial José María.',
+    alternates: { canonical: canonicalPath('/productos', page) },
+  }
 }
 
 const PAGE_SIZE = 24

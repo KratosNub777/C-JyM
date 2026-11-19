@@ -6,6 +6,7 @@ import { FilterBar } from '@/components/FilterBar'
 import { Pagination } from '@/components/Pagination'
 import { ProductCard } from '@/components/ProductCard'
 import { getCachedCategoryBySlug, getCachedChildCategories } from '@/lib/categoryQueries'
+import { canonicalPath } from '@/lib/structuredData'
 import { mergeWhere, parseProductFilters, sortToPayload, type RawSearchParams } from '@/lib/productFilters'
 import { getCachedProducts, getDistinctBrands, getOnSaleCount, getPriceBounds } from '@/lib/productQueries'
 
@@ -13,10 +14,13 @@ const PAGE_SIZE = 24
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ page?: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  const page = Number((await searchParams).page) || 1
   const category = await getCachedCategoryBySlug(slug)
 
   if (!category) {
@@ -26,6 +30,7 @@ export async function generateMetadata({
   return {
     title: category.name,
     description: `Productos de ${category.name} en Comercial José María.`,
+    alternates: { canonical: canonicalPath(`/categorias/${category.slug}`, page) },
   }
 }
 
