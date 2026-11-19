@@ -1,10 +1,16 @@
+import type { Metadata } from 'next'
+
 import { CategoryBentoGrid } from '@/components/CategoryBentoGrid'
 import { CategoryShelf } from '@/components/CategoryShelf'
 import { Hero } from '@/components/Hero'
 import { ValuePropStrip } from '@/components/ValuePropStrip'
 import { buildCategoryTree, getParentId } from '@/lib/categories'
 import { getCachedHomeData } from '@/lib/categoryQueries'
+import { getSiteUrl } from '@/lib/site'
+import { serializeJsonLd, storeJsonLd } from '@/lib/structuredData'
 import type { Product } from '@/payload-types'
+
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 // Debe ser un literal estático (analizable en build time) — no se puede
 // importar CATALOG_REVALIDATE_SECONDS acá; mantener en sync manualmente.
@@ -61,6 +67,10 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(storeJsonLd(getSiteUrl())) }}
+      />
       <Hero />
 
       {categoriesWithCount.length > 0 && (
